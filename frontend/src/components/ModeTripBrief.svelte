@@ -1,4 +1,5 @@
 <script>
+  import { onMount } from 'svelte';
   import { requestTripBrief } from '../lib/api.js';
 
   let { onOpenDoc = () => {} } = $props();
@@ -11,47 +12,53 @@
   let errorMsg = $state('');
   let result = $state(null);
   let copySuccess = $state(false);
+  let activePresetIdx = $state(0);
 
   const PRESETS = [
     {
-      label: '⚠️ Periode Nyepi 2026 (Ubud & Bandara)',
+      label: '01 · Periode Nyepi 2026 (Ubud & Bandara)',
       text: 'Tiba di Bandara Ngurah Rai, menginap di Ubud tanggal 18 Maret 2026 sampai 21 Maret 2026. Berencana jalan-jalan ke Pura Saraswati dan sewa motor di jalan raya. Kode booking: GA4521 email: alex@travel.com.',
       start: '2026-03-18',
       end: '2026-03-21',
       origin: 'international'
     },
     {
-      label: '🏖️ Wisata Budaya & Pura (Kuta & Besakih)',
-      text: 'Mengunjungi Pura Besakih dan Pura Uluwatu, menonton Tari Kecak, belanja suvenir di Sukawati dan nongkrong di beach club Seminyak.',
+      label: '02 · Kunjungan Pura & Kawasan Suci (Besakih)',
+      text: 'Mengunjungi Pura Besakih dan Pura Uluwatu, menonton Tari Kecak, belanja suvenir di Sukawati dan makan malam di Seminyak.',
       start: '2026-05-10',
       end: '2026-05-15',
       origin: 'international'
     },
     {
-      label: '🛵 Sewa Motor & Villa Canggu',
-      text: 'Sewa skuter matik untuk mobilitas Canggu - Seminyak, bekerja remote dari cafe, dan surf trip ke Pantai Echo.',
+      label: '03 · Sewa Kendaraan & Remote Work (Canggu)',
+      text: 'Sewa sepeda motor untuk mobilitas Canggu - Seminyak, bekerja dari kafe, dan kunjungan ke pantai.',
       start: '2026-06-01',
       end: '2026-06-08',
       origin: 'international'
     }
   ];
 
-  function applyPreset(p) {
+  onMount(() => {
+    applyPreset(PRESETS[0], 0, true);
+  });
+
+  function applyPreset(p, idx, autoRun = false) {
+    activePresetIdx = idx;
     itineraryText = p.text;
     startDate = p.start;
     endDate = p.end;
     travelerOrigin = p.origin;
+    if (autoRun) handleSubmit();
   }
 
   async function handleSubmit(e) {
     if (e) e.preventDefault();
     if (!itineraryText.trim() || !startDate) {
-      errorMsg = 'Harap masukkan itinerary dan tanggal perjalanan.';
+      errorMsg = 'Masukkan rencana perjalanan dan tanggal keberangkatan.';
       return;
     }
     loading = true;
     errorMsg = '';
-    result = null;
 
     try {
       result = await requestTripBrief({
@@ -61,7 +68,7 @@
         traveler_origin: travelerOrigin
       });
     } catch (err) {
-      errorMsg = err.message || 'Gagal memproses itinerary.';
+      errorMsg = err.message || 'Gagal memproses rencana perjalanan.';
     } finally {
       loading = false;
     }
@@ -85,274 +92,295 @@
     try {
       await navigator.clipboard.writeText(result.whatsapp_text);
       copySuccess = true;
-      setTimeout(() => copySuccess = false, 2500);
+      setTimeout(() => (copySuccess = false), 2500);
     } catch (e) {
       console.error(e);
     }
   }
 </script>
 
-<div class="space-y-6">
-  <!-- Input Form Card -->
-  <div class="bg-white rounded-xl border border-borderline p-5 sm:p-6 shadow-sm">
-    <div class="flex items-center justify-between pb-4 border-b border-borderline">
-      <div>
-        <h2 class="text-lg font-bold text-ink-900">Input Rencana Perjalanan (Trip Brief)</h2>
-        <p class="text-xs text-ink-500 mt-0.5">Analisis aturan adat, bentrok hari raya Nyepi, dan kewajiban hukum Bali.</p>
-      </div>
-      <span class="text-xs font-mono bg-azure-50 text-azure-700 border border-azure-100 px-2.5 py-1 rounded-md">
-        Mode Pencegahan
-      </span>
-    </div>
+<div class="mx-auto" style="max-width: 1360px; width: 100%; border-left: 1px solid #cdc9be; border-right: 1px solid #cdc9be; background-color: #e6e4de; color: #0a0a0a; overflow: hidden;">
+  <div>
 
-    <!-- Presets -->
-    <div class="mt-4">
-      <span class="text-xs font-medium text-ink-500 block mb-2">Preset Simulasi Pengujian:</span>
-      <div class="flex flex-wrap gap-2">
-        {#each PRESETS as preset}
-          <button
-            type="button"
-            onclick={() => applyPreset(preset)}
-            class="text-xs px-3 py-1.5 rounded-lg bg-canvas hover:bg-black/5 border border-borderline text-ink-700 transition-colors font-medium text-left"
-          >
-            {preset.label}
-          </button>
-        {/each}
-      </div>
-    </div>
+    <!-- Atmospheric Opero Banner + Preset Selector -->
+    <div class="p-3 sm:p-4" style="border-bottom: 1px solid #cdc9be;">
+      <div
+        class="relative overflow-hidden p-6 sm:p-8 flex flex-col md:flex-row md:items-end justify-between gap-6"
+        style="background-color: #091e8a; color: #ffffff; border: 1.5px solid #0a0a0a; box-shadow: 4px 4px 0px #0a0a0a;"
+      >
+        <img
+          src="/assets/opero_bali_hero.jpg"
+          alt="Pointillist Bali Sky"
+          class="absolute inset-0 w-full h-full object-cover opacity-35 pointer-events-none"
+          style="object-position: center 20%;"
+        />
+        <div
+          class="absolute inset-0 pointer-events-none"
+          style="background: linear-gradient(90deg, rgba(8, 24, 115, 0.94) 0%, rgba(8, 24, 115, 0.72) 60%, rgba(8, 24, 115, 0.55) 100%);"
+        ></div>
 
-    <form onsubmit={handleSubmit} class="mt-4 space-y-4">
-      <div>
-        <label for="itinerary" class="block text-xs font-semibold text-ink-700 uppercase tracking-wider mb-1.5">
-          Rencana Rute / Catatan Booking / Aktivitas
-        </label>
-        <textarea
-          id="itinerary"
-          bind:value={itineraryText}
-          rows="3"
-          placeholder="Contoh: Menginap di Ubud, jalan-jalan ke Pura Uluwatu, sewa motor di Denpasar... (Data nama, email, dan kode booking disamarkan otomatis oleh sistem)."
-          class="w-full px-3.5 py-2.5 text-sm rounded-lg border border-borderline focus:outline-none focus:ring-2 focus:ring-ink-900 focus:border-transparent font-sans"
-        ></textarea>
-      </div>
-
-      <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
-        <div>
-          <label for="start-date" class="block text-xs font-semibold text-ink-700 uppercase tracking-wider mb-1">
-            Tanggal Tiba / Mulai
-          </label>
-          <input
-            id="start-date"
-            type="date"
-            bind:value={startDate}
-            class="w-full px-3 py-2 text-sm rounded-lg border border-borderline focus:outline-none focus:ring-2 focus:ring-ink-900 bg-white"
-          />
-        </div>
-
-        <div>
-          <label for="end-date" class="block text-xs font-semibold text-ink-700 uppercase tracking-wider mb-1">
-            Tanggal Selesai
-          </label>
-          <input
-            id="end-date"
-            type="date"
-            bind:value={endDate}
-            class="w-full px-3 py-2 text-sm rounded-lg border border-borderline focus:outline-none focus:ring-2 focus:ring-ink-900 bg-white"
-          />
-        </div>
-
-        <div>
-          <label for="traveler-origin" class="block text-xs font-semibold text-ink-700 uppercase tracking-wider mb-1">
-            Status Wisatawan
-          </label>
-          <select
-            id="traveler-origin"
-            bind:value={travelerOrigin}
-            class="w-full px-3 py-2 text-sm rounded-lg border border-borderline focus:outline-none focus:ring-2 focus:ring-ink-900 bg-white"
-          >
-            <option value="international">Wisatawan Mancanegara (WNA)</option>
-            <option value="domestic">Wisatawan Nusantara (WNI)</option>
-          </select>
-        </div>
-      </div>
-
-      {#if errorMsg}
-        <div class="p-3 bg-red-50 text-red-700 rounded-lg text-xs border border-red-200">
-          {errorMsg}
-        </div>
-      {/if}
-
-      <div class="flex items-center justify-between pt-2">
-        <span class="text-[11px] text-ink-400">
-          *PII Masking aktif: nama, kontak, dan nomor booking tidak disimpan.
-        </span>
-        <button
-          type="submit"
-          disabled={loading}
-          class="px-5 py-2.5 bg-ink-900 hover:bg-black text-white text-sm font-semibold rounded-lg shadow transition-all flex items-center gap-2 disabled:opacity-50"
-        >
-          {#if loading}
-            <span class="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></span>
-            <span>Mengekstrak Aturan...</span>
-          {:else}
-            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path></svg>
-            <span>Hasilkan Trip Brief</span>
-          {/if}
-        </button>
-      </div>
-    </form>
-  </div>
-
-  <!-- Results Section -->
-  {#if result}
-    <div class="space-y-5 animate-in fade-in duration-300">
-      
-      <!-- PII Masking Feedback -->
-      {#if result.pii_redacted_count > 0}
-        <div class="p-3 bg-amber-50/80 border border-amber-200/80 rounded-lg flex items-center justify-between text-xs text-amber-900">
-          <div class="flex items-center gap-2">
-            <span class="font-bold">🔒 PII Masking Aktif:</span>
-            <span>{result.pii_redacted_count} data pribadi/booking code disamarkan otomatis sebelum diproses.</span>
+        <div class="relative z-10">
+          <div class="inline-flex items-center text-[11px] font-medium mb-3" style="background-color: rgba(255,255,255,0.14); color: #ffffff; border-radius: 2px; padding: 2px;">
+            <span style="background-color: #dfd8c8; color: #0a0a0a; border-radius: 1px;" class="px-2 py-0.5 font-bold">✦</span>
+            <span class="px-3 py-0.5">Pencegahan Pra-Perjalanan &amp; Kalender Saka</span>
           </div>
-          <span class="font-mono text-[11px] bg-amber-200/60 px-2 py-0.5 rounded">Aman & Teruji</span>
+          <h1 class="opero-h1 text-3xl sm:text-5xl" style="color: #ffffff;">
+            Studio <span class="opero-serif" style="color: #dfd8c8;">Trip Brief</span> &amp; Konflik Nyepi
+          </h1>
         </div>
-      {/if}
 
-      <!-- Nyepi / Holiday Conflict Banner -->
-      {#if result.calendar_conflicts && result.calendar_conflicts.has_nyepi}
-        {@const nyepi = result.calendar_conflicts.nyepi_summary}
-        <div class="bg-red-50/90 border-2 border-red-400 rounded-xl p-5 shadow-sm">
-          <div class="flex items-start justify-between">
-            <div class="flex items-center gap-2.5">
-              <span class="w-3 h-3 rounded-full bg-red-600 animate-ping"></span>
-              <h3 class="font-bold text-red-950 text-base">
-                PERINGATAN KRITIS: {nyepi.event_name} ({nyepi.date})
-              </h3>
-            </div>
-            <span class="px-2.5 py-0.5 bg-red-600 text-white font-mono text-[11px] font-bold rounded-full uppercase">
-              Total Silence 24 Jam
+        <div class="relative z-10 flex flex-wrap gap-2">
+          {#each PRESETS as preset, idx}
+            <button
+              type="button"
+              onclick={() => applyPreset(preset, idx, true)}
+              style={activePresetIdx === idx
+                ? 'background-color: #dfd8c8; color: #0a0a0a; border-radius: 3px; font-weight: 600;'
+                : 'background-color: rgba(255, 255, 255, 0.14); color: #ffffff; border: 1px solid rgba(255, 255, 255, 0.25); border-radius: 3px;'}
+              class="px-3.5 py-2 text-xs transition-colors cursor-pointer backdrop-blur-xs"
+            >
+              {preset.label}
+            </button>
+          {/each}
+        </div>
+      </div>
+    </div>
+
+    <!-- Main 2-Pane Split Ledger -->
+    <div class="grid grid-cols-1 lg:grid-cols-12">
+
+      <!-- Left Pane: Input Parameters (4 cols) -->
+      <div class="lg:col-span-4 p-6 space-y-6" style="background-color: #f2f0ea; border-right: 1px solid #c8c4ba;">
+        <form onsubmit={handleSubmit} class="space-y-5">
+          <div>
+            <label for="itinerary" class="block text-xs font-semibold mb-2" style="color: #0a0a0a;">
+              Rincian Rute atau Catatan Reservasi
+            </label>
+            <textarea
+              id="itinerary"
+              bind:value={itineraryText}
+              rows="5"
+              placeholder="Masukkan rincian rute perjalanan, destinasi pura, atau catatan booking..."
+              style="background-color: #ffffff; color: #0a0a0a; border: 1px solid #c8c4ba; border-radius: 4px;"
+              class="w-full p-3.5 text-xs sm:text-sm focus:outline-none leading-relaxed"
+            ></textarea>
+            <span class="block text-[11px] mt-1.5" style="color: #5e5d58;">
+              Penyaringan PII otomatis menyamarkan email, telepon, paspor, kartu, &amp; kode booking.
             </span>
           </div>
-          
-          <p class="text-xs text-red-900 mt-2 leading-relaxed">
-            Jadwal perjalanan Anda bersinggungan dengan Hari Suci Nyepi. Pada hari ini seluruh aktivitas umum di Pulau Bali dihentikan total (pukul 06.00 s/d 06.00 WITA keesokan harinya).
-          </p>
 
-          <!-- 4 Catur Brata Rules -->
-          <div class="mt-3.5 grid grid-cols-1 sm:grid-cols-2 gap-2.5">
-            {#each nyepi.restrictions as r}
-              <div class="bg-white/90 p-3 rounded-lg border border-red-200 text-xs">
-                <span class="font-bold text-red-950">{r.rule} ({r.translation})</span>
-                <p class="text-ink-700 mt-1 leading-normal">{r.instruction}</p>
+          <div class="grid grid-cols-2 gap-3 pt-4" style="border-top: 1px solid #c8c4ba;">
+            <div>
+              <label for="start-date" class="block text-xs font-semibold mb-1.5" style="color: #0a0a0a;">
+                Tanggal Tiba
+              </label>
+              <input
+                id="start-date"
+                type="date"
+                bind:value={startDate}
+                style="background-color: #ffffff; color: #0a0a0a; border: 1px solid #c8c4ba; border-radius: 4px;"
+                class="w-full px-3 py-2 text-xs"
+              />
+            </div>
+
+            <div>
+              <label for="end-date" class="block text-xs font-semibold mb-1.5" style="color: #0a0a0a;">
+                Tanggal Pulang
+              </label>
+              <input
+                id="end-date"
+                type="date"
+                bind:value={endDate}
+                style="background-color: #ffffff; color: #0a0a0a; border: 1px solid #c8c4ba; border-radius: 4px;"
+                class="w-full px-3 py-2 text-xs"
+              />
+            </div>
+          </div>
+
+          <div class="pt-4" style="border-top: 1px solid #c8c4ba;">
+            <label for="traveler-origin" class="block text-xs font-semibold mb-1.5" style="color: #0a0a0a;">
+              Kategori Yurisdiksi Wisatawan
+            </label>
+            <select
+              id="traveler-origin"
+              bind:value={travelerOrigin}
+              style="background-color: #ffffff; color: #0a0a0a; border: 1px solid #c8c4ba; border-radius: 4px;"
+              class="w-full px-3 py-2.5 text-xs"
+            >
+              <option value="international">Wisatawan Mancanegara (WNA — Wajib Pungutan Perda 6/2023)</option>
+              <option value="domestic">Wisatawan Nusantara (WNI)</option>
+            </select>
+          </div>
+
+          {#if errorMsg}
+            <div class="p-3 bg-white text-xs font-medium" style="border-left: 3px solid #b91c1c; color: #b91c1c;">
+              {errorMsg}
+            </div>
+          {/if}
+
+          <div class="pt-2">
+            <button
+              type="submit"
+              disabled={loading}
+              style="background-color: #0c249c; color: #ffffff;"
+              class="w-full inline-flex items-stretch justify-between text-xs font-medium hover:opacity-95 transition-opacity disabled:opacity-50"
+            >
+              <span class="px-4 py-3 flex items-center gap-2">
+                <span>{loading ? 'Memeriksa Korpus JDIH...' : 'Susun Dokumen Trip Brief'}</span>
+              </span>
+              <span
+                style="background-color: #e6e4de; color: #0a0a0a; margin: 3px;"
+                class="w-9 flex items-center justify-center font-mono text-xs font-bold"
+              >
+                ↗
+              </span>
+            </button>
+          </div>
+        </form>
+      </div>
+
+      <!-- Right Pane: Editorial Legal Dossier (8 cols) -->
+      <div class="lg:col-span-8 min-w-0" style="background-color: #e6e4de;">
+        {#if result}
+          {#key result.masked_itinerary}
+            <div class="animate-brutal-stamp">
+          <!-- Row 1: Telemetry & Export Strip -->
+          <div class="px-6 py-3.5 flex flex-wrap items-center justify-between gap-3" style="background-color: #dfd8c8; border-bottom: 1px solid #c8c4ba;">
+            <div class="flex flex-wrap items-center gap-3 font-mono text-[11px]" style="color: #0a0a0a;">
+              <span>ENGINE: <strong>{result.ai_engine || 'Strict-RAG'}</strong></span>
+              <span>|</span>
+              <span>PII REDACTED: <strong>{result.pii_redacted_count}</strong></span>
+              <span>|</span>
+              <span style="color: #0c249c;" class="font-bold">{result.guard_status}</span>
+            </div>
+
+            <div class="flex items-center gap-2">
+              <button
+                type="button"
+                onclick={copyWhatsApp}
+                style="background-color: #ffffff; color: #0a0a0a; border: 1px solid #c8c4ba;"
+                class="px-3.5 py-1.5 text-xs font-medium hover:bg-stone transition-colors"
+              >
+                {copySuccess ? 'Tersalin' : 'Salin Ringkasan WA'}
+              </button>
+              <button
+                type="button"
+                onclick={downloadIcs}
+                style="background-color: #0c249c; color: #ffffff;"
+                class="px-3.5 py-1.5 text-xs font-medium hover:opacity-90 transition-opacity"
+              >
+                Unduh Kalender (.ICS)
+              </button>
+            </div>
+          </div>
+
+          <!-- Row 2: Executive Synthesis & Masked Input -->
+          {#if result.ai_synthesis}
+            <div class="p-6 space-y-2.5 bg-white" style="border-bottom: 1px solid #c8c4ba;">
+              <span class="font-mono text-[10px] uppercase tracking-wider block" style="color: #0c249c; font-weight: 600;">
+                Ringkasan Kepatuhan Rute ({result.start_date} s/d {result.end_date})
+              </span>
+              <p class="text-base sm:text-lg leading-relaxed" style="color: #0a0a0a;">
+                {result.ai_synthesis}
+              </p>
+              {#if result.pii_redacted_count > 0}
+                <div class="pt-2 font-mono text-[11px]" style="color: #5e5d58;">
+                  Log Masukan Terlindungi: <span style="color: #0a0a0a;">{result.masked_itinerary}</span>
+                </div>
+              {/if}
+            </div>
+          {/if}
+
+          <!-- Row 3: Nyepi Critical Schedule Ledger -->
+          {#if result.calendar_conflicts && result.calendar_conflicts.has_nyepi}
+            {@const nyepi = result.calendar_conflicts.nyepi_summary}
+            <div style="border-bottom: 1px solid #c8c4ba;">
+              <div class="px-6 py-4 flex flex-wrap items-center justify-between gap-2" style="background-color: #0c249c; color: #ffffff;">
+                <div>
+                  <span class="font-mono text-[10px] uppercase tracking-wider block" style="color: #dfd8c8;">
+                    Peringatan Kalender Kritis — Penghentian Aktivitas 24 Jam
+                  </span>
+                  <h3 class="text-base font-medium tracking-tight mt-0.5">
+                    {nyepi.event_name} — {nyepi.date}
+                  </h3>
+                </div>
+                <span class="font-mono text-[11px] px-2.5 py-1 font-semibold" style="background-color: #dfd8c8; color: #0a0a0a;">
+                  06.00 WITA → 06.00 WITA (+1 Hari)
+                </span>
+              </div>
+
+              <!-- 4 Catur Brata Columns -->
+              <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 bg-white" style="border-bottom: 1px solid #c8c4ba;">
+                {#each nyepi.restrictions as r, idx}
+                  <div class="p-4 space-y-1.5" style="border-right: 1px solid #c8c4ba;">
+                    <span class="font-mono text-[10px] font-bold block" style="color: #0c249c;">0{idx + 1} / {r.rule}</span>
+                    <span class="text-xs font-semibold block" style="color: #0a0a0a;">{r.translation}</span>
+                    <p class="text-[11px] leading-relaxed" style="color: #333330;">{r.instruction}</p>
+                  </div>
+                {/each}
+              </div>
+
+              <!-- Infrastructure Disruptions -->
+              <div class="px-6 py-4 grid grid-cols-1 md:grid-cols-12 gap-4 text-xs" style="background-color: #f2f0ea;">
+                <div class="md:col-span-3 font-mono text-[10px] uppercase font-semibold" style="color: #0a0a0a;">
+                  Dampak Infrastruktur Publik
+                </div>
+                <ul class="md:col-span-9 space-y-1 list-disc list-inside" style="color: #333330;">
+                  {#each nyepi.service_disruptions as d}
+                    <li>{d}</li>
+                  {/each}
+                </ul>
+              </div>
+            </div>
+          {/if}
+
+          <!-- Row 4: Applicable Statutes Table -->
+          <div>
+            <div class="px-6 py-3 flex items-center justify-between font-mono text-[10px] uppercase tracking-wider" style="background-color: #dfd8c8; color: #0a0a0a; border-bottom: 1px solid #c8c4ba;">
+              <span class="font-semibold">Instrumen Hukum Terverifikasi ({result.briefing_items.length} Pasal)</span>
+              <span>Kutipan Verbatim JDIH Bali</span>
+            </div>
+
+            {#each result.briefing_items as item}
+              <div class="p-6 grid grid-cols-1 md:grid-cols-12 gap-4 bg-white hover:bg-stone/40 transition-colors" style="border-bottom: 1px solid #c8c4ba;">
+                <div class="md:col-span-4 space-y-1.5">
+                  <span class="font-mono text-[10px] px-2 py-0.5 inline-block font-semibold" style="background-color: #0c249c; color: #ffffff;">
+                    Tingkat {item.tier} · {item.tier_label}
+                  </span>
+                  <h4 class="text-sm font-semibold pt-1" style="color: #0a0a0a;">{item.category}</h4>
+                  <p class="font-mono text-[11px]" style="color: #5e5d58;">{item.pasal}</p>
+                  <button
+                    type="button"
+                    onclick={() => onOpenDoc(item)}
+                    style="color: #0c249c;"
+                    class="pt-2 inline-block font-mono text-[11px] font-semibold hover:underline"
+                  >
+                    Buka Naskah Penuh →
+                  </button>
+                </div>
+
+                <div class="md:col-span-8 space-y-3">
+                  <p class="text-xs font-semibold" style="color: #0a0a0a;">{item.title}</p>
+                  <blockquote class="p-3.5 font-mono text-xs leading-relaxed" style="background-color: #f2f0ea; border-left: 3px solid #0c249c; color: #0a0a0a;">
+                    "{item.summary}"
+                  </blockquote>
+                  <div class="text-xs flex items-baseline gap-2" style="color: #333330;">
+                    <span class="font-mono text-[10px] uppercase font-semibold shrink-0" style="color: #0a0a0a;">Sanksi:</span>
+                    <span>{item.penalties}</span>
+                  </div>
+                </div>
               </div>
             {/each}
           </div>
 
-          <!-- Service Disruptions -->
-          <div class="mt-3.5 p-3 bg-red-100/70 rounded-lg text-xs text-red-950">
-            <span class="font-bold block mb-1">Dampak Layanan Transportasi & Komunikasi:</span>
-            <ul class="list-disc list-inside space-y-0.5 text-red-900 text-[11px]">
-              {#each nyepi.service_disruptions as d}
-                <li>{d}</li>
-              {/each}
-            </ul>
+          <div class="px-6 py-3.5 font-mono text-[11px]" style="background-color: #f2f0ea; color: #5e5d58;">
+            {result.disclaimer}
           </div>
-        </div>
-      {/if}
-
-      <!-- Other Holiday Conflicts (Pengerupukan, Galungan) -->
-      {#if result.calendar_conflicts && result.calendar_conflicts.events}
-        {#each result.calendar_conflicts.events as ev}
-          {#if ev.severity !== 'CRITICAL'}
-            <div class="bg-amber-50 border border-amber-200 rounded-lg p-3.5 flex items-start justify-between text-xs">
-              <div>
-                <span class="font-bold text-amber-950">{ev.name} ({ev.date})</span>
-                <p class="text-amber-900 mt-0.5">{ev.details.service_disruptions?.[0] || 'Perayaan upacara adat Bali.'}</p>
-              </div>
-              <span class="px-2 py-0.5 bg-amber-200 text-amber-900 font-mono text-[10px] rounded font-semibold">
-                Info Upacara
-              </span>
             </div>
-          {/if}
-        {/each}
-      {/if}
-
-      <!-- Briefing Cards Header & Quick Actions -->
-      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pt-2">
-        <div>
-          <h3 class="text-base font-bold text-ink-900">
-            Aturan Hukum Terverifikasi ({result.briefing_items.length} Pasal Relevan)
-          </h3>
-          <p class="text-xs text-ink-500">Kutipan resmi dari JDIH Provinsi Bali dan Hukum Nasional.</p>
-        </div>
-
-        <div class="flex items-center gap-2">
-          <button
-            onclick={copyWhatsApp}
-            class="px-3 py-1.5 bg-white hover:bg-canvas border border-borderline text-ink-800 text-xs font-medium rounded-lg shadow-sm transition-all flex items-center gap-1.5"
-          >
-            {#if copySuccess}
-              <span class="text-emerald-600 font-bold">✓ Tersalin!</span>
-            {:else}
-              <svg class="w-3.5 h-3.5 text-emerald-600" fill="currentColor" viewBox="0 0 24 24"><path d="M12.031 6.172c-3.181 0-5.767 2.586-5.768 5.766-.001 1.298.38 2.27 1.019 3.287l-.582 2.128 2.182-.573c.978.58 1.911.928 3.145.929 3.178 0 5.767-2.587 5.768-5.766.001-3.187-2.575-5.77-5.764-5.771zm3.392 8.244c-.144.405-.837.774-1.17.824-.299.045-.677.063-1.092-.069-.252-.08-.575-.187-.988-.365-1.739-.751-2.874-2.502-2.961-2.617-.087-.116-.708-.94-.708-1.793s.448-1.273.607-1.446c.159-.173.346-.217.462-.217l.332.006c.106.005.249-.04.39.298.144.347.491 1.2.534 1.287.043.087.072.188.014.303-.058.116-.087.188-.173.289l-.26.302c-.087.087-.178.182-.077.355.101.173.449.741.963 1.2.662.591 1.221.774 1.394.86.173.086.275.072.376-.044.101-.116.433-.506.549-.679.116-.173.231-.145.39-.087s1.011.477 1.184.564.289.13.332.202c.043.072.043.419-.101.824z"/></svg>
-              <span>Salin WhatsApp</span>
-            {/if}
-          </button>
-
-          <button
-            onclick={downloadIcs}
-            class="px-3 py-1.5 bg-ink-900 hover:bg-black text-white text-xs font-medium rounded-lg shadow-sm transition-all flex items-center gap-1.5"
-          >
-            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
-            <span>Unduh Kalender (.ics)</span>
-          </button>
-        </div>
-      </div>
-
-      <!-- Regulation Cards Grid -->
-      <div class="grid grid-cols-1 gap-4">
-        {#each result.briefing_items as item}
-          <div class="bg-white rounded-xl border border-borderline p-5 shadow-sm hover:border-ink-400 transition-all">
-            <div class="flex items-center justify-between flex-wrap gap-2 pb-3 border-b border-borderline/60">
-              <div class="flex items-center gap-2">
-                <span class={`text-[11px] font-mono px-2.5 py-0.5 rounded-full font-bold ${
-                  item.tier === '1A' ? 'bg-indigo-100 text-indigo-800' :
-                  item.tier === '1B' ? 'bg-emerald-100 text-emerald-800' :
-                  'bg-amber-100 text-amber-800'
-                }`}>
-                  {item.tier_label}
-                </span>
-                <span class="text-xs font-semibold text-ink-900">{item.category}</span>
-                <span class="text-xs font-mono text-ink-400">({item.pasal})</span>
-              </div>
-
-              <button
-                onclick={() => onOpenDoc(item)}
-                class="text-xs text-azure-700 hover:text-azure-900 font-medium flex items-center gap-1"
-              >
-                <span>Lihat Teks Pasal Penuh</span>
-                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
-              </button>
-            </div>
-
-            <h4 class="text-sm font-bold text-ink-900 mt-3">{item.title}</h4>
-            
-            <p class="text-xs text-ink-700 mt-2 leading-relaxed bg-canvas/70 p-3 rounded-lg border border-borderline/50">
-              "{item.summary}"
-            </p>
-
-            <div class="mt-3 flex items-start gap-2 text-xs text-red-700 bg-red-50/60 p-2.5 rounded-lg border border-red-100">
-              <span class="font-bold shrink-0">⚠️ Konsekuensi/Sanksi:</span>
-              <span>{item.penalties}</span>
-            </div>
-          </div>
-        {/each}
-      </div>
-
-      <!-- Disclaimer -->
-      <div class="p-3 bg-canvas border border-borderline rounded-lg text-center text-[11px] text-ink-500">
-        {result.disclaimer}
+          {/key}
+        {/if}
       </div>
 
     </div>
-  {/if}
+  </div>
 </div>

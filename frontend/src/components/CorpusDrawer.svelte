@@ -5,89 +5,104 @@
 {#if item}
   <div class="fixed inset-0 z-50 overflow-hidden flex justify-end">
     <!-- Backdrop -->
-    <button 
+    <button
       type="button"
       aria-label="Tutup panel"
-      onclick={onClose} 
-      class="fixed inset-0 bg-black/40 backdrop-blur-sm transition-opacity"
+      onclick={onClose}
+      class="fixed inset-0 transition-opacity"
+      style="background-color: rgba(10, 10, 10, 0.45); backdrop-filter: blur(2px);"
     ></button>
 
-    <!-- Drawer panel -->
-    <div class="relative w-full max-w-xl bg-white h-full shadow-2xl border-l border-borderline z-10 flex flex-col animate-in slide-in-from-right duration-200">
-      
+    <!-- Drawer panel (Sharp architectural lines, warm stone/paper palette) -->
+    <div
+      class="relative w-full max-w-xl h-full shadow-2xl border-l z-10 flex flex-col"
+      style="background-color: #e6e4de; border-color: #c8c4ba; color: #0a0a0a;"
+    >
       <!-- Drawer Header -->
-      <div class="p-5 border-b border-borderline flex items-center justify-between bg-canvas/40">
+      <div
+        class="px-6 py-4 border-b flex items-center justify-between"
+        style="background-color: #f2f0ea; border-color: #c8c4ba;"
+      >
         <div>
-          <span class="text-[11px] font-mono uppercase bg-ink-900 text-white px-2 py-0.5 rounded font-bold">
-            {item.tier_label || `Tingkat ${item.tier || '1B'}`}
+          <span
+            class="font-mono text-[10px] uppercase px-2 py-0.5 font-medium"
+            style="background-color: #0c249c; color: #ffffff;"
+          >
+            Tingkat {item.tier || '1B'} · {item.tier_label || 'Regulasi'}
           </span>
-          <h3 class="text-base font-bold text-ink-900 mt-1.5">
+          <h3 class="text-base font-medium mt-1.5" style="color: #0a0a0a;">
             {item.pasal || 'Naskah Regulasi'}
           </h3>
         </div>
 
-        <button 
-          aria-label="Tutup"
+        <button
+          type="button"
           onclick={onClose}
-          class="p-2 rounded-lg hover:bg-black/5 text-ink-500 hover:text-ink-900 transition-colors"
+          class="px-3 py-1 border font-mono text-xs transition-colors"
+          style="background-color: #ffffff; border-color: #c8c4ba; color: #0a0a0a;"
         >
-          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+          TUTUP [ESC]
         </button>
       </div>
 
       <!-- Drawer Content -->
-      <div class="p-5 overflow-y-auto flex-1 space-y-4">
-        <div>
-          <span class="text-xs font-semibold text-ink-500 uppercase tracking-wider block mb-1">
-            Judul Peraturan Resmi
+      <div class="p-6 overflow-y-auto flex-1 space-y-6" style="background-color: #ffffff;">
+        <div class="pb-4 border-b" style="border-color: #c8c4ba;">
+          <span class="font-mono text-[10px] uppercase tracking-wider block mb-1" style="color: #5c5b57;">
+            Nomenklatur Peraturan Resmi
           </span>
-          <p class="text-sm font-bold text-ink-900 leading-snug">
+          <p class="text-sm font-medium leading-snug" style="color: #0a0a0a;">
             {item.title || item.official_doc_title}
           </p>
         </div>
 
         <div>
-          <span class="text-xs font-semibold text-ink-500 uppercase tracking-wider block mb-1.5">
-            Teks Asli Naskah Hukum (Verbatim)
+          <span class="font-mono text-[10px] uppercase tracking-wider block mb-2" style="color: #5c5b57;">
+            Batang Tubuh / Teks Verbatim
           </span>
-          <div class="p-4 bg-canvas/80 border border-borderline rounded-xl text-xs sm:text-sm text-ink-800 leading-relaxed font-serif whitespace-pre-line border-l-4 border-l-amber-500">
+          <div
+            class="p-5 border text-xs sm:text-sm leading-relaxed font-mono whitespace-pre-line"
+            style="background-color: #f2f0ea; border-color: #c8c4ba; border-left: 3px solid #0c249c; color: #0a0a0a;"
+          >
             {item.full_text || item.quoted_text}
           </div>
         </div>
 
         {#if item.penalties}
-          <div>
-            <span class="text-xs font-semibold text-red-700 uppercase tracking-wider block mb-1">
-              Sanksi & Konsekuensi Hukum
+          <div class="pt-4 border-t" style="border-color: #c8c4ba;">
+            <span class="font-mono text-[10px] uppercase tracking-wider block mb-1.5" style="color: #5c5b57;">
+              Ketentuan Sanksi & Penegakan
             </span>
-            <div class="p-3 bg-red-50 border border-red-200 rounded-lg text-xs text-red-900">
+            <p class="text-xs leading-relaxed" style="color: #2b2b29;">
               {item.penalties}
-            </div>
+            </p>
           </div>
         {/if}
 
-        <div class="pt-2">
-          <span class="text-xs font-semibold text-ink-500 uppercase tracking-wider block mb-1">
-            Sumber Publikasi Resmi
+        <div class="pt-4 border-t" style="border-color: #c8c4ba;">
+          <span class="font-mono text-[10px] uppercase tracking-wider block mb-1.5" style="color: #5c5b57;">
+            Tautan Portal JDIH / Sumber Resmi
           </span>
           <a
             href={item.source_url}
             target="_blank"
             rel="noopener noreferrer"
-            class="inline-flex items-center gap-1.5 text-xs text-azure-700 hover:text-azure-900 font-medium underline break-all"
+            class="inline-flex items-center gap-1.5 text-xs hover:underline font-mono break-all"
+            style="color: #0c249c;"
           >
             <span>{item.source_url}</span>
-            <svg class="w-3.5 h-3.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path></svg>
+            <span>↗</span>
           </a>
         </div>
-
       </div>
 
       <!-- Drawer Footer -->
-      <div class="p-4 border-t border-borderline bg-canvas/30 text-center text-[11px] text-ink-500">
-        Naskah peraturan perundang-undangan tidak dilindungi hak cipta menurut Pasal 42 huruf b UU No. 28 Tahun 2014.
+      <div
+        class="px-6 py-3.5 border-t font-mono text-[10px]"
+        style="background-color: #f2f0ea; border-color: #c8c4ba; color: #5c5b57;"
+      >
+        Naskah peraturan perundang-undangan merupakan domain publik berdasarkan Pasal 42 huruf b UU No. 28 Tahun 2014.
       </div>
-
     </div>
   </div>
 {/if}
