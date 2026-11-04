@@ -207,7 +207,7 @@
               style="background-color: #ffffff; color: #0a0a0a; border: 1px solid #c8c4ba; border-radius: 4px;"
               class="w-full px-3 py-2.5 text-xs"
             >
-              <option value="international">Wisatawan Mancanegara (WNA — Wajib Pungutan Perda 6/2023)</option>
+              <option value="international">Wisatawan Mancanegara (WNA, Wajib Pungutan Perda 6/2023)</option>
               <option value="domestic">Wisatawan Nusantara (WNI)</option>
             </select>
           </div>
@@ -298,10 +298,10 @@
               <div class="px-6 py-4 flex flex-wrap items-center justify-between gap-2" style="background-color: #0c249c; color: #ffffff;">
                 <div>
                   <span class="font-mono text-[10px] uppercase tracking-wider block" style="color: #dfd8c8;">
-                    Peringatan Kalender Kritis — Penghentian Aktivitas 24 Jam
+                    Peringatan Kalender Kritis: Penghentian Aktivitas 24 Jam
                   </span>
                   <h3 class="text-base font-medium tracking-tight mt-0.5">
-                    {nyepi.event_name} — {nyepi.date}
+                    {nyepi.event_name} ({nyepi.date})
                   </h3>
                 </div>
                 <span class="font-mono text-[11px] px-2.5 py-1 font-semibold" style="background-color: #dfd8c8; color: #0a0a0a;">

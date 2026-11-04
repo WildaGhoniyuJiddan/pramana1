@@ -1,5 +1,5 @@
 # PROPOSAL SOLUSI & MVP AI WEB
-## BALI DIGIFEST 2026 — AI WEB INNOVATION CHALLENGE
+## BALI DIGIFEST 2026 - AI WEB INNOVATION CHALLENGE
 
 - **Nama Produk:** PRAMANA (Platform AI Strict-RAG Kepatuhan Hukum & Konteks Regulasi Pariwisata Bali)
 - **Tema Ruang Lingkup:** Bali Smart Society (Pariwisata, Budaya, Layanan Publik, & Sistem Informasi Cerdas)
@@ -11,7 +11,7 @@
 
 Sebagai destinasi pariwisata utama dunia, Bali menghadapi tantangan krusial pada titik temu antara pertumbuhan kunjungan wisatawan, pelestarian kesucian budaya (*Sad Kerthi* / *Tri Hita Karana*), dan ketertiban hukum:
 
-1. **Asimetri Informasi Regulasi & Kalender Adat:** Banyak pelanggaran yang dilakukan wisatawan—seperti memasuki area *Utama Mandala* Pura tanpa busana adat, memanjat pohon keramat, mengabaikan Pungutan Wisatawan Asing Rp150.000 (Perda Bali No. 6 Tahun 2023), hingga keluar penginapan saat Hari Suci Nyepi—terjadi akibat ketidaktahuan terhadap aturan spesifik daerah yang tersebar dalam dokumen hukum formal.
+1. **Asimetri Informasi Regulasi & Kalender Adat:** Banyak pelanggaran yang dilakukan wisatawan (seperti memasuki area *Utama Mandala* Pura tanpa busana adat, memanjat pohon keramat, mengabaikan Pungutan Wisatawan Asing Rp150.000 (Perda Bali No. 6 Tahun 2023), hingga keluar penginapan saat Hari Suci Nyepi) terjadi akibat ketidaktahuan terhadap aturan spesifik daerah yang tersebar dalam dokumen hukum formal.
 2. **Eskalasi Disinformasi & Polarisasi di Media Sosial:** Ketika insiden wisatawan menjadi viral, ruang diskusi publik sering dipenuhi generalisasi sensasional (*framing* emosional) tanpa rujukan pasal yang tepat.
 3. **Risiko Halusinasi pada AI Generatif Konvensional:** Penggunaan *chatbot* LLM biasa untuk menanyakan aturan hukum lokal sangat berisiko karena LLM cenderung mengarang nomor pasal atau mencampuradukkan opini internet dengan produk hukum resmi.
 
@@ -29,8 +29,8 @@ Sebagai destinasi pariwisata utama dunia, Bali menghadapi tantangan krusial pada
 
 **Pramana** menyelesaikan masalah di atas melalui platform web berbasis **Strict-RAG (Retrieval-Augmented Generation)** dengan jaminan **Nol Halusinasi Kutipan (*Zero Hallucination Guarantee*)** dalam dua alur pengguna utama:
 
-- **User Journey 1 — Mode Pencegahan (Trip Brief):** Pengguna memasukkan rencana rute atau catatan pemesanan beserta tanggal perjalanan $\rightarrow$ Sistem menyamarkan data pribadi (PII) secara otomatis $\rightarrow$ Sistem memeriksa bentrok tanggal dengan Hari Suci Nyepi (*Catur Brata Penyepian*) dan upacara Pawukon $\rightarrow$ Sistem mengekstrak pasal hukum yang relevan dan menyusun ringkasan eksekutif beserta tombol unduh kalender `.ics` dan salin teks.
-- **User Journey 2 — Mode Verifikasi (Context Note):** Pengguna menempelkan teks unggahan viral atau klaim insiden $\rightarrow$ Sistem mendeteksi frasa sensasional/generalisasi $\rightarrow$ Sistem mencari dasar hukum di korpus resmi JDIH Bali $\rightarrow$ Jika ditemukan, sistem menghasilkan Catatan Konteks netral dengan kutipan *verbatim*; jika klaim berada di luar cakupan hukum, sistem menolak berspekulasi (**Strict Abstain / `TIDAK_DITEMUKAN`**).
+- **User Journey 1: Mode Pencegahan (Trip Brief):** Pengguna memasukkan rencana rute atau catatan pemesanan beserta tanggal perjalanan $\rightarrow$ Sistem menyamarkan data pribadi (PII) secara otomatis $\rightarrow$ Sistem memeriksa bentrok tanggal dengan Hari Suci Nyepi (*Catur Brata Penyepian*) dan upacara Pawukon $\rightarrow$ Sistem mengekstrak pasal hukum yang relevan dan menyusun ringkasan eksekutif beserta tombol unduh kalender `.ics` dan salin teks.
+- **User Journey 2: Mode Verifikasi (Context Note):** Pengguna menempelkan teks unggahan viral atau klaim insiden $\rightarrow$ Sistem mendeteksi frasa sensasional/generalisasi $\rightarrow$ Sistem mencari dasar hukum di korpus resmi JDIH Bali $\rightarrow$ Jika ditemukan, sistem menghasilkan Catatan Konteks netral dengan kutipan *verbatim*; jika klaim berada di luar cakupan hukum, sistem menolak berspekulasi (**Strict Abstain / `TIDAK_DITEMUKAN`**).
 
 ---
 
@@ -112,7 +112,7 @@ Sebagai destinasi pariwisata utama dunia, Bali menghadapi tantangan krusial pada
 - **Backend:** Python 3.11+, FastAPI, Pydantic v2, Uvicorn, HTTPX
 - **Database / Storage:** Structured JSON Legal Corpus (`corpus/bali_regulations.json`)
 - **AI Model / Method:** Google Gemini API (`gemini-2.5-flash`) + Deterministic Strict-RAG + Dual-Layer Verifier + Regex PII Masking
-- **Dataset:** Peraturan resmi dari JDIH Provinsi Bali (`jdih.baliprov.go.id`) dan `peraturan.go.id` (Domain Publik — Pasal 42 huruf b UU Hak Cipta No. 28/2014)
+- **Dataset:** Peraturan resmi dari JDIH Provinsi Bali (`jdih.baliprov.go.id`) dan `peraturan.go.id` (Domain Publik, Pasal 42 huruf b UU Hak Cipta No. 28/2014)
 - **AI Coding Assistant:** Google Antigravity / Gemini digunakan sebagai asisten pengembangan kode dan pengujian; seluruh kode sumber dan arsitektur diuji serta dipertanggungjawabkan penuh oleh tim.
 
 ---

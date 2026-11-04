@@ -288,7 +288,7 @@ class StrictRAGEngine:
     ) -> str:
         date_span = f"{start_date}" + (f" s/d {end_date}" if end_date and end_date != start_date else "")
         lines = [
-            f"*PRAMANA — Bali Trip Brief & Local Rules*",
+            f"*PRAMANA: Bali Trip Brief & Local Rules*",
             f"Tanggal: {date_span}",
             ""
         ]

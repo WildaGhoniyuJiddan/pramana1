@@ -157,7 +157,7 @@
                   {activeReg.doc_title}
                 </h2>
                 <p class="font-mono text-xs mt-2" style="color: #5e5d58;">
-                  {activeReg.bab} — {activeReg.pasal}
+                  {activeReg.bab}: {activeReg.pasal}
                 </p>
               </div>
 

@@ -1,6 +1,6 @@
-# PRAMANA — Platform AI Strict-RAG Kepatuhan Hukum & Konteks Regulasi Pariwisata Bali
+# PRAMANA - Platform AI Strict-RAG Kepatuhan Hukum & Konteks Regulasi Pariwisata Bali
 
-**Bali DigiFest 2026 — AI Web Innovation Challenge**  
+**Bali DigiFest 2026 - AI Web Innovation Challenge**  
 *Build with AI, Solve for Bali*
 
 ---
@@ -10,8 +10,8 @@
 **Pramana** adalah aplikasi web berbasis *Strict Retrieval-Augmented Generation (Strict-RAG)* yang dirancang untuk mencegah pelanggaran hukum/adat oleh wisatawan di Bali serta meredam disinformasi pada unggahan insiden viral melalui kutipan pasal resmi *verbatim* (tanpa halusinasi).
 
 Pramana bekerja dalam dua mode terintegrasi:
-1. **Mode 1: Trip Brief (Pencegahan Pra-Perjalanan)** — Menganalisis rencana rute perjalanan wisatawan, menyamarkan data pribadi (*PII Masking*), mendeteksi bentrok kalender Hari Suci Nyepi (*Catur Brata Penyepian*) maupun upacara Pawukon, serta menyusun ringkasan aturan mengikat lengkap dengan ekspor kalender `.ics` (RFC 5545) dan format pesan teks.
-2. **Mode 2: Context Note (Verifikasi Klaim & Edukasi Publik)** — Menganalisis teks postingan viral atau klaim insiden, mendeteksi penanda bingkai emosional/generalisasi sensasional, dan menyajikan Catatan Konteks netral beserta kutipan *verbatim* dari JDIH Provinsi Bali dan Hukum Nasional. Jika klaim berada di luar cakupan hukum yang terverifikasi, sistem secara ketat menerapkan prinsip **Abstain (`TIDAK_DITEMUKAN`)**.
+1. **Mode 1: Trip Brief (Pencegahan Pra-Perjalanan)**: Menganalisis rencana rute perjalanan wisatawan, menyamarkan data pribadi (*PII Masking*), mendeteksi bentrok kalender Hari Suci Nyepi (*Catur Brata Penyepian*) maupun upacara Pawukon, serta menyusun ringkasan aturan mengikat lengkap dengan ekspor kalender `.ics` (RFC 5545) dan format pesan teks.
+2. **Mode 2: Context Note (Verifikasi Klaim & Edukasi Publik)**: Menganalisis teks postingan viral atau klaim insiden, mendeteksi penanda bingkai emosional/generalisasi sensasional, dan menyajikan Catatan Konteks netral beserta kutipan *verbatim* dari JDIH Provinsi Bali dan Hukum Nasional. Jika klaim berada di luar cakupan hukum yang terverifikasi, sistem secara ketat menerapkan prinsip **Abstain (`TIDAK_DITEMUKAN`)**.
 
 ---
 
@@ -157,7 +157,7 @@ Aplikasi **tidak memerlukan login atau akun khusus**. Juri dapat langsung menguj
 
 ## Third-party Resources / Credits
 
-- **Sumber Data Regulasi (Domain Publik — Pasal 42 huruf b UU No. 28 Tahun 2014 tentang Hak Cipta):**
+- **Sumber Data Regulasi (Domain Publik, Pasal 42 huruf b UU No. 28 Tahun 2014 tentang Hak Cipta):**
   - Jaringan Dokumentasi dan Informasi Hukum (JDIH) Provinsi Bali (`https://jdih.baliprov.go.id`)
   - Portal Peraturan Perundang-undangan Republik Indonesia (`https://peraturan.go.id`)
   - Parisada Hindu Dharma Indonesia (PHDI) Provinsi Bali (`https://phdi.or.id`)
@@ -182,10 +182,10 @@ Aplikasi **tidak memerlukan login atau akun khusus**. Juri dapat langsung menguj
 | **Template / Boilerplate** | Dibangun dari awal (*custom architecture*) tanpa template komersial pihak ketiga. |
 | **AI Coding Assistant** | Google Antigravity / Gemini digunakan sebagai asisten pengembangan kode, pembuatan aset ilustrasi header, dan penyusunan pengujian unit. Seluruh arsitektur, logika verifikasi, dan kode sumber telah diuji serta dapat dipertanggungjawabkan penuh oleh tim. |
 | **Pre-existing Components** | Tidak ada (*100% dikembangkan khusus untuk Bali DigiFest 2026 AI Web Innovation Challenge*). |
-| **Third-party Assets / Credits** | Google Fonts (`Inter`, `JetBrains Mono` — SIL Open Font License). |
+| **Third-party Assets / Credits** | Google Fonts (`Inter`, `JetBrains Mono` (SIL Open Font License)). |
 
 ---
 
 ## Team Members
 
-- **Tim Pengembang Pramana** — Kategori Mahasiswa / Umum — Bali DigiFest 2026 AI Web Innovation Challenge.
+- **Tim Pengembang Pramana** (Kategori Mahasiswa / Umum) - Bali DigiFest 2026 AI Web Innovation Challenge.

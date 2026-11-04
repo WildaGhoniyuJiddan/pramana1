@@ -20,7 +20,7 @@ def test_mode1_trip_brief_with_nyepi():
     assert result["calendar_conflicts"]["has_nyepi"] is True
     assert len(result["briefing_items"]) > 0
     assert "BEGIN:VCALENDAR" in result["ics_content"]
-    assert "*PRAMANA — Bali Trip Brief" in result["whatsapp_text"]
+    assert "*PRAMANA: Bali Trip Brief" in result["whatsapp_text"]
 
 
 def test_mode2_viral_post_verified():
