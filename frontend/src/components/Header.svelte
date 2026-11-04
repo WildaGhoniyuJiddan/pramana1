@@ -1,77 +1,112 @@
 <script>
-  let { activeTab = $bindable('trip-brief'), openTransparency = () => {} } = $props();
+  let { currentPath = '/', navigate = (p) => {}, overlay = false } = $props();
+
+  const NAV_ITEMS = [
+    { path: '/', label: 'Home' },
+    { path: '/trip-brief', label: 'Trip Brief' },
+    { path: '/context-note', label: 'Context Note' },
+    { path: '/corpus', label: 'Korpus JDIH' }
+  ];
 </script>
 
-<header class="relative overflow-hidden border-b border-borderline bg-white">
-  <!-- Hero background painting container with subtle overlay -->
-  <div class="relative w-full h-64 md:h-80 overflow-hidden">
-    <img 
-      src="/assets/balinese_gate_hero.png" 
-      alt="Balinese Candi Bentar Landscape" 
-      class="w-full h-full object-cover object-center filter saturate-[1.05] contrast-[1.02]"
-    />
-    <!-- Subtle gradient overlay so text remains razor-sharp -->
-    <div class="absolute inset-0 bg-gradient-to-t from-black/75 via-black/30 to-black/10"></div>
+{#if overlay}
+  <!-- Floating Top Navbar inside Hero Artwork -->
+  <div class="absolute top-4 sm:top-5 inset-x-0 z-30 flex justify-center px-4 pointer-events-none">
+    <nav
+      style="background-color: #ffffff; color: #0a0a0a; max-width: 580px; width: 100%; border: 1px solid #d4d0c5; border-radius: 4px;"
+      class="pointer-events-auto flex items-center justify-between pl-4 pr-1.5 py-1.5"
+    >
+      <a
+        href="/"
+        onclick={(e) => { e.preventDefault(); navigate('/'); }}
+        class="flex items-center gap-2 font-semibold text-[13px] tracking-tight pr-4"
+        style="color: #0a0a0a;"
+      >
+        <!-- Clean Sketchy Scissor-Cut Swirl Logo -->
+        <img
+          src="/assets/pramana_logo.svg?v=5"
+          alt="Pramana Logo"
+          class="w-4 h-4 object-contain shrink-0"
+        />
+        <span>Pramana</span>
+      </a>
 
-    <!-- Top floating nav bar -->
-    <div class="absolute top-4 inset-x-0 max-w-6xl mx-auto px-4 sm:px-6 flex items-center justify-between">
-      <div class="flex items-center space-x-3 bg-white/95 backdrop-blur-md px-3.5 py-1.5 rounded-full border border-white/60 shadow-sm">
-        <span class="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse"></span>
-        <span class="font-bold tracking-tight text-ink-900 text-sm">PRAMANA</span>
-        <span class="text-[11px] font-mono uppercase bg-amber-100 text-amber-800 px-2 py-0.5 rounded-full font-medium">Bali DigiFest 2026</span>
+      <div class="flex items-center gap-5 sm:gap-7 text-[12px] font-medium">
+        {#each NAV_ITEMS as item}
+          <a
+            href={item.path}
+            onclick={(e) => { e.preventDefault(); navigate(item.path); }}
+            style={currentPath === item.path ? 'color: #0c249c; font-weight: 600;' : 'color: #3a3935;'}
+            class="hover:opacity-70 transition-opacity"
+          >
+            {item.label}
+          </a>
+        {/each}
       </div>
 
-      <button 
-        onclick={openTransparency}
-        class="text-xs font-medium text-white/95 hover:text-white bg-black/40 hover:bg-black/60 backdrop-blur-md px-3.5 py-1.5 rounded-full border border-white/20 transition-all flex items-center gap-1.5"
-      >
-        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-        <span>Transparansi Korpus & Evaluasi</span>
-      </button>
-    </div>
-
-    <!-- Hero Titles -->
-    <div class="absolute bottom-6 inset-x-0 max-w-6xl mx-auto px-4 sm:px-6 text-white">
-      <div class="inline-flex items-center gap-2 px-2.5 py-1 rounded-md bg-white/20 backdrop-blur-sm border border-white/30 text-xs font-mono text-white mb-2">
-        <span>Dual-Layer Strict-RAG</span>
-        <span>•</span>
-        <span>Pasal Resmi JDIH Bali</span>
-      </div>
-      <h1 class="font-serif text-3xl sm:text-4xl md:text-5xl font-bold tracking-tight text-white drop-shadow-sm">
-        Pramana
-      </h1>
-      <p class="text-sm sm:text-base text-white/90 max-w-2xl font-normal leading-relaxed mt-1 drop-shadow-sm">
-        Platform AI kepatuhan hukum dan pemahaman konteks aturan lokal pariwisata Bali dengan kutipan pasal verbatim tanpa halusinasi.
-      </p>
-    </div>
-  </div>
-
-  <!-- Mode Switcher Tabs -->
-  <div class="max-w-6xl mx-auto px-4 sm:px-6">
-    <div class="flex space-x-2 py-3 border-t border-borderline/60">
       <button
-        onclick={() => activeTab = 'trip-brief'}
-        class={`px-4 py-2 rounded-lg text-sm font-medium transition-all flex items-center gap-2 ${
-          activeTab === 'trip-brief'
-            ? 'bg-ink-900 text-white shadow-sm'
-            : 'text-ink-700 hover:text-ink-900 hover:bg-black/5'
-        }`}
+        type="button"
+        onclick={() => navigate('/trip-brief')}
+        aria-label="Buka Trip Brief"
+        style="background-color: #0c249c; color: #ffffff; border-radius: 2px;"
+        class="opero-arrow-btn ml-4 w-7 h-7 flex items-center justify-center text-xs hover:opacity-90 transition-all cursor-pointer"
       >
-        <span class="w-2 h-2 rounded-full {activeTab === 'trip-brief' ? 'bg-amber-400' : 'bg-transparent'}"></span>
-        Mode 1: Trip Brief (Pencegahan)
+        →
       </button>
-
-      <button
-        onclick={() => activeTab = 'context-note'}
-        class={`px-4 py-2 rounded-lg text-sm font-medium transition-all flex items-center gap-2 ${
-          activeTab === 'context-note'
-            ? 'bg-ink-900 text-white shadow-sm'
-            : 'text-ink-700 hover:text-ink-900 hover:bg-black/5'
-        }`}
-      >
-        <span class="w-2 h-2 rounded-full {activeTab === 'context-note' ? 'bg-emerald-400' : 'bg-transparent'}"></span>
-        Mode 2: Analisis Postingan Viral
-      </button>
-    </div>
+    </nav>
   </div>
-</header>
+{:else}
+  <!-- Centered Navbar on Workspace Routes -->
+  <header
+    style="background-color: #e6e4de; border-bottom: 1px solid #cdc9be;"
+    class="sticky top-0 z-40 w-full"
+  >
+    <div
+      class="mx-auto px-4 py-3 flex items-center justify-center"
+      style="max-width: 1360px; width: 100%; border-left: 1px solid #cdc9be; border-right: 1px solid #cdc9be;"
+    >
+      <nav
+        style="background-color: #ffffff; color: #0a0a0a; max-width: 580px; width: 100%; border: 1px solid #d4d0c5; border-radius: 4px;"
+        class="flex items-center justify-between pl-4 pr-1.5 py-1.5"
+      >
+        <a
+          href="/"
+          onclick={(e) => { e.preventDefault(); navigate('/'); }}
+          style="color: #0a0a0a;"
+          class="flex items-center gap-2 font-semibold text-[13px] tracking-tight pr-4"
+        >
+          <!-- Clean Sketchy Scissor-Cut Swirl Logo -->
+          <img
+            src="/assets/pramana_logo.svg?v=5"
+            alt="Pramana Logo"
+            class="w-4 h-4 object-contain shrink-0"
+          />
+          <span>Pramana</span>
+        </a>
+
+        <div class="flex items-center gap-5 sm:gap-7 text-[12px] font-medium">
+          {#each NAV_ITEMS as item}
+            <a
+              href={item.path}
+              onclick={(e) => { e.preventDefault(); navigate(item.path); }}
+              style={currentPath === item.path ? 'color: #0c249c; font-weight: 600;' : 'color: #3a3935;'}
+              class="py-1 transition-opacity hover:opacity-70"
+            >
+              {item.label}
+            </a>
+          {/each}
+        </div>
+
+        <button
+          type="button"
+          onclick={() => navigate(currentPath === '/trip-brief' ? '/context-note' : '/trip-brief')}
+          style="background-color: #0c249c; color: #ffffff; border-radius: 2px;"
+          class="opero-arrow-btn ml-4 w-7 h-7 flex items-center justify-center text-xs cursor-pointer"
+          title={currentPath === '/trip-brief' ? 'Buka Context Note' : 'Buka Trip Brief'}
+        >
+          →
+        </button>
+      </nav>
+    </div>
+  </header>
+{/if}
