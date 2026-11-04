@@ -1,0 +1,23 @@
+# Environment
+.env
+.env.local
+*.env
+
+# Python
+venv/
+backend/venv/
+__pycache__/
+*.pyc
+*.pyo
+.pytest_cache/
+
+# Node
+node_modules/
+frontend/node_modules/
+frontend/dist/
+frontend/.svelte-kit/
+
+# Logs & temp
+*.log
+.DS_Store
+Thumbs.db
