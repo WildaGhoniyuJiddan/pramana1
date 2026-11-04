@@ -13,24 +13,25 @@
   let result = $state(null);
   let copySuccess = $state(false);
   let activePresetIdx = $state(0);
+  let showTechAudit = $state(false);
 
   const PRESETS = [
     {
-      label: '01 · Periode Nyepi 2026 (Ubud & Bandara)',
+      label: 'Periode Nyepi (18-21 Mar 2026)',
       text: 'Tiba di Bandara Ngurah Rai, menginap di Ubud tanggal 18 Maret 2026 sampai 21 Maret 2026. Berencana jalan-jalan ke Pura Saraswati dan sewa motor di jalan raya. Kode booking: GA4521 email: alex@travel.com.',
       start: '2026-03-18',
       end: '2026-03-21',
       origin: 'international'
     },
     {
-      label: '02 · Kunjungan Pura & Kawasan Suci (Besakih)',
+      label: 'Kawasan Pura & Tempat Suci',
       text: 'Mengunjungi Pura Besakih dan Pura Uluwatu, menonton Tari Kecak, belanja suvenir di Sukawati dan makan malam di Seminyak.',
       start: '2026-05-10',
       end: '2026-05-15',
       origin: 'international'
     },
     {
-      label: '03 · Sewa Kendaraan & Remote Work (Canggu)',
+      label: 'Sewa Motor & Kerja Remote',
       text: 'Sewa sepeda motor untuk mobilitas Canggu - Seminyak, bekerja dari kafe, dan kunjungan ke pantai.',
       start: '2026-06-01',
       end: '2026-06-08',
@@ -53,8 +54,8 @@
 
   async function handleSubmit(e) {
     if (e) e.preventDefault();
-    if (!itineraryText.trim() || !startDate) {
-      errorMsg = 'Masukkan rencana perjalanan dan tanggal keberangkatan.';
+    if (!itineraryText.trim()) {
+      errorMsg = 'Masukkan rute perjalanan atau catatan reservasi terlebih dahulu.';
       return;
     }
     loading = true;
@@ -64,23 +65,23 @@
       result = await requestTripBrief({
         itinerary_text: itineraryText,
         start_date: startDate,
-        end_date: endDate || startDate,
+        end_date: endDate,
         traveler_origin: travelerOrigin
       });
     } catch (err) {
-      errorMsg = err.message || 'Gagal memproses rencana perjalanan.';
+      errorMsg = err.message || 'Gagal menyusun panduan perjalanan.';
     } finally {
       loading = false;
     }
   }
 
   function downloadIcs() {
-    if (!result || !result.ics_content) return;
-    const blob = new Blob([result.ics_content], { type: 'text/calendar;charset=utf-8' });
+    if (!result || !result.ics_calendar) return;
+    const blob = new Blob([result.ics_calendar], { type: 'text/calendar;charset=utf-8' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = `pramana_trip_brief_${startDate}.ics`;
+    a.download = `panduan_bali_${startDate}.ics`;
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);
@@ -99,288 +100,307 @@
   }
 </script>
 
-<div class="mx-auto" style="max-width: 1360px; width: 100%; border-left: 1px solid #cdc9be; border-right: 1px solid #cdc9be; background-color: #e6e4de; color: #0a0a0a; overflow: hidden;">
-  <div>
+<div class="mx-auto" style="max-width: 1360px; width: 100%; border-left: 1px solid #cdc9be; border-right: 1px solid #cdc9be; background-color: #e6e4de; color: #0a0a0a;">
 
-    <!-- Atmospheric Opero Banner + Preset Selector -->
-    <div class="p-3 sm:p-4" style="border-bottom: 1px solid #cdc9be;">
-      <div
-        class="relative overflow-hidden p-6 sm:p-8 flex flex-col md:flex-row md:items-end justify-between gap-6"
-        style="background-color: #091e8a; color: #ffffff; border: 1.5px solid #0a0a0a; box-shadow: 4px 4px 0px #0a0a0a;"
-      >
-        <img
-          src="/assets/opero_bali_hero.jpg"
-          alt="Pointillist Bali Sky"
-          class="absolute inset-0 w-full h-full object-cover opacity-35 pointer-events-none"
-          style="object-position: center 20%;"
-        />
-        <div
-          class="absolute inset-0 pointer-events-none"
-          style="background: linear-gradient(90deg, rgba(8, 24, 115, 0.94) 0%, rgba(8, 24, 115, 0.72) 60%, rgba(8, 24, 115, 0.55) 100%);"
-        ></div>
-
-        <div class="relative z-10">
-          <div class="inline-flex items-center text-[11px] font-medium mb-3" style="background-color: rgba(255,255,255,0.14); color: #ffffff; border-radius: 2px; padding: 2px;">
-            <span style="background-color: #dfd8c8; color: #0a0a0a; border-radius: 1px;" class="px-2 py-0.5 font-bold">✦</span>
-            <span class="px-3 py-0.5">Pencegahan Pra-Perjalanan &amp; Kalender Saka</span>
-          </div>
-          <h1 class="opero-h1 text-3xl sm:text-5xl" style="color: #ffffff;">
-            Studio <span class="opero-serif" style="color: #dfd8c8;">Trip Brief</span> &amp; Konflik Nyepi
-          </h1>
+  <!-- Clean Editorial Sub-header -->
+  <div class="px-6 sm:px-10 py-7" style="border-bottom: 1px solid #cdc9be; background-color: #dfd8c8;">
+    <div class="flex flex-col md:flex-row md:items-end justify-between gap-4">
+      <div>
+        <div class="inline-flex items-center gap-1.5 text-[11px] font-mono tracking-wider uppercase text-ink-600 mb-1.5">
+          <span class="w-2 h-2 rounded-full" style="background-color: #0c249c;"></span>
+          <span>Mode 1 · Pencegahan Pra-Perjalanan</span>
         </div>
+        <h1 class="opero-h1 text-2xl sm:text-4xl">
+          Panduan Perjalanan &amp; <span class="opero-serif">Aturan Bali</span>
+        </h1>
+        <p class="text-xs sm:text-[13px] text-ink-600 mt-1 max-w-xl">
+          Masukkan rencana kunjungan untuk memeriksa kewajiban hukum resmi, larangan kawasan suci, serta jadwal penutupan Hari Suci Nyepi.
+        </p>
+      </div>
 
-        <div class="relative z-10 flex flex-wrap gap-2">
-          {#each PRESETS as preset, idx}
-            <button
-              type="button"
-              onclick={() => applyPreset(preset, idx, true)}
-              style={activePresetIdx === idx
-                ? 'background-color: #dfd8c8; color: #0a0a0a; border-radius: 3px; font-weight: 600;'
-                : 'background-color: rgba(255, 255, 255, 0.14); color: #ffffff; border: 1px solid rgba(255, 255, 255, 0.25); border-radius: 3px;'}
-              class="px-3.5 py-2 text-xs transition-colors cursor-pointer backdrop-blur-xs"
-            >
-              {preset.label}
-            </button>
-          {/each}
-        </div>
+      <!-- Presets as quiet chips -->
+      <div class="flex flex-wrap items-center gap-2">
+        <span class="text-xs text-ink-500 font-mono">Contoh:</span>
+        {#each PRESETS as preset, idx}
+          <button
+            type="button"
+            onclick={() => applyPreset(preset, idx, true)}
+            style={activePresetIdx === idx
+              ? 'background-color: #0c249c; color: #ffffff; border: 1.5px solid #0a0a0a; box-shadow: 2px 2px 0px #0a0a0a;'
+              : 'background-color: #ffffff; color: #0a0a0a; border: 1px solid #c8c4ba;'}
+            class="brutal-press px-3 py-1.5 text-xs font-medium cursor-pointer"
+          >
+            {preset.label}
+          </button>
+        {/each}
       </div>
     </div>
+  </div>
 
-    <!-- Main 2-Pane Split Ledger -->
-    <div class="grid grid-cols-1 lg:grid-cols-12">
+  <!-- 2-Pane Split: Left Input, Right Results -->
+  <div class="grid grid-cols-1 lg:grid-cols-12 min-h-[600px]">
 
-      <!-- Left Pane: Input Parameters (4 cols) -->
-      <div class="lg:col-span-4 p-6 space-y-6" style="background-color: #f2f0ea; border-right: 1px solid #c8c4ba;">
-        <form onsubmit={handleSubmit} class="space-y-5">
+    <!-- Left Column: Input Form -->
+    <div class="lg:col-span-5 p-6 sm:p-7 space-y-5" style="background-color: #f4f2ec; border-right: 1px solid #cdc9be;">
+      <form onsubmit={handleSubmit} class="space-y-5">
+        <div>
+          <label for="itinerary" class="block text-xs font-semibold mb-1.5" style="color: #0a0a0a;">
+            Rencana Perjalanan Anda
+          </label>
+          <textarea
+            id="itinerary"
+            bind:value={itineraryText}
+            rows="5"
+            placeholder="Contoh: Menginap di Ubud tanggal 18-21 Maret, sewa motor ke pantai, dan berkunjung ke Pura Besakih..."
+            style="background-color: #ffffff; color: #0a0a0a; border: 1.5px solid #0a0a0a; box-shadow: 2px 2px 0px #0a0a0a;"
+            class="w-full p-3.5 text-xs sm:text-sm focus:outline-none leading-relaxed"
+          ></textarea>
+          <div class="flex items-center gap-2 mt-2 text-[11px]" style="color: #5c5b57;">
+            <svg class="w-3.5 h-3.5 shrink-0 text-emerald-700" viewBox="0 0 16 16" fill="currentColor">
+              <path fill-rule="evenodd" d="M8 1a3.5 3.5 0 0 0-3.5 3.5V7A1.5 1.5 0 0 0 3 8.5v5A1.5 1.5 0 0 0 4.5 15h7a1.5 1.5 0 0 0 1.5-1.5v-5A1.5 1.5 0 0 0 11.5 7V4.5A3.5 3.5 0 0 0 8 1Zm2 6V4.5a2 2 0 1 0-4 0V7h4Z" clip-rule="evenodd" />
+            </svg>
+            <span>Privasi aman: email, paspor, telepon, &amp; kode booking disamarkan otomatis sebelum diproses.</span>
+          </div>
+        </div>
+
+        <!-- Dates -->
+        <div class="grid grid-cols-2 gap-3 pt-3" style="border-top: 1px solid #dcd7cb;">
           <div>
-            <label for="itinerary" class="block text-xs font-semibold mb-2" style="color: #0a0a0a;">
-              Rincian Rute atau Catatan Reservasi
+            <label for="start-date" class="block text-xs font-semibold mb-1" style="color: #0a0a0a;">
+              Tanggal Tiba
             </label>
-            <textarea
-              id="itinerary"
-              bind:value={itineraryText}
-              rows="5"
-              placeholder="Masukkan rincian rute perjalanan, destinasi pura, atau catatan booking..."
-              style="background-color: #ffffff; color: #0a0a0a; border: 1px solid #c8c4ba; border-radius: 4px;"
-              class="w-full p-3.5 text-xs sm:text-sm focus:outline-none leading-relaxed"
-            ></textarea>
-            <span class="block text-[11px] mt-1.5" style="color: #5e5d58;">
-              Penyaringan PII otomatis menyamarkan email, telepon, paspor, kartu, &amp; kode booking.
-            </span>
+            <input
+              id="start-date"
+              type="date"
+              bind:value={startDate}
+              style="background-color: #ffffff; color: #0a0a0a; border: 1px solid #0a0a0a;"
+              class="w-full px-3 py-2 text-xs"
+            />
           </div>
 
-          <div class="grid grid-cols-2 gap-3 pt-4" style="border-top: 1px solid #c8c4ba;">
-            <div>
-              <label for="start-date" class="block text-xs font-semibold mb-1.5" style="color: #0a0a0a;">
-                Tanggal Tiba
-              </label>
-              <input
-                id="start-date"
-                type="date"
-                bind:value={startDate}
-                style="background-color: #ffffff; color: #0a0a0a; border: 1px solid #c8c4ba; border-radius: 4px;"
-                class="w-full px-3 py-2 text-xs"
-              />
-            </div>
-
-            <div>
-              <label for="end-date" class="block text-xs font-semibold mb-1.5" style="color: #0a0a0a;">
-                Tanggal Pulang
-              </label>
-              <input
-                id="end-date"
-                type="date"
-                bind:value={endDate}
-                style="background-color: #ffffff; color: #0a0a0a; border: 1px solid #c8c4ba; border-radius: 4px;"
-                class="w-full px-3 py-2 text-xs"
-              />
-            </div>
-          </div>
-
-          <div class="pt-4" style="border-top: 1px solid #c8c4ba;">
-            <label for="traveler-origin" class="block text-xs font-semibold mb-1.5" style="color: #0a0a0a;">
-              Kategori Yurisdiksi Wisatawan
+          <div>
+            <label for="end-date" class="block text-xs font-semibold mb-1" style="color: #0a0a0a;">
+              Tanggal Pulang
             </label>
-            <select
-              id="traveler-origin"
-              bind:value={travelerOrigin}
-              style="background-color: #ffffff; color: #0a0a0a; border: 1px solid #c8c4ba; border-radius: 4px;"
-              class="w-full px-3 py-2.5 text-xs"
-            >
-              <option value="international">Wisatawan Mancanegara (WNA, Wajib Pungutan Perda 6/2023)</option>
-              <option value="domestic">Wisatawan Nusantara (WNI)</option>
-            </select>
+            <input
+              id="end-date"
+              type="date"
+              bind:value={endDate}
+              style="background-color: #ffffff; color: #0a0a0a; border: 1px solid #0a0a0a;"
+              class="w-full px-3 py-2 text-xs"
+            />
           </div>
+        </div>
 
-          {#if errorMsg}
-            <div class="p-3 bg-white text-xs font-medium" style="border-left: 3px solid #b91c1c; color: #b91c1c;">
-              {errorMsg}
-            </div>
-          {/if}
+        <!-- Traveler Origin -->
+        <div class="pt-3" style="border-top: 1px solid #dcd7cb;">
+          <label for="traveler-origin" class="block text-xs font-semibold mb-1" style="color: #0a0a0a;">
+            Kewarganegaraan Wisatawan
+          </label>
+          <select
+            id="traveler-origin"
+            bind:value={travelerOrigin}
+            style="background-color: #ffffff; color: #0a0a0a; border: 1px solid #0a0a0a;"
+            class="w-full px-3 py-2.5 text-xs font-medium"
+          >
+            <option value="international">Wisatawan Asing / WNA (Wajib Retribusi Love Bali Rp150.000)</option>
+            <option value="domestic">Wisatawan Nusantara / WNI (Bebas Retribusi Love Bali)</option>
+          </select>
+        </div>
 
-          <div class="pt-2">
-            <button
-              type="submit"
-              disabled={loading}
-              style="background-color: #0c249c; color: #ffffff;"
-              class="w-full inline-flex items-stretch justify-between text-xs font-medium hover:opacity-95 transition-opacity disabled:opacity-50"
-            >
-              <span class="px-4 py-3 flex items-center gap-2">
-                <span>{loading ? 'Memeriksa Korpus JDIH...' : 'Susun Dokumen Trip Brief'}</span>
-              </span>
-              <span
-                style="background-color: #e6e4de; color: #0a0a0a; margin: 3px;"
-                class="w-9 flex items-center justify-center font-mono text-xs font-bold"
-              >
-                ↗
-              </span>
-            </button>
+        {#if errorMsg}
+          <div class="p-3 bg-red-50 text-xs font-medium text-red-700 border-l-4 border-red-700">
+            {errorMsg}
           </div>
-        </form>
-      </div>
+        {/if}
 
-      <!-- Right Pane: Editorial Legal Dossier (8 cols) -->
-      <div class="lg:col-span-8 min-w-0" style="background-color: #e6e4de;">
-        {#if result}
-          {#key result.masked_itinerary}
-            <div class="animate-brutal-stamp">
-          <!-- Row 1: Telemetry & Export Strip -->
-          <div class="px-6 py-3.5 flex flex-wrap items-center justify-between gap-3" style="background-color: #dfd8c8; border-bottom: 1px solid #c8c4ba;">
-            <div class="flex flex-wrap items-center gap-3 font-mono text-[11px]" style="color: #0a0a0a;">
-              <span>ENGINE: <strong>{result.ai_engine || 'Strict-RAG'}</strong></span>
-              <span>|</span>
-              <span>PII REDACTED: <strong>{result.pii_redacted_count}</strong></span>
-              <span>|</span>
-              <span style="color: #0c249c;" class="font-bold">{result.guard_status}</span>
+        <button
+          type="submit"
+          disabled={loading}
+          style="background-color: #0c249c; color: #ffffff; padding: 2px; border: 1.5px solid #0a0a0a; box-shadow: 3px 3px 0px #0a0a0a;"
+          class="opero-split-btn brutal-press w-full inline-flex items-center justify-between text-xs font-medium cursor-pointer disabled:opacity-50"
+        >
+          <span class="px-4 py-2.5 font-semibold">
+            {loading ? 'Memeriksa Korpus Hukum...' : 'Periksa Rencana Perjalanan'}
+          </span>
+          <span
+            style="background-color: #dfd8c8; color: #0a0a0a;"
+            class="opero-arrow-box w-8 h-8 flex items-center justify-center font-mono text-xs font-bold"
+          >
+            ↗
+          </span>
+        </button>
+      </form>
+    </div>
+
+    <!-- Right Column: Results Dossier -->
+    <div class="lg:col-span-7 min-w-0" style="background-color: #e6e4de;">
+      {#if result}
+        <div class="animate-page-fade">
+
+          <!-- Action bar -->
+          <div class="px-6 py-4 flex flex-wrap items-center justify-between gap-3 bg-white" style="border-bottom: 1px solid #cdc9be;">
+            <div>
+              <span class="text-xs font-semibold" style="color: #0a0a0a;">
+                Hasil Analisis Kepatuhan Rute
+              </span>
+              <span class="block text-[11px] text-ink-500 font-mono">
+                {result.start_date} s/d {result.end_date}
+              </span>
             </div>
 
             <div class="flex items-center gap-2">
               <button
                 type="button"
                 onclick={copyWhatsApp}
-                style="background-color: #ffffff; color: #0a0a0a; border: 1px solid #c8c4ba;"
-                class="px-3.5 py-1.5 text-xs font-medium hover:bg-stone transition-colors"
+                style="background-color: #ffffff; color: #0a0a0a; border: 1.5px solid #0a0a0a; box-shadow: 2px 2px 0px #0a0a0a;"
+                class="brutal-press px-3 py-1.5 text-xs font-medium cursor-pointer"
               >
-                {copySuccess ? 'Tersalin' : 'Salin Ringkasan WA'}
+                {copySuccess ? 'Tersalin' : 'Salin Ringkasan'}
               </button>
-              <button
-                type="button"
-                onclick={downloadIcs}
-                style="background-color: #0c249c; color: #ffffff;"
-                class="px-3.5 py-1.5 text-xs font-medium hover:opacity-90 transition-opacity"
-              >
-                Unduh Kalender (.ICS)
-              </button>
+
+              {#if result.calendar_conflicts && result.calendar_conflicts.has_nyepi}
+                <button
+                  type="button"
+                  onclick={downloadIcs}
+                  style="background-color: #0c249c; color: #ffffff; border: 1.5px solid #0a0a0a; box-shadow: 2px 2px 0px #0a0a0a;"
+                  class="brutal-press px-3 py-1.5 text-xs font-medium cursor-pointer"
+                >
+                  Unduh Kalender (.ICS)
+                </button>
+              {/if}
             </div>
           </div>
 
-          <!-- Row 2: Executive Synthesis & Masked Input -->
-          {#if result.ai_synthesis}
-            <div class="p-6 space-y-2.5 bg-white" style="border-bottom: 1px solid #c8c4ba;">
-              <span class="font-mono text-[10px] uppercase tracking-wider block" style="color: #0c249c; font-weight: 600;">
-                Ringkasan Kepatuhan Rute ({result.start_date} s/d {result.end_date})
-              </span>
-              <p class="text-base sm:text-lg leading-relaxed" style="color: #0a0a0a;">
-                {result.ai_synthesis}
-              </p>
-              {#if result.pii_redacted_count > 0}
-                <div class="pt-2 font-mono text-[11px]" style="color: #5e5d58;">
-                  Log Masukan Terlindungi: <span style="color: #0a0a0a;">{result.masked_itinerary}</span>
-                </div>
-              {/if}
-            </div>
-          {/if}
-
-          <!-- Row 3: Nyepi Critical Schedule Ledger -->
+          <!-- Alert Banner if Nyepi is inside travel window -->
           {#if result.calendar_conflicts && result.calendar_conflicts.has_nyepi}
             {@const nyepi = result.calendar_conflicts.nyepi_summary}
-            <div style="border-bottom: 1px solid #c8c4ba;">
-              <div class="px-6 py-4 flex flex-wrap items-center justify-between gap-2" style="background-color: #0c249c; color: #ffffff;">
+            <div style="background-color: #0c249c; color: #ffffff; border-bottom: 2px solid #0a0a0a;" class="p-6">
+              <div class="flex items-start gap-3">
+                <span class="text-xl">⚠️</span>
                 <div>
-                  <span class="font-mono text-[10px] uppercase tracking-wider block" style="color: #dfd8c8;">
-                    Peringatan Kalender Kritis: Penghentian Aktivitas 24 Jam
-                  </span>
-                  <h3 class="text-base font-medium tracking-tight mt-0.5">
+                  <div class="font-mono text-[10px] tracking-wider uppercase font-bold text-amber-200">
+                    Perhatian Kritis · Penghentian Total 24 Jam
+                  </div>
+                  <h3 class="text-lg sm:text-xl font-bold tracking-tight mt-0.5">
                     {nyepi.event_name} ({nyepi.date})
                   </h3>
+                  <p class="text-xs sm:text-sm mt-1.5 text-blue-100 leading-relaxed max-w-2xl">
+                    Jadwal perjalanan Anda melewati Hari Suci Nyepi. Seluruh aktivitas publik, bandara, pelabuhan, jalan raya, dan data seluler dihentikan mulai pukul 06.00 WITA hingga 06.00 WITA keesokan harinya.
+                  </p>
                 </div>
-                <span class="font-mono text-[11px] px-2.5 py-1 font-semibold" style="background-color: #dfd8c8; color: #0a0a0a;">
-                  06.00 WITA → 06.00 WITA (+1 Hari)
-                </span>
               </div>
 
-              <!-- 4 Catur Brata Columns -->
-              <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 bg-white" style="border-bottom: 1px solid #c8c4ba;">
+              <!-- 4 Catur Brata rules in 4 clean cards -->
+              <div class="mt-5 grid grid-cols-2 sm:grid-cols-4 gap-2.5">
                 {#each nyepi.restrictions as r, idx}
-                  <div class="p-4 space-y-1.5" style="border-right: 1px solid #c8c4ba;">
-                    <span class="font-mono text-[10px] font-bold block" style="color: #0c249c;">0{idx + 1} / {r.rule}</span>
-                    <span class="text-xs font-semibold block" style="color: #0a0a0a;">{r.translation}</span>
-                    <p class="text-[11px] leading-relaxed" style="color: #333330;">{r.instruction}</p>
+                  <div class="p-3 bg-white text-ink-900" style="border: 1.5px solid #0a0a0a;">
+                    <span class="font-mono text-[10px] font-bold text-indigo-700 block">0{idx + 1} / {r.rule}</span>
+                    <span class="text-xs font-bold block mt-0.5">{r.translation}</span>
+                    <p class="text-[11px] text-ink-600 mt-1 leading-snug">{r.instruction}</p>
                   </div>
                 {/each}
               </div>
-
-              <!-- Infrastructure Disruptions -->
-              <div class="px-6 py-4 grid grid-cols-1 md:grid-cols-12 gap-4 text-xs" style="background-color: #f2f0ea;">
-                <div class="md:col-span-3 font-mono text-[10px] uppercase font-semibold" style="color: #0a0a0a;">
-                  Dampak Infrastruktur Publik
-                </div>
-                <ul class="md:col-span-9 space-y-1 list-disc list-inside" style="color: #333330;">
-                  {#each nyepi.service_disruptions as d}
-                    <li>{d}</li>
-                  {/each}
-                </ul>
-              </div>
             </div>
           {/if}
 
-          <!-- Row 4: Applicable Statutes Table -->
-          <div>
-            <div class="px-6 py-3 flex items-center justify-between font-mono text-[10px] uppercase tracking-wider" style="background-color: #dfd8c8; color: #0a0a0a; border-bottom: 1px solid #c8c4ba;">
-              <span class="font-semibold">Instrumen Hukum Terverifikasi ({result.briefing_items.length} Pasal)</span>
-              <span>Kutipan Verbatim JDIH Bali</span>
+          <!-- Plain-Language Summary -->
+          {#if result.ai_synthesis}
+            <div class="p-6 bg-white" style="border-bottom: 1px solid #cdc9be;">
+              <span class="text-[11px] font-mono font-semibold uppercase text-ink-500 block mb-1">
+                Ikhtisar Regulasi
+              </span>
+              <p class="text-sm sm:text-base leading-relaxed text-ink-900">
+                {result.ai_synthesis}
+              </p>
+            </div>
+          {/if}
+
+          <!-- Applicable Legal Rules (Cards with clear categories) -->
+          <div class="p-6 space-y-4">
+            <div class="flex items-center justify-between">
+              <span class="text-xs font-bold uppercase tracking-wider font-mono text-ink-900">
+                Aturan Hukum yang Berlaku ({result.briefing_items.length} Pasal)
+              </span>
+              <span class="text-[11px] text-ink-500">
+                Berdasarkan JDIH Provinsi Bali
+              </span>
             </div>
 
-            {#each result.briefing_items as item}
-              <div class="p-6 grid grid-cols-1 md:grid-cols-12 gap-4 bg-white hover:bg-stone/40 transition-colors" style="border-bottom: 1px solid #c8c4ba;">
-                <div class="md:col-span-4 space-y-1.5">
-                  <span class="font-mono text-[10px] px-2 py-0.5 inline-block font-semibold" style="background-color: #0c249c; color: #ffffff;">
-                    Tingkat {item.tier} · {item.tier_label}
-                  </span>
-                  <h4 class="text-sm font-semibold pt-1" style="color: #0a0a0a;">{item.category}</h4>
-                  <p class="font-mono text-[11px]" style="color: #5e5d58;">{item.pasal}</p>
-                  <button
-                    type="button"
-                    onclick={() => onOpenDoc(item)}
-                    style="color: #0c249c;"
-                    class="pt-2 inline-block font-mono text-[11px] font-semibold hover:underline"
-                  >
-                    Buka Naskah Penuh →
-                  </button>
-                </div>
+            <div class="space-y-3">
+              {#each result.briefing_items as item}
+                <div
+                  class="p-4 bg-white space-y-2"
+                  style="border: 1.5px solid #0a0a0a; box-shadow: 2px 2px 0px #0a0a0a;"
+                >
+                  <div class="flex items-center justify-between gap-2">
+                    <span
+                      class="px-2 py-0.5 font-mono text-[10px] font-bold"
+                      style="background-color: #dfd8c8; color: #0a0a0a; border: 1px solid #0a0a0a;"
+                    >
+                      {item.category}
+                    </span>
+                    <span class="font-mono text-[11px] font-semibold text-ink-600">
+                      {item.pasal}
+                    </span>
+                  </div>
 
-                <div class="md:col-span-8 space-y-3">
-                  <p class="text-xs font-semibold" style="color: #0a0a0a;">{item.title}</p>
-                  <blockquote class="p-3.5 font-mono text-xs leading-relaxed" style="background-color: #f2f0ea; border-left: 3px solid #0c249c; color: #0a0a0a;">
-                    "{item.summary}"
-                  </blockquote>
-                  <div class="text-xs flex items-baseline gap-2" style="color: #333330;">
-                    <span class="font-mono text-[10px] uppercase font-semibold shrink-0" style="color: #0a0a0a;">Sanksi:</span>
-                    <span>{item.penalties}</span>
+                  <h4 class="text-xs sm:text-sm font-bold text-ink-900">
+                    {item.title}
+                  </h4>
+
+                  <p class="text-xs text-ink-700 leading-relaxed font-sans">
+                    {item.summary}
+                  </p>
+
+                  <div class="pt-2 flex flex-wrap items-center justify-between gap-2 text-[11px]" style="border-top: 1px dashed #cdc9be;">
+                    <div class="text-ink-600">
+                      <strong class="text-ink-900">Sanksi:</strong> {item.penalties}
+                    </div>
+                    <button
+                      type="button"
+                      onclick={() => onOpenDoc(item)}
+                      class="text-indigo-800 font-semibold hover:underline cursor-pointer"
+                    >
+                      Lihat Teks Pasal Penuh →
+                    </button>
                   </div>
                 </div>
-              </div>
-            {/each}
-          </div>
-
-          <div class="px-6 py-3.5 font-mono text-[11px]" style="background-color: #f2f0ea; color: #5e5d58;">
-            {result.disclaimer}
-          </div>
+              {/each}
             </div>
-          {/key}
-        {/if}
-      </div>
+          </div>
 
+          <!-- Collapsible Audit/Technical Telemetry (Quiet, not screaming) -->
+          <div class="px-6 pb-6">
+            <button
+              type="button"
+              onclick={() => (showTechAudit = !showTechAudit)}
+              class="text-[11px] font-mono text-ink-500 hover:text-ink-900 flex items-center gap-1.5 cursor-pointer"
+            >
+              <span>{showTechAudit ? '▼ Sembunyikan' : '▶ Tampilkan'} Detail Teknis Verifikasi</span>
+            </button>
+
+            {#if showTechAudit}
+              <div class="mt-2.5 p-3 text-[11px] font-mono space-y-1 bg-stone/20" style="border: 1px solid #cdc9be;">
+                <div>Engine: {result.ai_engine}</div>
+                <div>Status Verifier: {result.guard_status}</div>
+                <div>Data Pribadi Terlindungi: {result.pii_redacted_count} data</div>
+                {#if result.pii_redacted_count > 0}
+                  <div class="text-ink-600 truncate">Log Bersih: {result.masked_itinerary}</div>
+                {/if}
+              </div>
+            {/if}
+          </div>
+
+        </div>
+      {:else}
+        <div class="h-full flex items-center justify-center p-12 text-center text-ink-400">
+          <p class="text-sm max-w-xs">
+            Isi rute perjalanan di sebelah kiri atau pilih salah satu contoh untuk melihat hasil analisis aturan.
+          </p>
+        </div>
+      {/if}
     </div>
+
   </div>
 </div>
