@@ -1,5 +1,4 @@
 <script>
-  import Header from './Header.svelte';
   import AnatomyRig from './AnatomyRig.svelte';
 
   let { navigate = (path) => {}, onOpenDoc = (doc) => {} } = $props();
@@ -38,8 +37,6 @@
           class="absolute inset-x-0 bottom-0 h-28 pointer-events-none"
           style="background: linear-gradient(to top, rgba(226, 219, 203, 0.86) 0%, rgba(226, 219, 203, 0.32) 55%, rgba(226, 219, 203, 0) 100%);"
         ></div>
-
-        <Header currentPath="/" {navigate} overlay={true} />
 
         <div
           class="absolute bottom-4 left-0 right-0 z-20 px-2"

@@ -66,10 +66,8 @@
     </div>
   {/if}
 
-  <!-- On '/' the compact nav bar floats directly inside the hero artwork; on workspace routes it docks at top -->
-  {#if currentPath !== '/'}
-    <Header {currentPath} {navigate} overlay={false} />
-  {/if}
+  <!-- Fixed Top Navbar (follows scroll on all pages) -->
+  <Header {currentPath} {navigate} overlay={currentPath === '/'} />
 
   <!-- Route Views with smooth opacity fade (No translateY jump) -->
   <main class="flex-1 w-full" style="max-width: 100vw; overflow-x: hidden;">
