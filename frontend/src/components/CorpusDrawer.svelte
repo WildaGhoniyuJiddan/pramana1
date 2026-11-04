@@ -62,7 +62,7 @@
           </span>
           <div
             class="p-5 border text-xs sm:text-sm leading-relaxed font-mono whitespace-pre-line"
-            style="background-color: #f2f0ea; border-color: #c8c4ba; border-left: 3px solid #0c249c; color: #0a0a0a;"
+            style="background-color: #faf9f6; border: 1px solid #dcd7cb; color: #0a0a0a;"
           >
             {item.full_text || item.quoted_text}
           </div>

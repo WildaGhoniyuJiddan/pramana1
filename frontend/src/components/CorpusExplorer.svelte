@@ -47,9 +47,8 @@
     <div class="p-6 sm:p-8" style="background-color: #dfd8c8; border-bottom: 1.5px solid #0a0a0a;">
       <div class="flex flex-col lg:flex-row lg:items-end justify-between gap-6">
         <div class="space-y-2">
-          <div class="inline-flex items-center gap-2 text-[11px] font-semibold" style="color: #0c249c;">
-            <span class="w-2 h-2 rounded-full inline-block" style="background-color: #0c249c;"></span>
-            <span>PUSTAKA DOKUMEN RESMI JDIH PROVINSI BALI</span>
+          <div class="text-[11px] font-mono tracking-wider uppercase font-semibold" style="color: #0c249c;">
+            PUSTAKA DOKUMEN RESMI JDIH PROVINSI BALI
           </div>
           <h1 class="opero-h1 text-2xl sm:text-4xl" style="color: #0a0a0a;">
             Eksplorasi <span class="opero-serif" style="color: #0c249c;">Korpus Regulasi</span>
@@ -167,7 +166,7 @@
                 <span class="font-mono text-[10px] uppercase tracking-wider font-semibold block mb-2" style="color: #5e5d58;">
                   Bunyi Naskah Resmi
                 </span>
-                <div class="p-4 sm:p-5 text-xs sm:text-sm leading-relaxed whitespace-pre-line" style="background-color: #f7f5f0; border-left: 3px solid #0c249c; color: #0a0a0a;">
+                <div class="p-4 sm:p-5 text-xs sm:text-sm leading-relaxed whitespace-pre-line" style="background-color: #faf9f6; border: 1px solid #dcd7cb; color: #0a0a0a;">
                   {activeReg.text}
                 </div>
               </div>

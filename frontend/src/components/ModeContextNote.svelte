@@ -81,10 +81,9 @@
     <!-- Header Strip -->
     <div class="p-6 sm:p-8" style="background-color: #dfd8c8; border-bottom: 1.5px solid #0a0a0a;">
       <div class="flex flex-col lg:flex-row lg:items-end justify-between gap-6">
-        <div class="space-y-2">
-          <div class="inline-flex items-center gap-2 text-[11px] font-semibold" style="color: #0c249c;">
-            <span class="w-2 h-2 rounded-full inline-block" style="background-color: #0c249c;"></span>
-            <span>KLARIFIKASI FAKTA &amp; RUJUKAN HUKUM RESMI</span>
+        <div class="space-y-1.5">
+          <div class="text-[11px] font-mono tracking-wider uppercase font-semibold" style="color: #0c249c;">
+            Klarifikasi Fakta &amp; Rujukan Hukum Resmi
           </div>
           <h1 class="opero-h1 text-2xl sm:text-4xl" style="color: #0a0a0a;">
             Uji Klaim &amp; <span class="opero-serif" style="color: #0c249c;">Catatan Konteks</span>
@@ -95,7 +94,7 @@
         </div>
 
         <!-- Scenario Chips -->
-        <div class="space-y-2">
+        <div class="space-y-1.5">
           <span class="block text-[10px] font-mono uppercase tracking-wider font-semibold" style="color: #5e5d58;">
             Coba Contoh Kasus:
           </span>
@@ -117,14 +116,14 @@
       </div>
     </div>
 
-    <!-- Main 2-Pane Split Ledger -->
-    <div class="grid grid-cols-1 lg:grid-cols-12">
+    <!-- Main 2-Pane Split: Left Sticky Form, Right Results -->
+    <div class="grid grid-cols-1 lg:grid-cols-12 items-start">
 
-      <!-- Left Pane: Claim Input (5 cols) -->
-      <div class="lg:col-span-5 p-6 sm:p-7 space-y-6" style="background-color: #f2f0ea; border-right: 1px solid #c8c4ba;">
-        <form onsubmit={handleSubmit} class="space-y-5">
+      <!-- Left Pane: Claim Input (5 cols, Sticky) -->
+      <div class="lg:col-span-5 p-6 sm:p-7 space-y-5 lg:sticky lg:top-4 self-start" style="background-color: #f2f0ea; border-right: 1px solid #c8c4ba;">
+        <form onsubmit={handleSubmit} class="space-y-4">
           <div>
-            <label for="post-content" class="block text-xs font-semibold mb-2" style="color: #0a0a0a;">
+            <label for="post-content" class="block text-xs font-semibold mb-1.5" style="color: #0a0a0a;">
               Teks Klaim, Keluhan, atau Kabar Medsos
             </label>
             <textarea
@@ -141,7 +140,7 @@
           </div>
 
           {#if errorMsg}
-            <div class="p-3 bg-white text-xs font-medium" style="border-left: 3px solid #b91c1c; color: #b91c1c;">
+            <div class="p-3 bg-red-50 text-xs font-medium text-red-700 border border-red-700">
               {errorMsg}
             </div>
           {/if}
@@ -151,7 +150,7 @@
               type="submit"
               disabled={loading}
               style="background-color: #0c249c; color: #ffffff;"
-              class="w-full inline-flex items-center justify-between px-4 py-3 text-xs font-semibold hover:opacity-95 transition-opacity disabled:opacity-50"
+              class="w-full inline-flex items-center justify-between px-4 py-3 text-xs font-semibold hover:opacity-95 transition-opacity disabled:opacity-50 cursor-pointer"
             >
               <span>{loading ? 'Memverifikasi Korpus JDIH...' : 'Periksa Klaim Sekarang'}</span>
               <span class="font-mono text-xs">→</span>
@@ -159,7 +158,7 @@
           </div>
         </form>
 
-        <div class="pt-5 space-y-2 text-xs" style="border-top: 1px solid #c8c4ba; color: #333330;">
+        <div class="pt-4 space-y-2 text-xs" style="border-top: 1px solid #c8c4ba; color: #333330;">
           <span class="font-mono text-[10px] uppercase tracking-wider font-semibold block" style="color: #0c249c;">
             Prinsip Verifikasi
           </span>
@@ -178,12 +177,11 @@
           {#key result.masked_post_content}
             <div class="animate-brutal-stamp">
 
-              <!-- Top Bar: Quick Status & Copy -->
-              <div class="px-6 py-4 flex flex-wrap items-center justify-between gap-3" style="background-color: #dfd8c8; border-bottom: 1px solid #c8c4ba;">
+              <!-- Top Bar: Quick Status & Copy (No colored dots) -->
+              <div class="px-6 py-3.5 flex flex-wrap items-center justify-between gap-3" style="background-color: #dfd8c8; border-bottom: 1px solid #c8c4ba;">
                 <div class="flex items-center gap-2">
-                  <span class="w-2 h-2 rounded-full" style={result.status === 'TIDAK_DITEMUKAN' ? 'background-color: #5e5d58;' : 'background-color: #15803d;'}></span>
-                  <span class="text-xs font-bold" style="color: #0a0a0a;">
-                    {result.status === 'TIDAK_DITEMUKAN' ? 'Di Luar Cakupan Regulasi' : 'Klarifikasi Siap Dibagikan'}
+                  <span class="text-xs font-bold uppercase tracking-wider font-mono" style="color: #0a0a0a;">
+                    {result.status === 'TIDAK_DITEMUKAN' ? 'Status: Di Luar Cakupan Regulasi' : 'Status: Klarifikasi Siap Dibagikan'}
                   </span>
                 </div>
 
@@ -191,7 +189,7 @@
                   <button
                     type="button"
                     onclick={() => (showTechAudit = !showTechAudit)}
-                    class="text-[11px] font-mono underline hover:text-black"
+                    class="text-[11px] font-mono underline hover:text-black cursor-pointer"
                     style="color: #5e5d58;"
                   >
                     {showTechAudit ? 'Tutup Diagnostik' : 'Lihat Diagnostik'}
@@ -202,7 +200,7 @@
                       type="button"
                       onclick={copyComment}
                       style="background-color: #0c249c; color: #ffffff;"
-                      class="px-3.5 py-1.5 text-xs font-medium hover:opacity-90 transition-opacity"
+                      class="px-3.5 py-1.5 text-xs font-medium hover:opacity-90 transition-opacity cursor-pointer"
                     >
                       {copySuccess ? 'Tersalin' : 'Salin Catatan'}
                     </button>
@@ -221,8 +219,8 @@
 
               {#if result.status === 'TIDAK_DITEMUKAN'}
                 <div class="p-8 sm:p-10 bg-white space-y-4" style="border-bottom: 1px solid #c8c4ba;">
-                  <div class="inline-flex items-center gap-2 px-2.5 py-1 text-xs font-semibold" style="background-color: #f2f0ea; color: #5e5d58;">
-                    <span>STATUS: TIDAK DITEMUKAN</span>
+                  <div class="inline-flex items-center gap-2 px-2.5 py-1 text-xs font-semibold" style="background-color: #f2f0ea; color: #5e5d58; border: 1px solid #c8c4ba;">
+                    <span>TIDAK DITEMUKAN PADA KORPUS RESMI</span>
                   </div>
                   <h2 class="text-xl sm:text-2xl font-normal tracking-tight" style="color: #0a0a0a;">
                     Dasar hukum tidak ditemukan di korpus regulasi resmi Bali.
@@ -236,7 +234,7 @@
                 </div>
               {:else}
                 <!-- Neutral Context Note Summary -->
-                <div class="p-6 sm:p-8 space-y-3 bg-white" style="border-bottom: 1px solid #c8c4ba;">
+                <div class="p-6 sm:p-8 space-y-2.5 bg-white" style="border-bottom: 1px solid #c8c4ba;">
                   <span class="font-mono text-[10px] uppercase tracking-wider font-semibold block" style="color: #0c249c;">
                     Catatan Konteks Netral
                   </span>
@@ -266,7 +264,7 @@
                   </div>
                 {/if}
 
-                <!-- Citations List -->
+                <!-- Citations List (NO generic left border stripe) -->
                 <div>
                   <div class="px-6 py-3 flex items-center justify-between font-mono text-[10px] uppercase tracking-wider" style="background-color: #dfd8c8; color: #0a0a0a; border-bottom: 1px solid #c8c4ba;">
                     <span class="font-semibold">Rujukan Regulasi Terkait ({result.citations.length})</span>
@@ -284,7 +282,7 @@
                           type="button"
                           onclick={() => onOpenDoc(cite)}
                           style="color: #0c249c;"
-                          class="inline-block text-xs font-semibold hover:underline"
+                          class="inline-block text-xs font-semibold hover:underline cursor-pointer"
                         >
                           Lihat Dokumen Lengkap →
                         </button>
@@ -292,9 +290,13 @@
 
                       <div class="md:col-span-8 space-y-2.5">
                         <p class="text-xs font-medium" style="color: #4a4943;">{cite.official_doc_title}</p>
-                        <blockquote class="p-3.5 text-xs sm:text-sm leading-relaxed" style="background-color: #f7f5f0; border-left: 3px solid #0c249c; color: #0a0a0a;">
-                          "{cite.quoted_text}"
-                        </blockquote>
+                        <!-- Authentic editorial quote container without vertical left bar -->
+                        <div class="p-4 text-xs sm:text-sm leading-relaxed" style="background-color: #faf9f6; border: 1px solid #dcd7cb; color: #0a0a0a;">
+                          <div class="font-serif italic text-base sm:text-lg mb-1" style="color: #5e5d58;">“</div>
+                          <p class="leading-relaxed">
+                            {cite.quoted_text}
+                          </p>
+                        </div>
                         {#if cite.penalties}
                           <div class="text-xs flex items-baseline gap-2 pt-1" style="color: #333330;">
                             <span class="text-[11px] font-semibold shrink-0" style="color: #0a0a0a;">Sanksi:</span>
