@@ -2,9 +2,6 @@
   let { currentPath = '/', navigate = (p) => {}, overlay = false } = $props();
 
   let scrollY = $state(0);
-  let lastScrollY = $state(0);
-  let scrollDelta = $state(0);
-  let isScrollingDown = $state(false);
   let isScrolled = $derived(scrollY > 15);
 
   const NAV_ITEMS = [
@@ -13,28 +10,12 @@
     { path: '/context-note', label: 'Context Note' },
     { path: '/corpus', label: 'Korpus JDIH' }
   ];
-
-  let scrollTimeout;
-  function onScroll() {
-    const current = window.scrollY;
-    const diff = current - lastScrollY;
-    if (Math.abs(diff) > 2) {
-      isScrollingDown = diff > 0;
-      scrollDelta = Math.max(-8, Math.min(8, diff * 0.25));
-    }
-    lastScrollY = current;
-
-    clearTimeout(scrollTimeout);
-    scrollTimeout = setTimeout(() => {
-      scrollDelta = 0;
-    }, 140);
-  }
 </script>
 
-<svelte:window bind:scrollY={scrollY} onscroll={onScroll} />
+<svelte:window bind:scrollY={scrollY} />
 
 {#if !overlay}
-  <!-- Structural Top Spacer in document flow for workspace routes -->
+  <!-- Structural Spacer in document flow so top content is never clipped -->
   <div
     class="w-full"
     style="background-color: #e6e4de; border-bottom: 1px solid #cdc9be; height: 62px;"
@@ -46,16 +27,14 @@
   </div>
 {/if}
 
-<!-- Smooth Floating Following Navbar -->
+<!-- Smooth Floating Navbar (Rock-solid, zero jitter, pure CSS transition) -->
 <div
-  class="fixed top-0 inset-x-0 z-40 flex justify-center px-4 pointer-events-none transition-all duration-300 ease-out"
-  style={overlay
-    ? `padding-top: ${isScrolled ? '14px' : '26px'};`
-    : `padding-top: ${isScrolled ? '10px' : '15px'};`}
+  class="fixed inset-x-0 z-40 flex justify-center px-4 pointer-events-none transition-all duration-300 ease-out"
+  style="top: {overlay ? (isScrolled ? '12px' : '22px') : '12px'};"
 >
   <nav
-    style="background-color: rgba(255, 255, 255, 0.94); backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px); color: #0a0a0a; max-width: 580px; width: 100%; border: 1.5px solid #0a0a0a; border-radius: 4px; box-shadow: {isScrolled ? '4px 4px 0px #0a0a0a' : '2.5px 2.5px 0px #0a0a0a'}; transform: translateY({scrollDelta}px);"
-    class="pointer-events-auto flex items-center justify-between pl-4 pr-1.5 py-1.5 transition-all duration-200 ease-out"
+    style="background-color: rgba(255, 255, 255, {isScrolled ? '0.96' : '0.92'}); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); color: #0a0a0a; max-width: 580px; width: 100%; border: 1.5px solid #0a0a0a; border-radius: 4px; box-shadow: {isScrolled ? '4px 4px 0px #0a0a0a' : '3px 3px 0px #0a0a0a'};"
+    class="pointer-events-auto flex items-center justify-between pl-4 pr-1.5 py-1.5 transition-all duration-300 ease-out"
   >
     <a
       href="/"
