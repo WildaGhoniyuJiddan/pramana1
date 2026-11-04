@@ -30,12 +30,14 @@ class BriefingItem(BaseModel):
 class TripBriefResponse(BaseModel):
     status: str
     guard_status: str
+    ai_engine: str = "deterministic-strict-rag"
     masked_itinerary: str
     pii_redacted_count: int
     start_date: str
     end_date: str
     calendar_conflicts: Dict[str, Any]
     briefing_items: List[BriefingItem]
+    ai_synthesis: Optional[str] = None
     whatsapp_text: str
     ics_content: str
     disclaimer: str
@@ -66,6 +68,7 @@ class CitationItem(BaseModel):
 class ContextNoteResponse(BaseModel):
     status: str
     guard_status: str
+    ai_engine: str = "deterministic-strict-rag"
     confidence: str
     masked_post: str
     pii_redacted_count: Optional[int] = 0
