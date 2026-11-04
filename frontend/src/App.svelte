@@ -105,8 +105,6 @@
           class="w-4 h-4 object-contain shrink-0"
         />
         <span class="font-semibold text-xs" style="color: #0a0a0a;">Pramana</span>
-        <span style="color: #cdc9be;">|</span>
-        <span>Bali DigiFest 2026 — AI Web Innovation Challenge</span>
       </div>
       <div class="flex items-center gap-5 font-mono text-[11px]" style="color: #5c5b57;">
         <a href="/" onclick={(e) => { e.preventDefault(); navigate('/'); }} class="hover:underline">/</a>
