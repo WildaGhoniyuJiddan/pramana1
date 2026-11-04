@@ -1,0 +1,106 @@
+{
+  "metadata": {
+    "version": "1.0.0",
+    "last_updated": "2026-11-04",
+    "description": "Korpus regulasi resmi kepariwisataan, ketertiban budaya, dan keimigrasian Provinsi Bali untuk sistem AI Strict-RAG Pramana.",
+    "total_documents": 6
+  },
+  "tiers": {
+    "1A": "Hukum Nasional (UU Keimigrasian, KUHP)",
+    "1B": "Hukum Daerah (Peraturan Daerah & Peraturan Gubernur Bali)",
+    "2": "Kebijakan & Pedoman (Surat Edaran Gubernur Bali)",
+    "3": "Norma Adat (Awig-awig / Pararem Desa Adat)"
+  },
+  "regulations": [
+    {
+      "id": "SE_GUB_04_2023_DO",
+      "doc_title": "Surat Edaran Gubernur Bali No. 4 Tahun 2023 tentang Tatanan Baru bagi Wisatawan Mancanegara selama Berada di Bali",
+      "doc_number": "Nomor 4 Tahun 2023",
+      "tier": "2",
+      "tier_label": "Pedoman Kebijakan",
+      "category": "Kewajiban Wisman (Do's)",
+      "bab": "Ketentuan Umum",
+      "pasal": "Poin 1.a s/d 1.h",
+      "source_url": "https://baliprov.go.id/web/surat-edaran-gubernur-bali-nomor-4-tahun-2023/",
+      "status": "Berlaku",
+      "keywords": ["pura", "tempat suci", "pakaian adat", "simbol suci", "mata uang rupiah", "tata krama", "pemandu wisata"],
+      "text": "Wisatawan Mancanegara yang berkunjung ke Bali wajib: 1. Memuliakan kesucian Pura, Pratima, dan Simbol-simbol Keagamaan yang disucikan; 2. Berbusana yang sopan, wajar, dan pantas pada saat berkunjung ke kawasan tempat suci, daya tarik wisata, dan tempat umum di Bali; 3. Berkelakuan yang sopan di kawasan suci, kawasan wisata, restoran, tempat perbelanjaan, jalan raya, dan tempat umum lainnya; 4. Didampingi pemandu wisata yang berlisensi saat mengunjungi daya tarik wisata; 5. Melakukan penukaran mata uang asing di penyelenggara KUPVA resmi (berizin Bank Indonesia); 6. Melakukan pembayaran dengan menggunakan Kode QR Standar Indonesia (QRIS) atau mata uang Rupiah; 7. Menaati peraturan perundang-undangan lalu lintas yang berlaku di Indonesia.",
+      "penalties": "Teguran lisan, penghentian kunjungan, sanksi adat setempat, hingga pelaporan ke pihak Imigrasi."
+    },
+    {
+      "id": "SE_GUB_04_2023_DONT",
+      "doc_title": "Surat Edaran Gubernur Bali No. 4 Tahun 2023 tentang Tatanan Baru bagi Wisatawan Mancanegara selama Berada di Bali",
+      "doc_number": "Nomor 4 Tahun 2023",
+      "tier": "2",
+      "tier_label": "Pedoman Kebijakan",
+      "category": "Larangan Wisman (Don'ts)",
+      "bab": "Ketentuan Larangan",
+      "pasal": "Poin 2.a s/d 2.h",
+      "source_url": "https://baliprov.go.id/web/surat-edaran-gubernur-bali-nomor-4-tahun-2023/",
+      "status": "Berlaku",
+      "keywords": ["memanjat pohon suci", "area utama mandala", "berfoto tidak sopan", "menodai tempat suci", "sepeda motor tanpa sim", "bekerja tanpa visa", "kata-kata kasar"],
+      "text": "Wisatawan Mancanegara dilarang: 1. Memasuki Utama Mandala dan Madya Mandala tempat suci atau Pura kecuali untuk bersembahyang dengan memakai busana adat Bali atau persembahyangan dan tidak sedang datang bulan (menstruasi); 2. Memanjat pohon yang disucikan; 3. Berkelakuan yang menodai kesucian tempat suci, pura, pratima, dan simbol-simbol keagamaan seperti berfoto dengan pakaian tidak pantas / tanpa busana; 4. Membuang sampah sembarangan dan/atau mengotori danau, mata air, sungai, laut, dan tempat umum; 5. Menggunakan plastik sekali pakai (kantong plastik, styrofoam, dan sedotan plastik); 6. Mengucapkan kata-kata kasar, berperilaku tidak sopan, membuat kegaduhan, serta bertindak agresif terhadap aparat negara, pemerintah, masyarakat lokal, maupun sesama wisatawan; 7. Melakukan aktivitas usaha atau bekerja secara ilegal tanpa memiliki dokumen resmi/visa kerja yang diterbitkan oleh instansi berwenang; 8. Mengendarai kendaraan bermotor tanpa memiliki SIM resmi, tanpa helm, melebihi kapasitas, dan melanggar rambu lalu lintas.",
+      "penalties": "Proses hukum pidana, sanksi denda adat (upacara pembersihan/prayascitta), serta deportasi dan penangkalan oleh instansi Imigrasi."
+    },
+    {
+      "id": "PERDA_BALI_05_2020_PASAL_15",
+      "doc_title": "Peraturan Daerah Provinsi Bali Nomor 5 Tahun 2020 tentang Penyelenggaraan Kepariwisataan Budaya Bali",
+      "doc_number": "Nomor 5 Tahun 2020",
+      "tier": "1B",
+      "tier_label": "Perda Bali",
+      "category": "Kewajiban Pengunjung & Wisatawan",
+      "bab": "BAB VII Hak dan Kewajiban",
+      "pasal": "Pasal 15",
+      "source_url": "https://jdih.baliprov.go.id/produk-hukum/peraturan-perundang-undangan/perda/26871",
+      "status": "Berlaku",
+      "keywords": ["kearifan lokal", "sad kerthi", "tri hita karana", "norma agama", "kesopanan", "kelestarian lingkungan"],
+      "text": "Setiap wisatawan yang berkunjung ke Daerah wajib: a. Menghormati nilai agama, adat istiadat, tradisi, seni dan budaya, serta kearifan lokal masyarakat Bali yang bersumber dari filosofi Tri Hita Karana dan Sad Kerthi; b. Menjaga dan memelihara kelestarian lingkungan alam dan budaya setempat; c. Mencegah dan tidak melakukan perbuatan yang bertentangan dengan norma agama, kesusilaan, ketertiban umum, dan peraturan perundang-undangan; d. Membayar pungutan daerah dan retribusi yang sah sesuai dengan ketentuan peraturan perundang-undangan.",
+      "penalties": "Sanksi administratif, pembatasan akses daya tarik wisata, serta tuntutan ganti rugi adat bila merusak sarana kawasan suci."
+    },
+    {
+      "id": "PERDA_BALI_06_2023_LEVY",
+      "doc_title": "Peraturan Daerah Provinsi Bali Nomor 6 Tahun 2023 tentang Pungutan bagi Wisatawan Asing untuk Perlindungan Kebudayaan dan Lingkungan Alam Bali (jo. Perda No. 2 Tahun 2025)",
+      "doc_number": "Nomor 6 Tahun 2023 jo. No. 2 Tahun 2025",
+      "tier": "1B",
+      "tier_label": "Perda Bali",
+      "category": "Pungutan Wisatawan Asing (Tourist Levy)",
+      "bab": "BAB III Tata Cara Pungutan",
+      "pasal": "Pasal 4 & Pasal 5",
+      "source_url": "https://jdih.baliprov.go.id/produk-hukum/peraturan-perundang-undangan/perda/28402",
+      "status": "Berlaku",
+      "keywords": ["love bali", "pungutan wisman", "tourist levy", "rp 150000", "voucher digital", "pintu masuk"],
+      "text": "1. Wisatawan asing yang melakukan perjalanan ke Bali dikenakan Pungutan sebesar Rp150.000,00 (seratus lima puluh ribu rupiah) per orang untuk satu kali masuk ke Bali selama berada di Indonesia. 2. Pembayaran wajib dilakukan secara non-tunai melalui sistem Love Bali (aplikasi atau web) sebelum atau pada saat kedatangan di pintu masuk Bali (Bandara I Gusti Ngurah Rai atau Pelabuhan Laut). 3. Bukti pembayaran berupa voucher digital dipindai pada pintu pemeriksaan bandara/pelabuhan atau saat memasuki daya tarik wisata.",
+      "penalties": "Pemeriksaan di pos pantau pariwisata; wisatawan yang belum membayar diwajibkan melakukan pembayaran seketika di tempat atau dilarang memasuki destinasi wisata budaya binaan."
+    },
+    {
+      "id": "UU_06_2011_PASAL_75",
+      "doc_title": "Undang-Undang Republik Indonesia Nomor 6 Tahun 2011 tentang Keimigrasian",
+      "doc_number": "Nomor 6 Tahun 2011",
+      "tier": "1A",
+      "tier_label": "Hukum Nasional",
+      "category": "Tindakan Administratif Keimigrasian",
+      "bab": "BAB VII Pengawasan dan Tindakan Keimigrasian",
+      "pasal": "Pasal 75 Ayat (1) & (2)",
+      "source_url": "https://peraturan.go.id/id/uu-no-6-tahun-2011",
+      "status": "Berlaku",
+      "keywords": ["deportasi", "penangkalan", "ketertiban umum", "izin tinggal", "penyalahgunaan visa", "tindakan administratif"],
+      "text": "(1) Pejabat Imigrasi berwenang melakukan Tindakan Administratif Keimigrasian terhadap Orang Asing yang berada di Wilayah Indonesia yang melakukan kegiatan berbahaya dan patut diduga membahayakan keamanan dan ketertiban umum atau tidak menghormati atau tidak menaati peraturan perundang-undangan. (2) Tindakan Administratif Keimigrasian sebagaimana dimaksud pada ayat (1) dapat berupa: a. pencantuman dalam daftar Pencegahan atau Penangkalan; b. pembatasan, perubahan, atau pembatalan Izin Tinggal; c. larangan untuk berada di satu atau beberapa tempat tertentu di Wilayah Indonesia; d. keharusan untuk bertempat tinggal di suatu tempat tertentu di Wilayah Indonesia; e. pengenaan biaya beban; dan/atau f. Deportasi dari Wilayah Indonesia.",
+      "penalties": "Deportasi langsung ke negara asal dan dimasukkan ke dalam daftar penangkalan (cekal) masuk ke Indonesia minimal 6 bulan hingga seumur hidup."
+    },
+    {
+      "id": "KETENTUAN_HARI_RAYA_NYEPI",
+      "doc_title": "Ketentuan Pelaksanaan Hari Suci Nyepi dan Seruan Bersama Parisada Hindu Dharma Indonesia (PHDI) & Majelis Desa Adat (MDA) Bali",
+      "doc_number": "Seruan Bersama Tahunan",
+      "tier": "2",
+      "tier_label": "Pedoman Adat & Kebijakan",
+      "category": "Hari Suci Nyepi (Catur Brata Penyepian)",
+      "bab": "Pedoman Nyepi",
+      "pasal": "Catur Brata Penyepian",
+      "source_url": "https://phdi.or.id/",
+      "status": "Berlaku Tahunan",
+      "keywords": ["nyepi", "catur brata penyepian", "amati geni", "amati karya", "amati lelungan", "amati lelanguan", "pecalang", "bandara tutup", "data seluler mati"],
+      "text": "Selama 24 jam penuh perayaan Hari Suci Nyepi (pukul 06.00 WITA hingga 06.00 WITA keesokan harinya), seluruh masyarakat dan wisatawan di Bali wajib mematuhi Catur Brata Penyepian: 1. Amati Geni: Tidak menyalakan api, lampu penerangan luar, atau cahaya yang terlihat dari luar; 2. Amati Karya: Tidak melakukan pekerjaan atau aktivitas fisik perkantoran/perdagangan; 3. Amati Lelungan: Tidak bepergian keluar dari pekarangan rumah atau area hotel/resort; 4. Amati Lelanguan: Tidak mengadakan hiburan, kegaduhan, atau membunyikan suara keras. Ketentuan khusus: Seluruh bandara dan pelabuhan ditutup kecuali penerbangan darurat medis; penyedia layanan telekomunikasi mematikan data seluler dan IPTV; pengawasan dilakukan oleh Pecalang (petugas keamanan adat desa).",
+      "penalties": "Teguran dan penertiban oleh Pecalang, sanksi denda adat (danda pasikepan), serta penyerahan ke aparat kepolisian/imigrasi bila melakukan perlawanan."
+    }
+  ]
+}
