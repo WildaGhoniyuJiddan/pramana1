@@ -8,6 +8,13 @@
   let selectedTier = $state('ALL');
   let activeReg = $state(null);
 
+  const TIER_OPTIONS = [
+    { id: 'ALL', label: 'Semua Regulasi' },
+    { id: '1A', label: 'UU Nasional (1A)' },
+    { id: '1B', label: 'Perda Bali (1B)' },
+    { id: '2', label: 'Surat Edaran (2)' }
+  ];
+
   onMount(async () => {
     try {
       corpusData = await fetchCorpus();
@@ -36,52 +43,44 @@
 <div class="mx-auto" style="max-width: 1360px; width: 100%; border-left: 1px solid #cdc9be; border-right: 1px solid #cdc9be; background-color: #e6e4de; color: #0a0a0a; overflow: hidden;">
   <div>
 
-    <!-- Atmospheric Opero Banner + Filter Bar -->
-    <div class="p-3 sm:p-4" style="border-bottom: 1px solid #cdc9be;">
-      <div
-        class="relative overflow-hidden p-6 sm:p-8 flex flex-col md:flex-row md:items-end justify-between gap-6"
-        style="background-color: #091e8a; color: #ffffff; border: 1.5px solid #0a0a0a; box-shadow: 4px 4px 0px #0a0a0a;"
-      >
-        <img
-          src="/assets/opero_bali_hero.jpg"
-          alt="Pointillist Bali Sky"
-          class="absolute inset-0 w-full h-full object-cover opacity-35 pointer-events-none"
-          style="object-position: center 25%;"
-        />
-        <div
-          class="absolute inset-0 pointer-events-none"
-          style="background: linear-gradient(90deg, rgba(8, 24, 115, 0.94) 0%, rgba(8, 24, 115, 0.72) 60%, rgba(8, 24, 115, 0.55) 100%);"
-        ></div>
-
-        <div class="relative z-10">
-          <div class="inline-flex items-center text-[11px] font-mono mb-3" style="background-color: rgba(255,255,255,0.14); color: #ffffff; border-radius: 2px; padding: 2px;">
-            <span style="background-color: #dfd8c8; color: #0a0a0a; border-radius: 1px;" class="px-2 py-0.5 font-bold">§</span>
-            <span class="px-3 py-0.5">Domain Publik · Pasal 42 UU No. 28 Tahun 2014</span>
+    <!-- Header Strip -->
+    <div class="p-6 sm:p-8" style="background-color: #dfd8c8; border-bottom: 1.5px solid #0a0a0a;">
+      <div class="flex flex-col lg:flex-row lg:items-end justify-between gap-6">
+        <div class="space-y-2">
+          <div class="inline-flex items-center gap-2 text-[11px] font-semibold" style="color: #0c249c;">
+            <span class="w-2 h-2 rounded-full inline-block" style="background-color: #0c249c;"></span>
+            <span>PUSTAKA DOKUMEN RESMI JDIH PROVINSI BALI</span>
           </div>
-          <h1 class="opero-h1 text-3xl sm:text-5xl" style="color: #ffffff;">
-            Indeks <span class="opero-serif" style="color: #dfd8c8;">Korpus Hukum</span> JDIH Bali
+          <h1 class="opero-h1 text-2xl sm:text-4xl" style="color: #0a0a0a;">
+            Eksplorasi <span class="opero-serif" style="color: #0c249c;">Korpus Regulasi</span>
           </h1>
+          <p class="text-xs sm:text-sm max-w-2xl leading-relaxed" style="color: #4a4943;">
+            Seluruh naskah hukum, Perda, dan Surat Edaran yang menjadi rujukan verifikasi. Bersumber langsung dari JDIH Bali dan domain publik.
+          </p>
         </div>
 
-        <div class="relative z-10 flex flex-wrap items-center gap-2">
-          <input
-            type="search"
-            bind:value={searchQuery}
-            placeholder="Cari pasal, kata kunci, topik..."
-            style="background-color: #ffffff; color: #0a0a0a; border-radius: 3px;"
-            class="px-3.5 py-2 text-xs focus:outline-none w-60 shadow-xs"
-          />
-          <div class="inline-flex font-mono text-[11px] p-0.5" style="background-color: rgba(255,255,255,0.16); border-radius: 3px;">
-            {#each ['ALL', '1A', '1B', '2'] as tier}
+        <!-- Search & Filter Controls -->
+        <div class="space-y-2">
+          <div class="flex flex-wrap items-center gap-2">
+            <input
+              type="search"
+              bind:value={searchQuery}
+              placeholder="Cari pasal atau kata kunci..."
+              style="background-color: #ffffff; color: #0a0a0a; border: 1px solid #c8c4ba;"
+              class="px-3.5 py-1.5 text-xs focus:outline-none focus:border-black w-64 rounded-xs"
+            />
+          </div>
+          <div class="flex flex-wrap gap-1.5">
+            {#each TIER_OPTIONS as opt}
               <button
                 type="button"
-                onclick={() => (selectedTier = tier)}
-                style={selectedTier === tier
-                  ? 'background-color: #dfd8c8; color: #0a0a0a; border-radius: 2px; font-weight: 600;'
-                  : 'color: #ffffff;'}
-                class="px-3 py-1.5 transition-colors cursor-pointer"
+                onclick={() => (selectedTier = opt.id)}
+                style={selectedTier === opt.id
+                  ? 'background-color: #0c249c; color: #ffffff; border-color: #0a0a0a;'
+                  : 'background-color: #ffffff; color: #0a0a0a; border-color: #c8c4ba;'}
+                class="px-2.5 py-1 text-xs font-medium border rounded-xs transition-all hover:border-black cursor-pointer"
               >
-                {tier === 'ALL' ? 'SEMUA' : `T.${tier}`}
+                {opt.label}
               </button>
             {/each}
           </div>
@@ -90,107 +89,114 @@
     </div>
 
     {#if loading}
-      <div class="p-12 text-center font-mono text-xs" style="color: #5e5d58;">
+      <div class="p-12 text-center text-xs" style="color: #5e5d58;">
         Memuat indeks korpus regulasi...
       </div>
     {:else if corpusData}
       <div class="grid grid-cols-1 lg:grid-cols-12">
 
-        <!-- Left Index Column (4 cols) -->
-        <div class="lg:col-span-4" style="background-color: #f2f0ea; border-right: 1px solid #c8c4ba;">
+        <!-- Left Index Column (5 cols) -->
+        <div class="lg:col-span-5" style="background-color: #f2f0ea; border-right: 1px solid #c8c4ba;">
           <div class="px-5 py-3 flex items-center justify-between font-mono text-[10px] uppercase tracking-wider" style="background-color: #dfd8c8; color: #0a0a0a; border-bottom: 1px solid #c8c4ba;">
             <span class="font-semibold">Instrumen Terindeks ({filteredRegs.length})</span>
-            <span>v{corpusData.metadata?.version || '1.0.0'}</span>
+            <span>Versi {corpusData.metadata?.version || '1.0'}</span>
           </div>
 
-          {#each filteredRegs as reg}
-            <button
-              type="button"
-              onclick={() => (activeReg = reg)}
-              style={activeReg?.id === reg.id
-                ? 'background-color: #0c249c; color: #ffffff; border-bottom: 1px solid #0c249c;'
-                : 'background-color: #f2f0ea; color: #0a0a0a; border-bottom: 1px solid #c8c4ba;'}
-              class="w-full text-left p-5 transition-colors block hover:opacity-95"
-            >
-              <div class="flex items-center justify-between gap-2 font-mono text-[10px]">
-                <span style={activeReg?.id === reg.id ? 'color: #dfd8c8;' : 'color: #0c249c; font-weight: 600;'}>
-                  TINGKAT {reg.tier} · {reg.tier_label}
-                </span>
-                <span style={activeReg?.id === reg.id ? 'color: #dfd8c8;' : 'color: #5e5d58;'}>
-                  {reg.pasal}
-                </span>
-              </div>
-              <h3 class="text-sm font-semibold mt-1.5 leading-snug">{reg.category}</h3>
-              <p class="text-xs mt-1 line-clamp-2" style={activeReg?.id === reg.id ? 'color: rgba(255,255,255,0.85);' : 'color: #5e5d58;'}>
-                {reg.doc_title}
-              </p>
-            </button>
-          {/each}
+          <div class="divide-y" style="border-color: #c8c4ba;">
+            {#each filteredRegs as reg}
+              <button
+                type="button"
+                onclick={() => (activeReg = reg)}
+                style={activeReg?.id === reg.id
+                  ? 'background-color: #0c249c; color: #ffffff;'
+                  : 'background-color: #f2f0ea; color: #0a0a0a;'}
+                class="w-full text-left p-5 transition-colors block hover:opacity-95 cursor-pointer"
+              >
+                <div class="flex items-center justify-between gap-2 text-xs">
+                  <span class="font-semibold" style={activeReg?.id === reg.id ? 'color: #dfd8c8;' : 'color: #0c249c;'}>
+                    {reg.tier_label || `Tingkat ${reg.tier}`}
+                  </span>
+                  <span class="font-mono text-[11px]" style={activeReg?.id === reg.id ? 'color: #dfd8c8;' : 'color: #5e5d58;'}>
+                    {reg.pasal}
+                  </span>
+                </div>
+                <h3 class="text-sm font-semibold mt-1.5 leading-snug">{reg.category}</h3>
+                <p class="text-xs mt-1 line-clamp-2 leading-relaxed" style={activeReg?.id === reg.id ? 'color: rgba(255,255,255,0.85);' : 'color: #5e5d58;'}>
+                  {reg.doc_title}
+                </p>
+              </button>
+            {/each}
+          </div>
         </div>
 
-        <!-- Right Verbatim Document Dossier (8 cols) -->
-        <div class="lg:col-span-8 bg-white">
+        <!-- Right Document Reader (7 cols) -->
+        <div class="lg:col-span-7 bg-white min-w-0">
           {#if activeReg}
-            <div class="px-6 py-3.5 flex flex-wrap items-center justify-between gap-2 font-mono text-[11px]" style="background-color: #dfd8c8; color: #0a0a0a; border-bottom: 1px solid #c8c4ba;">
-              <div class="flex items-center gap-3">
-                <span>ID DOKUMEN: <strong>{activeReg.id}</strong></span>
-                <span>|</span>
-                <span style="color: #0c249c;" class="font-bold">STATUS: {activeReg.status}</span>
+            <div class="px-6 py-3.5 flex flex-wrap items-center justify-between gap-2 text-xs" style="background-color: #dfd8c8; color: #0a0a0a; border-bottom: 1px solid #c8c4ba;">
+              <div class="flex items-center gap-2">
+                <span class="font-mono text-[11px]">DOKUMEN: <strong>{activeReg.id}</strong></span>
               </div>
-              <a
-                href={activeReg.source_url}
-                target="_blank"
-                rel="noopener noreferrer"
-                style="color: #0c249c;"
-                class="font-semibold hover:underline"
-              >
-                Buka Tautan Resmi JDIH ↗
-              </a>
+              {#if activeReg.source_url}
+                <a
+                  href={activeReg.source_url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  style="color: #0c249c;"
+                  class="font-semibold hover:underline inline-flex items-center gap-1"
+                >
+                  <span>Buka Naskah Resmi di JDIH</span>
+                  <span>↗</span>
+                </a>
+              {/if}
             </div>
 
             <div class="p-6 sm:p-8 space-y-6">
               <div class="pb-5" style="border-bottom: 1px solid #c8c4ba;">
                 <span class="font-mono text-[10px] uppercase tracking-wider font-semibold block" style="color: #0c249c;">
-                  Nomenklatur Peraturan Resmi
+                  Nomenklatur Regulasi
                 </span>
-                <h2 class="text-lg sm:text-2xl font-normal mt-1 leading-snug" style="color: #0a0a0a;">
+                <h2 class="text-lg sm:text-xl font-normal mt-1 leading-snug" style="color: #0a0a0a;">
                   {activeReg.doc_title}
                 </h2>
-                <p class="font-mono text-xs mt-2" style="color: #5e5d58;">
+                <p class="text-xs font-semibold mt-2" style="color: #5e5d58;">
                   {activeReg.bab}: {activeReg.pasal}
                 </p>
               </div>
 
               <div>
                 <span class="font-mono text-[10px] uppercase tracking-wider font-semibold block mb-2" style="color: #5e5d58;">
-                  Batang Tubuh / Teks Verbatim (Rujukan Layer-1 Verifier)
+                  Bunyi Naskah Resmi
                 </span>
-                <blockquote class="p-5 font-mono text-xs sm:text-[13px] leading-relaxed whitespace-pre-line" style="background-color: #f2f0ea; border-left: 3px solid #0c249c; color: #0a0a0a;">
+                <div class="p-4 sm:p-5 text-xs sm:text-sm leading-relaxed whitespace-pre-line" style="background-color: #f7f5f0; border-left: 3px solid #0c249c; color: #0a0a0a;">
                   {activeReg.text}
-                </blockquote>
-              </div>
-
-              <div class="grid grid-cols-1 md:grid-cols-12 gap-4 pt-4 text-xs" style="border-top: 1px solid #c8c4ba;">
-                <div class="md:col-span-3 font-mono text-[10px] uppercase font-semibold" style="color: #0a0a0a;">
-                  Ketentuan Sanksi
-                </div>
-                <div class="md:col-span-9 leading-relaxed" style="color: #333330;">
-                  {activeReg.penalties}
                 </div>
               </div>
 
-              <div class="grid grid-cols-1 md:grid-cols-12 gap-4 pt-4 text-xs" style="border-top: 1px solid #c8c4ba;">
-                <div class="md:col-span-3 font-mono text-[10px] uppercase font-semibold" style="color: #0a0a0a;">
-                  Indeks Kata Kunci
+              {#if activeReg.penalties}
+                <div class="p-4 text-xs space-y-1" style="background-color: #f2f0ea; border: 1px solid #c8c4ba;">
+                  <span class="font-mono text-[10px] uppercase font-semibold block" style="color: #0a0a0a;">
+                    Ketentuan Sanksi
+                  </span>
+                  <p class="leading-relaxed" style="color: #333330;">
+                    {activeReg.penalties}
+                  </p>
                 </div>
-                <div class="md:col-span-9 flex flex-wrap gap-1.5">
-                  {#each activeReg.keywords || [] as kw}
-                    <span class="px-2.5 py-1 font-mono text-[11px]" style="background-color: #f2f0ea; border: 1px solid #c8c4ba; color: #0a0a0a;">
-                      {kw}
-                    </span>
-                  {/each}
+              {/if}
+
+              {#if activeReg.keywords && activeReg.keywords.length > 0}
+                <div class="pt-4 text-xs space-y-2" style="border-top: 1px solid #c8c4ba;">
+                  <span class="font-mono text-[10px] uppercase font-semibold block" style="color: #5e5d58;">
+                    Kata Kunci Terindeks
+                  </span>
+                  <div class="flex flex-wrap gap-1.5">
+                    {#each activeReg.keywords as kw}
+                      <span class="px-2.5 py-1 text-xs font-mono" style="background-color: #f2f0ea; border: 1px solid #c8c4ba; color: #0a0a0a;">
+                        {kw}
+                      </span>
+                    {/each}
+                  </div>
                 </div>
-              </div>
+              {/if}
             </div>
           {/if}
         </div>
