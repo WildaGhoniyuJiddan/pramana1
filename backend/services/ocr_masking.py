@@ -1,14 +1,22 @@
 """
 PII Masking Service for Pramana Strict-RAG.
-Strips sensitive personal information (names, emails, phone numbers, booking codes, card numbers)
-BEFORE any text is forwarded to LLM or stored.
+
+Strips five categories of sensitive personal information before text is
+processed or forwarded to an LLM:
+1. Email addresses
+2. Phone numbers
+3. Booking references / PNR / e-ticket codes
+4. Payment card numbers
+5. Passport numbers
+
+This is a best-effort deterministic filter, not a complete DLP system.
 """
 
 import re
 from typing import Dict, Any, Tuple
 
 
-EMAIL_PATTERN = re.compile(r'\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b')
+EMAIL_PATTERN = re.compile(r'\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}\b')
 PHONE_PATTERN = re.compile(r'(?:\+?62|08|0)[0-9\s\-]{8,14}[0-9]')
 BOOKING_CODE_PATTERN = re.compile(r'\b(?:Booking|Kode\s*Booking|PNR|E-ticket|Ticket|Kode\s*Pemesanan)[\s:#]+([A-Z0-9]{5,8})\b', re.IGNORECASE)
 CARD_PATTERN = re.compile(r'\b(?:\d{4}[-\s]?){3}\d{4}\b')

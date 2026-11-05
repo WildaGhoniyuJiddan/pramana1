@@ -47,18 +47,56 @@
 
       <!-- Drawer Content -->
       <div class="p-6 overflow-y-auto flex-1 space-y-6" style="background-color: #ffffff;">
-        <div class="pb-4 border-b" style="border-color: #c8c4ba;">
-          <span class="font-mono text-[10px] uppercase tracking-wider block mb-1" style="color: #5c5b57;">
+        <div class="pb-4 border-b space-y-2" style="border-color: #c8c4ba;">
+          <span class="font-mono text-[10px] uppercase tracking-wider block" style="color: #5c5b57;">
             Nomenklatur Peraturan Resmi
           </span>
           <p class="text-sm font-medium leading-snug" style="color: #0a0a0a;">
             {item.title || item.official_doc_title}
           </p>
+          <div class="flex flex-wrap gap-1.5">
+            {#if item.status}
+              <span class="font-mono text-[10px] font-bold px-2 py-0.5" style="background-color: #f2f0ea; color: #0a0a0a; border: 1px solid #c8c4ba;">
+                Status: {item.status}
+              </span>
+            {/if}
+            <span
+              class="font-mono text-[10px] font-bold px-2 py-0.5"
+              style={item.is_verbatim === false
+                ? 'background-color: #fff3cd; color: #8a3b00; border: 1px solid #8a3b00;'
+                : 'background-color: #e7f0ff; color: #0c249c; border: 1px solid #0c249c;'}
+            >
+              {item.is_verbatim === false ? 'Ringkasan, bukan kutipan verbatim' : 'Kutipan verbatim korpus'}
+            </span>
+            {#if item.last_verified_date}
+              <span class="font-mono text-[10px] font-bold px-2 py-0.5" style="background-color: #ffffff; color: #5c5952; border: 1px solid #cdc9be;">
+                Diverifikasi {item.last_verified_date}
+              </span>
+            {/if}
+          </div>
+          {#if item.status_note}
+            <p class="text-[11px] leading-snug" style="color: #8a3b00;">{item.status_note}</p>
+          {/if}
+          {#if item.source_note}
+            <p class="text-[11px] leading-snug" style="color: #5c5952;">Catatan sumber: {item.source_note}</p>
+          {/if}
+          {#if item.superseded_by}
+            <p class="text-[11px] leading-snug" style="color: #5c5952;">
+              Disempurnakan oleh:
+              {#if item.superseded_by_url}
+                <a href={item.superseded_by_url} target="_blank" rel="noopener noreferrer" class="underline" style="color: #0c249c;">
+                  {item.superseded_by}
+                </a>
+              {:else}
+                {item.superseded_by}
+              {/if}
+            </p>
+          {/if}
         </div>
 
         <div>
           <span class="font-mono text-[10px] uppercase tracking-wider block mb-2" style="color: #5c5b57;">
-            Batang Tubuh / Teks Verbatim
+            {item.is_verbatim === false ? 'Ringkasan Tersimpan (Bukan Kutipan Verbatim)' : 'Teks Tersimpan (Rujukan Layer-1 Korpus)'}
           </span>
           <div
             class="p-5 border text-xs sm:text-sm leading-relaxed font-mono whitespace-pre-line"
@@ -66,6 +104,16 @@
           >
             {item.full_text || item.quoted_text}
           </div>
+          {#if item.is_verbatim === false}
+            <p class="mt-2 text-[11px] leading-snug" style="color: #8a3b00;">
+              Entri ini adalah ringkasan/kompilasi, bukan salinan pasal. Jangan dikutip sebagai bunyi pasal verbatim.
+            </p>
+          {/if}
+          {#if item.quote_sha256}
+            <p class="mt-2 font-mono text-[10px] break-all" style="color: #5c5952;">
+              SHA-256 kutipan: {item.quote_sha256}
+            </p>
+          {/if}
         </div>
 
         {#if item.penalties}
@@ -81,7 +129,7 @@
 
         <div class="pt-4 border-t" style="border-color: #c8c4ba;">
           <span class="font-mono text-[10px] uppercase tracking-wider block mb-1.5" style="color: #5c5b57;">
-            Tautan Portal JDIH / Sumber Resmi
+            Tautan Sumber Resmi
           </span>
           <a
             href={item.source_url}
@@ -101,7 +149,7 @@
         class="px-6 py-3.5 border-t font-mono text-[10px]"
         style="background-color: #f2f0ea; border-color: #c8c4ba; color: #5c5b57;"
       >
-        Naskah peraturan perundang-undangan merupakan domain publik berdasarkan Pasal 42 huruf b UU No. 28 Tahun 2014.
+        Naskah peraturan perundang-undangan merupakan domain publik berdasarkan Pasal 42 huruf b UU No. 28 Tahun 2014. Tampilan ini bukan nasihat hukum.
       </div>
     </div>
   </div>

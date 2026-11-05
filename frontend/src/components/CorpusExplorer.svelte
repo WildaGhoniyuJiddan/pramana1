@@ -4,6 +4,7 @@
 
   let corpusData = $state(null);
   let loading = $state(true);
+  let errorMsg = $state('');
   let searchQuery = $state('');
   let selectedTier = $state('ALL');
   let activeReg = $state(null);
@@ -15,7 +16,9 @@
     { id: '2', label: 'T.2 // SE GUBERNUR' }
   ];
 
-  onMount(async () => {
+  async function loadCorpus() {
+    loading = true;
+    errorMsg = '';
     try {
       corpusData = await fetchCorpus();
       if (corpusData?.regulations?.length) {
@@ -23,9 +26,14 @@
       }
     } catch (e) {
       console.error(e);
+      errorMsg = 'Gagal memuat korpus regulasi. Pastikan backend berjalan, lalu coba lagi.';
     } finally {
       loading = false;
     }
+  }
+
+  onMount(() => {
+    loadCorpus();
   });
 
   let filteredRegs = $derived.by(() => {
@@ -65,7 +73,7 @@
         </div>
 
         <h1 class="opero-h1 text-[30px] sm:text-[42px]">
-          Indeks <span class="opero-serif">Korpus Hukum</span> JDIH Bali
+          Indeks <span class="opero-serif">Korpus Hukum</span> Pramana
         </h1>
       </div>
 
@@ -101,7 +109,47 @@
       <div class="p-12 text-center font-mono text-xs" style="color: #5c5952;">
         Memuat indeks korpus regulasi...
       </div>
+    {:else if errorMsg}
+      <div class="brutal-card p-6 space-y-3" style="background-color: #ffffff; border-color: #c92a2a;">
+        <p class="text-sm font-medium" style="color: #c92a2a;">{errorMsg}</p>
+        <button
+          type="button"
+          onclick={loadCorpus}
+          style="background-color: #0c249c; color: #ffffff; border: 1.5px solid #0a0a0a; box-shadow: 2px 2px 0px #0a0a0a;"
+          class="brutal-press px-3 py-1.5 font-mono text-[11px] font-semibold cursor-pointer"
+        >
+          Coba Lagi
+        </button>
+      </div>
     {:else if corpusData}
+      {#if corpusData.metadata}
+        <div class="brutal-card p-4 sm:p-5 mb-5 space-y-2" style="background-color: #f3f1eb;">
+          <div class="flex flex-wrap items-center justify-between gap-2">
+            <span class="font-mono text-[10px] font-bold px-2 py-0.5" style="background-color: #dfd6c3; color: #0a0a0a; border: 1px solid #0a0a0a;">
+              PROVENANCE KORPUS · v{corpusData.metadata.version || '-'}
+            </span>
+            <span class="font-mono text-[11px]" style="color: #5c5952;">
+              Diverifikasi: {corpusData.metadata.last_verified_date || corpusData.metadata.last_updated || '-'}
+            </span>
+          </div>
+          {#if corpusData.metadata.verification_scope}
+            <p class="text-[11px] leading-snug" style="color: #3a3935;">
+              {corpusData.metadata.verification_scope}
+            </p>
+          {/if}
+          {#if corpusData.metadata.known_gaps?.length}
+            <div class="p-3 text-[11px] leading-snug" style="background-color: #fff3cd; border: 1px solid #8a3b00; color: #5c2d00;">
+              <strong>Keterbatasan yang diketahui:</strong>
+              <ul class="list-disc pl-4 mt-1 space-y-0.5">
+                {#each corpusData.metadata.known_gaps as gap}
+                  <li>{gap}</li>
+                {/each}
+              </ul>
+            </div>
+          {/if}
+        </div>
+      {/if}
+
       <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
 
         <!-- LEFT COLUMN: INSTRUMENT SELECTOR (5 cols) -->
@@ -135,6 +183,19 @@
                     </span>
                   </div>
                   <h3 class="text-xs sm:text-sm font-semibold mt-1 leading-snug">{reg.category}</h3>
+                  <div class="flex flex-wrap gap-1.5 mt-2 font-mono text-[9px] font-bold">
+                    <span class="px-1.5 py-0.5" style="background-color: #f3f1eb; color: #0a0a0a; border: 1px solid #0a0a0a;">
+                      {reg.status || 'Status tidak dicatat'}
+                    </span>
+                    <span
+                      class="px-1.5 py-0.5"
+                      style={reg.is_verbatim === false
+                        ? 'background-color: #fff3cd; color: #8a3b00; border: 1px solid #8a3b00;'
+                        : 'background-color: #e7f0ff; color: #0c249c; border: 1px solid #0c249c;'}
+                    >
+                      {reg.is_verbatim === false ? 'RINGKASAN' : 'VERBATIM'}
+                    </span>
+                  </div>
                 </button>
               {/each}
             </div>
@@ -158,7 +219,7 @@
                     style="background-color: #dfd6c3; color: #0a0a0a; border: 1.5px solid #0a0a0a; box-shadow: 2px 2px 0px #0a0a0a;"
                     class="brutal-press px-3 py-1 font-mono text-[11px] font-bold inline-flex items-center gap-1.5"
                   >
-                    <span>Portal Resmi JDIH</span>
+                    <span>Buka Sumber Resmi</span>
                     <span>↗</span>
                   </a>
                 {/if}
@@ -173,9 +234,49 @@
                 </h2>
               </div>
 
+              <div class="flex flex-wrap gap-1.5">
+                <span class="font-mono text-[10px] font-bold px-2 py-0.5" style="background-color: #f3f1eb; color: #0a0a0a; border: 1px solid #0a0a0a;">
+                  Status: {activeReg.status || 'Tidak dicatat'}
+                </span>
+                <span
+                  class="font-mono text-[10px] font-bold px-2 py-0.5"
+                  style={activeReg.is_verbatim === false
+                    ? 'background-color: #fff3cd; color: #8a3b00; border: 1px solid #8a3b00;'
+                    : 'background-color: #e7f0ff; color: #0c249c; border: 1px solid #0c249c;'}
+                >
+                  {activeReg.is_verbatim === false ? 'Ringkasan, bukan kutipan verbatim' : 'Teks verbatim korpus'}
+                </span>
+                {#if activeReg.last_verified_date}
+                  <span class="font-mono text-[10px] font-bold px-2 py-0.5" style="background-color: #ffffff; color: #5c5952; border: 1px solid #cdc9be;">
+                    Diverifikasi {activeReg.last_verified_date}
+                  </span>
+                {/if}
+              </div>
+
+              {#if activeReg.status_note}
+                <p class="text-[11px] leading-snug" style="color: #8a3b00;">{activeReg.status_note}</p>
+              {/if}
+              {#if activeReg.source_note}
+                <p class="text-[11px] leading-snug" style="color: #5c5952;">Catatan sumber: {activeReg.source_note}</p>
+              {/if}
+              {#if activeReg.superseded_by}
+                <p class="text-[11px] leading-snug" style="color: #5c5952;">
+                  Disempurnakan oleh:
+                  {#if activeReg.superseded_by_url}
+                    <a href={activeReg.superseded_by_url} target="_blank" rel="noopener noreferrer" class="underline" style="color: #0c249c;">
+                      {activeReg.superseded_by}
+                    </a>
+                  {:else}
+                    {activeReg.superseded_by}
+                  {/if}
+                </p>
+              {/if}
+
               <div class="space-y-2">
                 <span class="font-mono text-[10px] uppercase font-bold block" style="color: #0c249c;">
-                  Bunyi Naskah Verbatim (Rujukan Layer-1)
+                  {activeReg.is_verbatim === false
+                    ? 'Ringkasan Tersimpan (Bukan Kutipan Verbatim)'
+                    : 'Teks Tersimpan (Rujukan Layer-1 Korpus)'}
                 </span>
                 <div
                   class="p-4 sm:p-5 text-xs sm:text-[13px] leading-relaxed whitespace-pre-line"
@@ -183,6 +284,11 @@
                 >
                   {activeReg.text}
                 </div>
+                {#if activeReg.is_verbatim === false}
+                  <p class="font-mono text-[10px] leading-snug" style="color: #8a3b00;">
+                    Entri ini adalah ringkasan/kompilasi. Jangan dikutip sebagai bunyi pasal verbatim.
+                  </p>
+                {/if}
               </div>
 
               {#if activeReg.penalties}

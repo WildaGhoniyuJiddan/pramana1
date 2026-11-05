@@ -8,7 +8,7 @@
     { path: '/', label: 'Home' },
     { path: '/trip-brief', label: 'Trip Brief' },
     { path: '/context-note', label: 'Context Note' },
-    { path: '/corpus', label: 'Korpus JDIH' }
+    { path: '/corpus', label: 'Korpus Pramana' }
   ];
 </script>
 

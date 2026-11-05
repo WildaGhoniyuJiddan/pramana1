@@ -5,6 +5,8 @@
 - **Tema Ruang Lingkup:** Bali Smart Society (Pariwisata, Budaya, Layanan Publik, & Sistem Informasi Cerdas)
 - **Kategori:** Mahasiswa / Umum
 
+> **Catatan status (5 November 2026):** Dokumen ini adalah proposal awal. Klaim implementasi telah dikoreksi agar sesuai kondisi nyata; status fitur, batasan, dan hasil pengujian terbaru ada di `README.md`. Pramana belum memiliki benchmark publik dan tidak mengklaim “nol halusinasi”.
+
 ---
 
 ## 1. Problem & Background
@@ -27,10 +29,10 @@ Sebagai destinasi pariwisata utama dunia, Bali menghadapi tantangan krusial pada
 
 ## 3. Proposed Solution
 
-**Pramana** menyelesaikan masalah di atas melalui platform web berbasis **Strict-RAG (Retrieval-Augmented Generation)** dengan jaminan **Nol Halusinasi Kutipan (*Zero Hallucination Guarantee*)** dalam dua alur pengguna utama:
+**Pramana** menyelesaikan masalah di atas melalui platform web berbasis **Strict-RAG (Retrieval-Augmented Generation)** dengan mekanisme **abstain deterministik** dan verifikasi kutipan terhadap korpus lokal, dalam dua alur pengguna utama:
 
 - **User Journey 1: Mode Pencegahan (Trip Brief):** Pengguna memasukkan rencana rute atau catatan pemesanan beserta tanggal perjalanan $\rightarrow$ Sistem menyamarkan data pribadi (PII) secara otomatis $\rightarrow$ Sistem memeriksa bentrok tanggal dengan Hari Suci Nyepi (*Catur Brata Penyepian*) dan upacara Pawukon $\rightarrow$ Sistem mengekstrak pasal hukum yang relevan dan menyusun ringkasan eksekutif beserta tombol unduh kalender `.ics` dan salin teks.
-- **User Journey 2: Mode Verifikasi (Context Note):** Pengguna menempelkan teks unggahan viral atau klaim insiden $\rightarrow$ Sistem mendeteksi frasa sensasional/generalisasi $\rightarrow$ Sistem mencari dasar hukum di korpus resmi JDIH Bali $\rightarrow$ Jika ditemukan, sistem menghasilkan Catatan Konteks netral dengan kutipan *verbatim*; jika klaim berada di luar cakupan hukum, sistem menolak berspekulasi (**Strict Abstain / `TIDAK_DITEMUKAN`**).
+- **User Journey 2: Mode Verifikasi (Context Note):** Pengguna menempelkan teks unggahan viral atau klaim insiden $\rightarrow$ Sistem mendeteksi frasa sensasional/generalisasi $\rightarrow$ Sistem mencari dasar hukum di korpus lokal Pramana yang bersumber dari dokumen resmi $\rightarrow$ Jika ditemukan, sistem menghasilkan Catatan Konteks netral dengan kutipan dari korpus (verbatim hanya untuk entri yang ditandai); jika klaim berada di luar cakupan hukum, sistem menolak berspekulasi (**Strict Abstain / `TIDAK_DITEMUKAN`**).
 
 ---
 
@@ -43,21 +45,21 @@ Sebagai destinasi pariwisata utama dunia, Bali menghadapi tantangan krusial pada
 - **Proses & Alasan AI Diperlukan:**
   1. *PII Masking (`ocr_masking.py`):* Menyamarkan email, telepon, paspor, kartu kredit, dan kode booking sebelum teks menyentuh model AI.
   2. *Retrieval & Layer-2 Abstain Guard (`corpus_loader.py` & `verifier.py`):* Menyeleksi pasal relevan dari korpus dan memblokir pemanggilan LLM jika tidak ada bukti hukum yang cukup.
-  3. *Constrained LLM Synthesis (`rag_engine.py`):* Gemini 2.5 Flash menyusun sintesis ringkas yang mudah dipahami pengguna namun terikat ketat (*grounded*) hanya pada teks pasal yang lolos seleksi. Dilengkapi *deterministic fallback* agar sistem tetap berfungsi 100% apabila jaringan API eksternal terputus.
-  4. *Layer-1 Verbatim Match (`verifier.py`):* Memvalidasi bahwa kutipan pasal yang ditampilkan sama persis karakter-demi-karakter dengan dokumen resmi JDIH.
-- **Output:** Ringkasan kepatuhan rute, peringatan kalender Nyepi, pendeteksi *framing* emosional, kutipan pasal *verbatim*, komentar siap salin, dan berkas kalender `.ics`.
+  3. *Constrained LLM Synthesis (`rag_engine.py`):* Gemini 2.5 Flash menyusun sintesis ringkas yang mudah dipahami pengguna namun terikat ketat (*grounded*) hanya pada teks pasal yang lolos seleksi. Dilengkapi *deterministic fallback* agar sistem tetap berfungsi dengan ringkasan lokal apabila API eksternal tidak tersedia.
+  4. *Layer-1 Local Corpus Match (`verifier.py`):* Memvalidasi bahwa kutipan pasal yang ditampilkan ada di dalam teks entri korpus lokal setelah normalisasi spasi. Ini bukan verifikasi ulang karakter-demi-karakter terhadap dokumen JDIH secara real-time.
+- **Output:** Ringkasan kepatuhan rute, peringatan kalender Nyepi, pendeteksi *framing* emosional, kutipan pasal dari korpus (verbatim hanya untuk entri yang ditandai), komentar siap salin, dan berkas kalender `.ics`.
 
 ---
 
 ## 5. MVP & Key Features
 
-### Fitur Inti (Sudah Berfungsi Penuh saat Submission)
+### Status Fitur (lihat `README.md` untuk tabel status terbaru)
 1. **Mode 1: Trip Brief Generator** dengan deteksi otomatis kewajiban Pungutan Wisman (Love Bali) dan aturan kawasan suci.
-2. **Mode 2: Viral Claim Context Note** dengan pendeteksi *framing* sensasional dan mekanisme *Zero-Hallucination Abstain*.
-3. **Dual-Layer Verifier (Layer-1 Exact Match & Layer-2 Abstain Gate).**
+2. **Mode 2: Viral Claim Context Note** dengan pendeteksi *framing* sensasional dan mekanisme abstain deterministik.
+3. **Dual-Layer Verifier (Layer-1 Local Corpus Match & Layer-2 Abstain Gate).**
 4. **Automated PII Masking Engine** untuk 5 kategori data sensitif.
 5. **Deterministic Balinese Calendar Engine** (Data resmi Nyepi 2025–2028, Pengerupukan, Galungan, Kuningan) + **RFC 5545 `.ics` Calendar Exporter**.
-6. **Interactive Verbatim Statute Drawer & Transparency Modal** untuk menginspeksi teks penuh peraturan dan tautan asli JDIH.
+6. **Interactive Statute Drawer & Transparency Modal** untuk menginspeksi teks yang tersimpan di korpus, status verbatim/ringkasan, dan tautan sumber resmi.
 
 ---
 
@@ -78,7 +80,7 @@ Sebagai destinasi pariwisata utama dunia, Bali menghadapi tantangan krusial pada
       └──► 5. Strict-RAG AI Engine (rag_engine.py -> Gemini 2.5 Flash API + Fallback)
       │
       ▼
-[Verified Response -> UI Cards, Verbatim Statute Drawer, WhatsApp Copy, & .ics Download]
+[Verified Response -> UI Cards, Corpus Statute Drawer, WhatsApp Copy, & .ics Download]
 ```
 
 ---
@@ -87,7 +89,7 @@ Sebagai destinasi pariwisata utama dunia, Bali menghadapi tantangan krusial pada
 
 | Aspek | Chatbot AI Umum / Pencarian Manual | PRAMANA (Strict-RAG) |
 | :--- | :--- | :--- |
-| **Akurasi Pasal Hukum** | Rentan mengarang nomor pasal (*halusinasi*). | **100% Verbatim** (diverifikasi karakter-per-karakter oleh *Layer-1 Verifier*). |
+| **Akurasi Pasal Hukum** | Rentan mengarang nomor pasal (*halusinasi*). | **Kutipan dicocokkan dengan korpus lokal** (bukan verifikasi real-time ke JDIH). |
 | **Klaim di Luar Aturan** | Tetap menjawab dengan spekulasi/opini. | **Strict Abstain (`TIDAK_DITEMUKAN`)** melalui *Layer-2 Guard*. |
 | **Kalender Adat Bali** | Sering salah menghitung tanggal Nyepi/Saka. | **Deterministik** (mengunci jadwal Nyepi 2025–2028 & siklus Pawukon + ekspor `.ics`). |
 | **Privasi Data (PII)** | Teks booking mentah langsung terkirim ke cloud. | **PII Masking Otomatis** sebelum diproses AI. |
@@ -108,11 +110,11 @@ Sebagai destinasi pariwisata utama dunia, Bali menghadapi tantangan krusial pada
 
 ## 9. Technology Disclosure
 
-- **Frontend:** Svelte 5, Vite 6, Tailwind CSS 3
+- **Frontend:** Svelte 5, Vite 5.4.x, Tailwind CSS 3
 - **Backend:** Python 3.11+, FastAPI, Pydantic v2, Uvicorn, HTTPX
 - **Database / Storage:** Structured JSON Legal Corpus (`corpus/bali_regulations.json`)
 - **AI Model / Method:** Google Gemini API (`gemini-2.5-flash`) + Deterministic Strict-RAG + Dual-Layer Verifier + Regex PII Masking
-- **Dataset:** Peraturan resmi dari JDIH Provinsi Bali (`jdih.baliprov.go.id`) dan `peraturan.go.id` (Domain Publik, Pasal 42 huruf b UU Hak Cipta No. 28/2014)
+- **Dataset:** Peraturan resmi dari JDIH BPK, `peraturan.go.id`, Pemerintah Kabupaten Buleleng, Disparda Bali, dan Kesbangpol Bali (Domain Publik, Pasal 42 huruf b UU Hak Cipta No. 28/2014)
 - **AI Coding Assistant:** Google Antigravity / Gemini digunakan sebagai asisten pengembangan kode dan pengujian; seluruh kode sumber dan arsitektur diuji serta dipertanggungjawabkan penuh oleh tim.
 
 ---
