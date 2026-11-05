@@ -21,15 +21,15 @@
       },
       step2: {
         tag: '02 // FILTER PRAMANA',
-        title: 'Cek Aturan Adat & JDIH',
+        title: 'Cek Aturan Adat & Korpus',
         desc: 'Mencocokkan lokasi kawasan suci Utama Mandala dengan SE Gubernur & UU Imigrasi.',
         pill: 'Gerbang Candi Bentar: LOLOS'
       },
       step3: {
-        tag: '03 // OUTPUT RESMI',
-        title: 'Kutipan Pasal Eksak',
-        desc: 'Mengikat sanksi deportasi Pasal 75 UU No. 6/2011 & larangan SE Gub No. 4/2023 Butir B.',
-        pill: '0% Halusinasi (Karakter Eksak)'
+        tag: '03 // OUTPUT KORPUS',
+        title: 'Kutipan dari Korpus',
+        desc: 'Merujuk Pasal 75 UU No. 6/2011 & larangan SE Gub No. 4/2023 (disempurnakan SE 7/2025).',
+        pill: 'Layer-1 exact match (korpus)'
       }
     },
     {
@@ -44,12 +44,12 @@
       },
       step2: {
         tag: '02 // FILTER PRAMANA',
-        title: 'Kalender Saka 1948',
+        title: 'Kalender Saka',
         desc: 'Mendeteksi irisan Hari Suci Nyepi pada 19 Maret 2026 (06.00 WITA – 20 Mar 06.00 WITA).',
         pill: 'Catur Brata Penyepian 24 Jam'
       },
       step3: {
-        tag: '03 // OUTPUT RESMI',
+        tag: '03 // OUTPUT KORPUS',
         title: 'Panduan & Kalender .ICS',
         desc: 'Notifikasi penutupan bandara/jalan raya + unduh jadwal pengingat .ICS (RFC 5545).',
         pill: 'Siap Impor ke Google/Apple Cal'
@@ -67,15 +67,15 @@
       },
       step2: {
         tag: '02 // FILTER PRAMANA',
-        title: 'Skor Kemiripan < 0.15',
-        desc: 'Tidak ditemukan kecocokan pasal di dalam basis data resmi JDIH Provinsi Bali.',
+        title: 'Skor di Bawah Ambang Relevansi',
+        desc: 'Tidak ditemukan kecocokan yang melewati ambang 0,50 di korpus lokal Pramana.',
         pill: 'Gerbang Candi Bentar: DITUTUP'
       },
       step3: {
-        tag: '03 // OUTPUT RESMI',
+        tag: '03 // OUTPUT KORPUS',
         title: 'Menolak Mengarang Pasal',
         desc: 'Mesin menghentikan sintesis AI (Abstain) agar tidak mengarang nomor Perda fiktif.',
-        pill: 'Zero-Hallucination Guard Aktif'
+        pill: 'Abstain Guard Aktif'
       }
     }
   ];
@@ -169,7 +169,7 @@
     return out.join('');
   }
 
-  // 4. Pedestal 03 (Right: JDIH Statute Anvil Base at z = 0..1.8 so packet glides right onto it!)
+  // 4. Pedestal 03 (Right: Pramana Corpus Anvil Base at z = 0..1.8 so packet glides right onto it!)
   function buildPedestal3Base() {
     const out = [];
     const base = { x: X3 - 26, y: -24, w: 52, d: 48, r: 4 };
@@ -183,7 +183,7 @@
     return out.join('');
   }
 
-  // Animated 3D JDIH Verbatim Stamp Cylinder (Suspended at z = 6..16, stamps down onto the packet at X3!)
+  // Animated 3D Pramana Corpus Seal Cylinder (Suspended at z = 6..16, stamps down onto the packet at X3!)
   function buildStampHead() {
     const out = [];
     const pad = { x: X3 - 12, y: -8, w: 24, d: 16, r: 1.5 };
@@ -291,7 +291,7 @@
           packetX = X1 + eased * (X3 - X1);
           stampZ = 5.5;
         } else {
-          // Packet rests on Pedestal 03 (X3 = +96) while the 3D JDIH Seal Cylinder stamps down onto it!
+          // Packet rests on Pedestal 03 (X3 = +96) while the 3D corpus seal stamps down onto it!
           packetX = X3;
           const stampPhase = (cycle - 0.72) / 0.28;
           stampZ = 5.5 - Math.sin(stampPhase * Math.PI) * 5.5;
@@ -361,7 +361,7 @@
       class="iso-svg"
       viewBox="0 0 {WIDTH} {HEIGHT}"
       role="img"
-      aria-label="Simulasi 3D Tiga Tahap Pramana: Input dan Redaksi PII, Gerbang Candi Bentar, dan Segel Pasal JDIH"
+      aria-label="Simulasi 3D Tiga Tahap Pramana: Input dan Redaksi PII, Gerbang Candi Bentar, dan Segel Korpus Pramana"
     >
       <!-- Back-to-Front Painter's Order along X1 (-96) -> X2 (0) -> X3 (+96) -->
       <!-- 1. Base Pedestals & Solid 3D Conveyor Bridges -->
@@ -399,7 +399,7 @@
         {@html staticFrontTower}
       </g>
 
-      <!-- 6. Animated 3D JDIH Verbatim Seal Cylinder on Pedestal 03 (Stamps down onto packet!) -->
+      <!-- 6. Animated 3D Pramana Corpus Seal Cylinder on Pedestal 03 (Stamps down onto packet!) -->
       <g bind:this={stampHeadEl} transform={k.translateAlong(P, [0, 0, 5.5])}>
         {@html staticStampHead}
       </g>
@@ -415,7 +415,7 @@
       {@html buildCalloutBadge(
         at([X3, 0, 28]),
         '03',
-        currentCase.isAbstain ? 'ABSTAIN (TOLAK)' : 'SEGEL PASAL JDIH',
+        currentCase.isAbstain ? 'ABSTAIN (TOLAK)' : 'SEGEL KORPUS PRAMANA',
         !currentCase.isAbstain
       )}
     </svg>

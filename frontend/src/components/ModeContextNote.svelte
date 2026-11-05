@@ -12,6 +12,7 @@
   let activePresetIdx = $state(0);
   let activeCiteIdx = $state(0);
   let showTechAudit = $state(false);
+  let summaryLang = $state('id');
 
   const PRESETS = [
     {
@@ -166,7 +167,7 @@
               class="opero-split-btn brutal-press w-full inline-flex items-center justify-between text-xs font-medium cursor-pointer disabled:opacity-50"
             >
               <span class="px-4 py-2 font-semibold">
-                {loading ? 'Memverifikasi Korpus JDIH...' : 'Uji Klaim & Susun Konteks'}
+                {loading ? 'Mencocokkan Korpus Pramana...' : 'Uji Klaim & Susun Konteks'}
               </span>
               <span
                 style="background-color: #dfd8c8; color: #0a0a0a;"
@@ -185,7 +186,7 @@
                 <path d="M5.5 9l2.5 2.5 4.5-5" stroke="#0a0a0a" stroke-width="1.5" />
               </svg>
               <span class="leading-snug">
-                <strong>Layer-1 Verbatim:</strong> Setiap kutipan dicocokkan langsung dengan naskah asli JDIH Bali.
+                <strong>Layer-1 (korpus):</strong> Kutipan dicocokkan dengan teks yang tersimpan di korpus lokal Pramana, bukan verifikasi ulang real-time ke JDIH.
               </span>
             </div>
             <div class="flex items-start gap-2.5">
@@ -209,13 +210,13 @@
             <div class="brutal-card p-6 sm:p-8 space-y-4" style="background-color: #dfd6c3;">
               <div class="flex items-center justify-between">
                 <span class="font-mono text-[10px] font-bold px-2 py-0.5" style="background-color: #0a0a0a; color: #ffffff;">
-                  LAYER-2 ABSTAIN // ZERO HALLUCINATION
+                  LAYER-2 ABSTAIN // TIDAK_DITEMUKAN
                 </span>
                 <span class="font-mono text-xs font-bold" style="color: #0a0a0a;">TIDAK DITEMUKAN</span>
               </div>
 
               <h2 class="opero-h1 text-2xl sm:text-3xl">
-                Di Luar Cakupan <span class="opero-serif">Korpus Hukum</span> Bali
+                Tidak Ditemukan Dasar Hukum di <span class="opero-serif">Korpus Pramana</span>
               </h2>
 
               <p class="text-xs sm:text-sm leading-relaxed" style="color: #3a3935;">
@@ -223,8 +224,24 @@
               </p>
 
               <div class="p-3 bg-white font-mono text-[11px]" style="border: 1.5px solid #0a0a0a;">
-                Status: Sintesis dibatalkan secara deterministik karena klaim tidak terkait dengan instrumen Perda atau SE Gubernur Bali yang terdata.
+                Status: Sintesis dibatalkan secara deterministik karena tidak ada kecocokan yang melewati ambang relevansi korpus. Keputusan ini bukan pernyataan bahwa perbuatan tersebut sah.
               </div>
+
+              {#if result.confidence_note}
+                <p class="text-[11px] leading-snug" style="color: #5c5952;">{result.confidence_note}</p>
+              {/if}
+
+              <div class="p-3 text-[11px] leading-snug" style="background-color: #ffffff; border: 1px solid #0a0a0a; color: #3a3935;">
+                <strong>Teks tersamarkan:</strong> {result.masked_post}
+                <br />
+                <strong>PII disamarkan:</strong> {result.pii_redacted_count ?? 0} entitas
+              </div>
+
+              {#if result.disclaimer}
+                <p class="text-[11px] leading-snug" style="color: #5c5952;">
+                  <strong>Disclaimer:</strong> {result.disclaimer}
+                </p>
+              {/if}
             </div>
           {:else}
             <!-- STEP 1: PRIMARY FOCUS - CATATAN KONTEKS NETRAL -->
@@ -253,9 +270,67 @@
                 {/if}
               </div>
 
-              <p class="text-sm sm:text-base leading-relaxed font-normal" style="color: #ffffff;">
-                {result.neutral_summary}
-              </p>
+              <div class="flex flex-wrap items-start justify-between gap-2">
+                <p class="text-sm sm:text-base leading-relaxed font-normal flex-1" style="color: #ffffff;">
+                  {summaryLang === 'en' && result.neutral_summary_en
+                    ? result.neutral_summary_en
+                    : result.neutral_summary}
+                </p>
+                {#if result.neutral_summary_en}
+                  <div class="flex gap-1 shrink-0">
+                    <button
+                      type="button"
+                      onclick={() => (summaryLang = 'id')}
+                      class="brutal-press px-2 py-0.5 font-mono text-[9px] font-bold cursor-pointer"
+                      style={summaryLang === 'id'
+                        ? 'background-color: #dfd6c3; color: #0a0a0a; border: 1px solid #0a0a0a;'
+                        : 'background-color: #ffffff; color: #0a0a0a; border: 1px solid #0a0a0a;'}
+                    >
+                      ID
+                    </button>
+                    <button
+                      type="button"
+                      onclick={() => (summaryLang = 'en')}
+                      class="brutal-press px-2 py-0.5 font-mono text-[9px] font-bold cursor-pointer"
+                      style={summaryLang === 'en'
+                        ? 'background-color: #dfd6c3; color: #0a0a0a; border: 1px solid #0a0a0a;'
+                        : 'background-color: #ffffff; color: #0a0a0a; border: 1px solid #0a0a0a;'}
+                    >
+                      EN
+                    </button>
+                  </div>
+                {/if}
+              </div>
+
+              {#if result.ai_synthesis_status === 'llm'}
+                <p class="text-[11px] font-mono" style="color: #dfd6c3;">
+                  Ringkasan AI tidak diverifikasi Layer-1. Sitasi di bawah adalah teks korpus terverifikasi.
+                </p>
+              {:else if result.ai_synthesis_status === 'unavailable'}
+                <p class="text-[11px] font-mono" style="color: #dfd6c3;">
+                  AI tidak tersedia. Sistem tidak menampilkan template sebagai jawaban AI; sitasi terverifikasi tetap ditampilkan.
+                </p>
+              {:else if result.ai_synthesis_status === 'abstain'}
+                <p class="text-[11px] font-mono" style="color: #dfd6c3;">
+                  AI memilih abstain karena permintaan tidak dapat dijawab aman dari bukti korpus.
+                </p>
+              {:else}
+                <p class="text-[11px] font-mono" style="color: #dfd6c3;">
+                  Template deterministik dipakai karena AI_MODE=optional atau API key tidak tersedia.
+                </p>
+              {/if}
+
+              {#if result.ai_claims?.length}
+                <p class="font-mono text-[10px]" style="color: #dfd6c3;">
+                  {result.ai_claims.length} klaim AI terverifikasi terhadap evidence span.
+                </p>
+              {/if}
+
+              <div class="p-3 text-[11px] leading-snug" style="background-color: #f3f1eb; color: #3a3935; border: 1px solid #0a0a0a;">
+                <strong>Teks tersamarkan:</strong> {result.masked_post}
+                <br />
+                <strong>PII disamarkan:</strong> {result.pii_redacted_count ?? 0} entitas
+              </div>
 
               {#if result.framing_markers && result.framing_markers.length > 0}
                 <div class="p-3.5 space-y-2" style="background-color: #f3f1eb; color: #0a0a0a; border: 1.5px solid #0a0a0a;">
@@ -278,10 +353,10 @@
             <div class="brutal-card p-5 sm:p-6 space-y-4" style="background-color: #f3f1eb;">
               <div class="flex flex-wrap items-center justify-between gap-2 pb-3" style="border-bottom: 1px solid #cdc9be;">
                 <span class="font-mono text-[10px] font-bold px-2 py-0.5" style="background-color: #dfd6c3; color: #0a0a0a; border: 1px solid #0a0a0a;">
-                  02 // RUJUKAN PASAL VERBATIM ({result.citations.length} DOKUMEN)
+                  02 // RUJUKAN KORPUS ({result.citations.length} DOKUMEN)
                 </span>
                 <span class="font-mono text-[11px] font-bold" style="color: #0c249c;">
-                  LAYER-1 EXACT MATCH
+                  LAYER-1 EXACT MATCH (KORPUS)
                 </span>
               </div>
 
@@ -321,13 +396,60 @@
                     {activeCite.official_doc_title}
                   </h3>
 
+                  <div class="flex flex-wrap gap-1.5">
+                    <span class="font-mono text-[10px] font-bold px-2 py-0.5" style="background-color: #ffffff; color: #0a0a0a; border: 1px solid #0a0a0a;">
+                      Status: {activeCite.status || 'Tidak dicatat'}
+                    </span>
+                    <span
+                      class="font-mono text-[10px] font-bold px-2 py-0.5"
+                      style={activeCite.is_verbatim
+                        ? 'background-color: #e7f0ff; color: #0c249c; border: 1px solid #0c249c;'
+                        : 'background-color: #fff3cd; color: #8a3b00; border: 1px solid #8a3b00;'}
+                    >
+                      {activeCite.text_status === 'compilation'
+                        ? 'Kompilasi pedoman, bukan kutipan pasal'
+                        : activeCite.is_verbatim ? 'Kutipan verbatim korpus' : 'Ringkasan, bukan kutipan verbatim'}
+                    </span>
+                  </div>
+
                   <!-- Full-border architectural quote box (no cliché left stripe) -->
                   <div
                     class="p-4 text-xs sm:text-[13px] leading-relaxed"
                     style="background-color: #f3f1eb; border: 1.5px solid #0a0a0a; color: #0a0a0a;"
                   >
-                    "{activeCite.quoted_text}"
+                    {#if activeCite.is_verbatim}
+                      "{activeCite.quoted_text}"
+                    {:else}
+                      {activeCite.quoted_text}
+                      <p class="mt-2 font-mono text-[10px] leading-snug" style="color: #8a3b00;">
+                        Entri ini adalah ringkasan/kompilasi, bukan salinan pasal. Jangan dikutip sebagai bunyi pasal verbatim.
+                      </p>
+                    {/if}
                   </div>
+
+                  {#if activeCite.status_note}
+                    <p class="text-[11px] leading-snug" style="color: #8a3b00;">{activeCite.status_note}</p>
+                  {/if}
+                  {#if activeCite.source_note}
+                    <p class="text-[11px] leading-snug" style="color: #5c5952;">Catatan sumber: {activeCite.source_note}</p>
+                  {/if}
+                  {#if activeCite.superseded_by}
+                    <p class="text-[11px] leading-snug" style="color: #5c5952;">
+                      Disempurnakan oleh:
+                      {#if activeCite.superseded_by_url}
+                        <a href={activeCite.superseded_by_url} target="_blank" rel="noopener noreferrer" class="underline" style="color: #0c249c;">
+                          {activeCite.superseded_by}
+                        </a>
+                      {:else}
+                        {activeCite.superseded_by}
+                      {/if}
+                    </p>
+                  {/if}
+                  {#if activeCite.quote_sha256}
+                    <p class="font-mono text-[10px] break-all" style="color: #5c5952;">
+                      SHA-256 kutipan: {activeCite.quote_sha256}
+                    </p>
+                  {/if}
 
                   {#if activeCite.penalties}
                     <div
@@ -348,7 +470,9 @@
                       style="background-color: #0a0a0a; color: #ffffff; padding: 2px; border: 1.5px solid #0a0a0a;"
                       class="brutal-press inline-flex items-center gap-2 text-xs font-medium cursor-pointer"
                     >
-                      <span class="px-2.5 py-1 font-mono text-[11px]">Buka Naskah Asli</span>
+                      <span class="px-2.5 py-1 font-mono text-[11px]">
+                        {activeCite.is_verbatim ? 'Buka Naskah Asli' : 'Buka Ringkasan Sumber'}
+                      </span>
                       <span
                         style="background-color: #dfd6c3; color: #0a0a0a;"
                         class="w-6 h-6 flex items-center justify-center font-mono text-xs font-bold"
@@ -375,9 +499,25 @@
               {#if showTechAudit}
                 <div class="p-3 bg-white font-mono text-[11px] space-y-1" style="border: 1px solid #0a0a0a;">
                   <div>ENGINE: <strong>{result.ai_engine}</strong></div>
+                  <div>AI SYNTHESIS: <strong>{result.ai_synthesis_status || 'deterministic'}</strong></div>
+                  <div>AI GUARD: <strong>{result.ai_guard_status || '-'}</strong></div>
+                  <div>AI CLAIMS: <strong>{result.ai_claims?.length || 0}</strong></div>
+                  <div>AI MODEL: <strong>{result.ai_model || '-'}</strong></div>
                   <div>GUARD: <strong>{result.guard_status}</strong></div>
                   <div>CONFIDENCE: <strong>{result.confidence}</strong></div>
+                  <div>SCOPE: <strong>{result.verification_scope || 'corpus'}</strong></div>
+                  <div>PII MASKED: <strong>{result.pii_redacted_count ?? 0} entitas</strong></div>
                 </div>
+              {/if}
+
+              {#if result.confidence_note}
+                <p class="text-[11px] leading-snug" style="color: #5c5952;">{result.confidence_note}</p>
+              {/if}
+
+              {#if result.disclaimer}
+                <p class="text-[11px] leading-snug" style="color: #5c5952;">
+                  <strong>Disclaimer:</strong> {result.disclaimer}
+                </p>
               {/if}
             </div>
           {/if}

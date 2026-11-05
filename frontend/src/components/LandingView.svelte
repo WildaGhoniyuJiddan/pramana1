@@ -5,12 +5,12 @@
 
   // Distinct institutional & statutory wordmarks for the single-row Hero Ribbon
   const HERO_INSTITUTIONS = [
-    { id: 'jdih', name: 'JDIH Provinsi Bali', icon: 'gate' },
+    { id: 'jdih', name: 'JDIH BPK & Sumber Resmi', icon: 'gate' },
     { id: 'imigrasi', name: 'UU Imigrasi Pasal 75', icon: 'compass' },
     { id: 'perda5', name: 'Perda Bali No. 5/2020', icon: 'dharma' },
-    { id: 'segub4', name: 'SE Gubernur No. 4/2023', icon: 'scroll' },
+    { id: 'segub4', name: 'SE Gubernur 4/2023 & 7/2025', icon: 'scroll' },
     { id: 'phdi', name: 'PHDI & Majelis Desa Adat', icon: 'lotus' },
-    { id: 'lovebali', name: 'Perda Pungutan No. 6/2023', icon: 'diamond' },
+    { id: 'lovebali', name: 'Perda Pungutan 6/2023 jo. 2/2025', icon: 'diamond' },
     { id: 'uu28', name: 'Domain Publik UU 28/2014', icon: 'book' }
   ];
 </script>
@@ -190,7 +190,7 @@
               class="text-xs sm:text-[13.5px] leading-relaxed break-words"
               style="color: rgba(255, 255, 255, 0.88);"
             >
-              Setiap permohonan melewati tiga tahap deterministik: penyaringan data pribadi otomatis (Tahap 01), filter spasio-temporal Gerbang Candi Bentar &amp; Kalender Saka 1948 (Tahap 02), serta pengikatan kutipan eksak terhadap naskah asli JDIH Provinsi Bali (Tahap 03).
+              Setiap permohonan melewati tiga tahap deterministik: penyaringan data pribadi otomatis (Tahap 01), filter spasio-temporal Gerbang Candi Bentar &amp; Kalender Saka (Tahap 02), serta pencocokan kutipan terhadap 40 chunk terverifikasi dari 29 dokumen registry Pramana (Tahap 03). Registry bukan bukti kutipan, dan korpus tidak diverifikasi ulang secara real-time ke JDIH.
             </p>
 
             <div class="pt-1 flex flex-wrap gap-3">
@@ -200,7 +200,7 @@
                 style="background-color: #dfd6c3; color: #0a0a0a; border: 1.5px solid #0a0a0a; box-shadow: 3px 3px 0px #0a0a0a;"
                 class="brutal-press px-4 py-2.5 text-xs font-semibold hover:bg-white transition-colors cursor-pointer"
               >
-                Inspeksi Korpus JDIH
+                Inspeksi Korpus Pramana
               </button>
               <button
                 type="button"
@@ -249,6 +249,9 @@
               </span>
               <span class="font-mono text-xs font-bold" style="color: #0c249c;">/trip-brief</span>
             </div>
+            <span class="inline-block font-mono text-[9.5px] font-bold px-1.5 py-0.5" style="background-color: #fff3cd; color: #8a3b00; border: 1px solid #8a3b00;">
+              🟡 Prototype
+            </span>
             <h3 class="text-lg font-medium tracking-tight pt-1" style="color: #0a0a0a;">
               Rencana Perjalanan &amp; Kalender .ICS
             </h3>
@@ -285,11 +288,14 @@
               </span>
               <span class="font-mono text-xs font-bold" style="color: #0c249c;">/context-note</span>
             </div>
+            <span class="inline-block font-mono text-[9.5px] font-bold px-1.5 py-0.5" style="background-color: #fff3cd; color: #8a3b00; border: 1px solid #8a3b00;">
+              🟡 Prototype
+            </span>
             <h3 class="text-lg font-medium tracking-tight pt-1" style="color: #0a0a0a;">
               Verifikasi Klaim Insiden Viral
             </h3>
             <p class="text-xs leading-relaxed" style="color: #3a3935;">
-              Luruskan misinformasi wisata dengan kutipan naskah Perda/SE Gubernur yang diverifikasi karakter-per-karakter (Layer-1) atau penolakan spekulasi (Layer-2 Abstain).
+              Luruskan misinformasi wisata dengan kutipan dari korpus regulasi Pramana yang dicocokkan Layer-1, atau penolakan spekulasi (Layer-2 Abstain). Bukan verifikasi real-time ke JDIH.
             </p>
           </div>
 
@@ -317,10 +323,13 @@
           <div class="space-y-3">
             <div class="flex items-center justify-between">
               <span class="font-mono text-[10px] font-bold px-2 py-0.5" style="background-color: #0c249c; color: #ffffff; border: 1px solid #0a0a0a;">
-                03 // SAKA 1948
+                03 // KALENDER SAKA
               </span>
               <span class="font-mono text-xs font-bold" style="color: #0a0a0a;">2026</span>
             </div>
+            <span class="inline-block font-mono text-[9.5px] font-bold px-1.5 py-0.5" style="background-color: #fff3cd; color: #8a3b00; border: 1px solid #8a3b00;">
+              🟡 Prototype
+            </span>
             <h3 class="text-lg font-medium tracking-tight pt-1" style="color: #0a0a0a;">
               Jadwal Deterministik Bali 2026
             </h3>
@@ -334,11 +343,11 @@
                 <span>Hari Suci Nyepi (Tutup 24J)</span>
               </div>
               <div class="flex justify-between py-1 px-2.5 bg-white" style="border: 1px solid #0a0a0a;">
-                <span class="font-mono font-bold">15 Apr</span>
+                <span class="font-mono font-bold">17 Jun</span>
                 <span>Hari Raya Galungan</span>
               </div>
               <div class="flex justify-between py-1 px-2.5 bg-white" style="border: 1px solid #0a0a0a;">
-                <span class="font-mono font-bold">25 Apr</span>
+                <span class="font-mono font-bold">27 Jun</span>
                 <span>Hari Raya Kuningan</span>
               </div>
             </div>
@@ -350,7 +359,7 @@
             style="background-color: #0a0a0a; color: #ffffff; padding: 2px; border: 1.5px solid #0a0a0a; box-shadow: 3px 3px 0px #0c249c;"
             class="opero-split-btn brutal-press w-full inline-flex items-center justify-between text-xs font-medium cursor-pointer"
           >
-            <span class="px-3.5 py-2">Buka Korpus JDIH</span>
+            <span class="px-3.5 py-2">Buka Korpus Pramana</span>
             <span
               style="background-color: #dfd8c8; color: #0a0a0a;"
               class="opero-arrow-box w-7 h-7 flex items-center justify-center font-mono text-xs font-bold"

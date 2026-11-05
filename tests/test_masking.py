@@ -29,6 +29,22 @@ def test_booking_code_masking():
     assert counts["booking_code"] == 1
 
 
+def test_booking_code_masking_with_intervening_word():
+    text = "Kode booking saya BK12345 untuk penerbangan besok."
+    masked, counts = mask_pii(text)
+    assert "[KODE_BOOKING_DISAMARKAN]" in masked
+    assert "BK12345" not in masked
+    assert counts["booking_code"] == 1
+
+
+def test_passport_masking_with_nomor_paspor():
+    text = "Nomor paspor saya A1234567 dan visa saya masih berlaku."
+    masked, counts = mask_pii(text)
+    assert "[PASPOR_DISAMARKAN]" in masked
+    assert "A1234567" not in masked
+    assert counts["passport"] == 1
+
+
 def test_clean_text_no_masking():
     text = "Rencana liburan ke Pura Besakih dan Danau Beratan bersama keluarga."
     masked, counts = mask_pii(text)

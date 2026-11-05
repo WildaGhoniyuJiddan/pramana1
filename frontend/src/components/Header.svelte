@@ -8,8 +8,16 @@
     { path: '/', label: 'Home' },
     { path: '/trip-brief', label: 'Trip Brief' },
     { path: '/context-note', label: 'Context Note' },
-    { path: '/corpus', label: 'Korpus JDIH' }
+    { path: '/totem', label: 'Gate' },
+    { path: '/corpus', label: 'Korpus Pramana' }
   ];
+
+  function isActive(item) {
+    if (item.path === '/totem') {
+      return currentPath === '/totem' || currentPath.startsWith('/totem/');
+    }
+    return currentPath === item.path;
+  }
 </script>
 
 <svelte:window bind:scrollY={scrollY} />
@@ -33,7 +41,7 @@
   style="top: {overlay ? (isScrolled ? '12px' : '22px') : '12px'};"
 >
   <nav
-    style="background-color: rgba(255, 255, 255, {isScrolled ? '0.96' : '0.92'}); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); color: #0a0a0a; max-width: 580px; width: 100%; border: 1.5px solid #0a0a0a; border-radius: 4px; box-shadow: {isScrolled ? '4px 4px 0px #0a0a0a' : '3px 3px 0px #0a0a0a'};"
+    style="background-color: rgba(255, 255, 255, {isScrolled ? '0.96' : '0.92'}); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); color: #0a0a0a; max-width: 680px; width: 100%; border: 1.5px solid #0a0a0a; border-radius: 4px; box-shadow: {isScrolled ? '4px 4px 0px #0a0a0a' : '3px 3px 0px #0a0a0a'};"
     class="pointer-events-auto flex items-center justify-between pl-4 pr-1.5 py-1.5 transition-all duration-300 ease-out"
   >
     <a
@@ -50,13 +58,13 @@
       <span>Pramana</span>
     </a>
 
-    <div class="flex items-center gap-5 sm:gap-7 text-[12px] font-medium">
+    <div class="flex items-center gap-3 sm:gap-5 text-[11px] sm:text-[12px] font-medium">
       {#each NAV_ITEMS as item}
         <a
           href={item.path}
           onclick={(e) => { e.preventDefault(); navigate(item.path); }}
-          style={currentPath === item.path ? 'color: #0c249c; font-weight: 600;' : 'color: #3a3935;'}
-          class="hover:opacity-70 transition-opacity"
+          style={isActive(item) ? 'color: #0c249c; font-weight: 600;' : 'color: #3a3935;'}
+          class="hover:opacity-70 transition-opacity whitespace-nowrap"
         >
           {item.label}
         </a>
