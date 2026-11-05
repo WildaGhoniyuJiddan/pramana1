@@ -144,3 +144,117 @@ def test_pipeline_supports_abstain(citations, monkeypatch):
     assert result["ai_synthesis_status"] == "abstain"
     assert result["guard_status"] == "AI_ABSTAIN"
     assert result["claims"] == []
+
+
+def test_pipeline_rejects_fake_rupiah_substring_match(citations, monkeypatch):
+    monkeypatch.setenv("AI_MODE", "optional")
+    span_index = build_span_index(citations)
+    span_id = next(iter(span_index))
+
+    # Rp500.000 is fake, should NOT match Rp150.000,00 substring
+    parsed = {
+        "abstain": False,
+        "summary_id": "Wisatawan asing wajib membayar denda Rp500.000 di Bali.",
+        "summary_en": "Foreign tourists must pay a 500,000 fine in Bali.",
+        "claims": [{
+            "claim_text_id": "Wisatawan asing wajib membayar denda Rp500.000 di Bali.",
+            "claim_text_en": "Foreign tourists must pay a 500,000 fine in Bali.",
+            "citation_id": "PERDA_BALI_06_2023_LEVY",
+            "span_ids": [span_id],
+        }],
+    }
+
+    result = _pipeline(parsed).answer(
+        citations=citations,
+        system_prompt="test",
+        user_prompt="test",
+        fallback_summary="fallback",
+    )
+
+    assert result["ai_synthesis_status"] == "deterministic"
+    assert result["guard_status"] == "FALLBACK_GUARD"
+
+
+def test_pipeline_rejects_external_url(citations, monkeypatch):
+    monkeypatch.setenv("AI_MODE", "optional")
+    span_index = build_span_index(citations)
+    span_id = next(iter(span_index))
+
+    parsed = {
+        "abstain": False,
+        "summary_id": "Bayar retribusi via http://evil.example/pay resmi.",
+        "summary_en": "Pay levy via http://evil.example/pay official.",
+        "claims": [{
+            "claim_text_id": "Wisatawan asing wajib membayar pungutan Rp150.000.",
+            "claim_text_en": "Foreign tourists must pay the IDR 150,000 levy.",
+            "citation_id": "PERDA_BALI_06_2023_LEVY",
+            "span_ids": [span_id],
+        }],
+    }
+
+    result = _pipeline(parsed).answer(
+        citations=citations,
+        system_prompt="test",
+        user_prompt="test",
+        fallback_summary="fallback",
+    )
+
+    assert result["ai_synthesis_status"] == "deterministic"
+    assert result["guard_status"] == "FALLBACK_GUARD"
+
+
+def test_pipeline_rejects_invented_number(citations, monkeypatch):
+    monkeypatch.setenv("AI_MODE", "optional")
+    span_index = build_span_index(citations)
+    span_id = next(iter(span_index))
+
+    parsed = {
+        "abstain": False,
+        "summary_id": "Pembayaran pungutan berlaku selama 30 hari di Bali.",
+        "summary_en": "Levy payment is valid for 30 days in Bali.",
+        "claims": [{
+            "claim_text_id": "Wisatawan asing wajib membayar pungutan Rp150.000.",
+            "claim_text_en": "Foreign tourists must pay the IDR 150,000 levy.",
+            "citation_id": "PERDA_BALI_06_2023_LEVY",
+            "span_ids": [span_id],
+        }],
+    }
+
+    result = _pipeline(parsed).answer(
+        citations=citations,
+        system_prompt="test",
+        user_prompt="test",
+        fallback_summary="fallback",
+    )
+
+    assert result["ai_synthesis_status"] == "deterministic"
+    assert result["guard_status"] == "FALLBACK_GUARD"
+
+
+def test_pipeline_rejects_contradiction_phrase(citations, monkeypatch):
+    monkeypatch.setenv("AI_MODE", "optional")
+    span_index = build_span_index(citations)
+    span_id = next(iter(span_index))
+
+    parsed = {
+        "abstain": False,
+        "summary_id": "Semua wisatawan dibebaskan dari semua kewajiban pungutan.",
+        "summary_en": "All tourists are exempt from all levy payments.",
+        "claims": [{
+            "claim_text_id": "Wisatawan asing wajib membayar pungutan Rp150.000.",
+            "claim_text_en": "Foreign tourists must pay the IDR 150,000 levy.",
+            "citation_id": "PERDA_BALI_06_2023_LEVY",
+            "span_ids": [span_id],
+        }],
+    }
+
+    result = _pipeline(parsed).answer(
+        citations=citations,
+        system_prompt="test",
+        user_prompt="test",
+        fallback_summary="fallback",
+    )
+
+    assert result["ai_synthesis_status"] == "deterministic"
+    assert result["guard_status"] == "FALLBACK_GUARD"
+

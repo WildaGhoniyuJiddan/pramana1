@@ -18,7 +18,18 @@ from backend.services.evidence_spans import (
 )
 
 ARTICLE_PATTERN = re.compile(r"\bPasal\s+(\d+[A-Za-z]?)\b", re.IGNORECASE)
-RUPIAH_PATTERN = re.compile(r"Rp\s?([\d.,]+)", re.IGNORECASE)
+RUPIAH_PATTERN = re.compile(r"\b(?:rp\.?|idr)\s*([\d.,]+)", re.IGNORECASE)
+URL_PATTERN = re.compile(r"https?://\S+|www\.\S+", re.IGNORECASE)
+
+CONTRADICTION_PATTERNS = [
+    re.compile(r"\bdibebaskan dari semua\b", re.IGNORECASE),
+    re.compile(r"\btidak perlu membayar\b", re.IGNORECASE),
+    re.compile(r"\bbebas dari segala\b", re.IGNORECASE),
+    re.compile(r"\btidak ada sanksi\b", re.IGNORECASE),
+    re.compile(r"\bexempt from all\b", re.IGNORECASE),
+    re.compile(r"\bno need to pay\b", re.IGNORECASE),
+    re.compile(r"\bfree of charge for all\b", re.IGNORECASE),
+]
 
 RESPONSE_SCHEMA: Dict[str, Any] = {
     "type": "OBJECT",
@@ -62,21 +73,42 @@ class GroundedAIPipeline:
         self.call_model = call_model
 
     @staticmethod
-    def _allowed_values(citations: List[Dict[str, Any]]) -> Tuple[set, set]:
+    def _clean_nominal(raw: str) -> str:
+        cleaned = re.sub(r"[,.]00$", "", raw.strip())
+        return re.sub(r"\D", "", cleaned)
+
+    @classmethod
+    def _allowed_values(
+        cls, citations: List[Dict[str, Any]]
+    ) -> Tuple[set, set, set, set]:
         allowed_articles = set()
         allowed_rupiah = set()
+        allowed_urls = set()
+        allowed_numbers = set()
+
         for citation in citations:
-            for value in (
-                citation.get("pasal", ""),
-                citation.get("quoted_text", ""),
-            ):
+            text = citation.get("quoted_text", "")
+            pasal = citation.get("pasal", "")
+            url = citation.get("source_url", "")
+            if url:
+                allowed_urls.add(url.strip())
+
+            for value in (pasal, text):
                 for match in ARTICLE_PATTERN.finditer(value):
                     allowed_articles.add(match.group(1).lower())
-            for match in RUPIAH_PATTERN.finditer(
-                citation.get("quoted_text", "")
-            ):
-                allowed_rupiah.add(re.sub(r"\D", "", match.group(1)))
-        return allowed_articles, allowed_rupiah
+
+            for match in RUPIAH_PATTERN.finditer(text):
+                clean_num = cls._clean_nominal(match.group(1))
+                if clean_num:
+                    allowed_rupiah.add(clean_num)
+                    allowed_numbers.add(clean_num)
+
+            for num in re.findall(r"\d+", text):
+                allowed_numbers.add(num)
+                if len(num) > 2 and num.endswith("00"):
+                    allowed_numbers.add(num[:-2])
+
+        return allowed_articles, allowed_rupiah, allowed_urls, allowed_numbers
 
     @classmethod
     def _guard_text(
@@ -89,7 +121,22 @@ class GroundedAIPipeline:
         if not text or len(text.strip()) < min_length or len(text) > max_length:
             return False
 
-        allowed_articles, allowed_rupiah = cls._allowed_values(citations)
+        # (1) Contradiction check
+        for pattern in CONTRADICTION_PATTERNS:
+            if pattern.search(text):
+                return False
+
+        allowed_articles, allowed_rupiah, allowed_urls, allowed_numbers = (
+            cls._allowed_values(citations)
+        )
+
+        # (2) Block external unverified URLs
+        for match in URL_PATTERN.finditer(text):
+            found_url = match.group(0).rstrip(".,;)")
+            if not any(found_url in allowed for allowed in allowed_urls):
+                return False
+
+        # (3) Articles check
         mentioned_articles = {
             match.group(1).lower()
             for match in ARTICLE_PATTERN.finditer(text)
@@ -97,11 +144,15 @@ class GroundedAIPipeline:
         if mentioned_articles - allowed_articles:
             return False
 
+        # (4) Rupiah exact match check
         for match in RUPIAH_PATTERN.finditer(text):
-            digits = re.sub(r"\D", "", match.group(1))
-            if digits and not any(
-                digits in allowed for allowed in allowed_rupiah
-            ):
+            digits = cls._clean_nominal(match.group(1))
+            if digits and digits not in allowed_rupiah:
+                return False
+
+        # (5) Fabricated numbers check
+        for num in re.findall(r"\d+", text):
+            if num not in allowed_numbers and num not in allowed_articles:
                 return False
 
         return True
