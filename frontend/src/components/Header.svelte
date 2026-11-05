@@ -9,7 +9,8 @@
     { path: '/trip-brief', label: 'Trip Brief' },
     { path: '/context-note', label: 'Context Note' },
     { path: '/totem', label: 'Gate' },
-    { path: '/corpus', label: 'Korpus Pramana' }
+    { path: '/corpus', label: 'Korpus' },
+    { path: '/settings', label: 'Pengaturan' }
   ];
 
   function isActive(item) {

@@ -11,6 +11,12 @@ export async function fetchHealth() {
   return res.json();
 }
 
+export async function fetchAiStatus() {
+  const res = await fetch(`${API_BASE}/ai/status`);
+  if (!res.ok) throw new Error('Failed to load AI status');
+  return res.json();
+}
+
 export async function fetchCorpus() {
   const res = await fetch(`${API_BASE}/corpus`);
   if (!res.ok) throw new Error('Failed to load legal corpus');

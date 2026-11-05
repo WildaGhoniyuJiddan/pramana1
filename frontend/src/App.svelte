@@ -7,8 +7,9 @@
   import CorpusExplorer from './components/CorpusExplorer.svelte';
   import CorpusDrawer from './components/CorpusDrawer.svelte';
   import SmartGateView from './components/SmartGateView.svelte';
+  import SettingsView from './components/SettingsView.svelte';
 
-  const STATIC_ROUTES = ['/', '/trip-brief', '/context-note', '/corpus', '/totem'];
+  const STATIC_ROUTES = ['/', '/trip-brief', '/context-note', '/corpus', '/totem', '/settings'];
   const TOTEM_ROUTE = /^\/totem\/[a-z0-9]+(?:-[a-z0-9]+)*$/;
 
   function normalizePath(p) {
@@ -93,6 +94,8 @@
           />
         {:else if currentPath === '/corpus'}
           <CorpusExplorer />
+        {:else if currentPath === '/settings'}
+          <SettingsView />
         {/if}
       </div>
     {/key}
@@ -122,6 +125,7 @@
         <a href="/context-note" onclick={(e) => { e.preventDefault(); navigate('/context-note'); }} class="hover:underline">/context-note</a>
         <a href="/totem" onclick={(e) => { e.preventDefault(); navigate('/totem'); }} class="hover:underline">/totem</a>
         <a href="/corpus" onclick={(e) => { e.preventDefault(); navigate('/corpus'); }} class="hover:underline">/corpus</a>
+        <a href="/settings" onclick={(e) => { e.preventDefault(); navigate('/settings'); }} class="hover:underline">/settings</a>
       </div>
     </div>
     <div
