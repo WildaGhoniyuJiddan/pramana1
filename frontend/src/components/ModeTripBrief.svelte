@@ -437,6 +437,17 @@
                 </svg>
                 <span>Unduh Kalender .ICS</span>
               </button>
+              {#if travelerOrigin === 'international'}
+                <a
+                  href="https://lovebali.baliprov.go.id"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  style="background-color: #dfd6c3; color: #0a0a0a; border: 1.5px solid #0a0a0a; box-shadow: 2px 2px 0px #0a0a0a;"
+                  class="brutal-press px-3 py-1.5 font-mono text-[11px] font-bold inline-flex items-center gap-1.5 cursor-pointer"
+                >
+                  <span>Portal Resmi Love Bali (Rp150k) ↗</span>
+                </a>
+              {/if}
             </div>
           </div>
 

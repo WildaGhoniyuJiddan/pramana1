@@ -2,8 +2,11 @@
   import { onMount, onDestroy } from 'svelte';
   import { fetchZones, fetchTotem, requestTotemBrief } from '../lib/api.js';
   import QrCode from './QrCode.svelte';
+  import GateScannerModal from './GateScannerModal.svelte';
 
   let { zoneId = null, navigate = (path) => {}, onOpenDoc = () => {} } = $props();
+
+  let showScanner = $state(false);
 
   const UI_TEXT = {
     id: {
@@ -407,6 +410,15 @@
         >
           EN
         </button>
+        <button
+          type="button"
+          onclick={() => showScanner = true}
+          style="background-color: #0c249c; color: #ffffff; border: 1.5px solid #0a0a0a; box-shadow: 2px 2px 0px #0a0a0a;"
+          class="brutal-press px-3 py-1.5 font-mono text-[11px] font-bold cursor-pointer inline-flex items-center gap-1.5"
+        >
+          <span>📷</span>
+          <span>{lang === 'id' ? 'Pindai QR / Tap NFC' : 'Scan QR / Tap NFC'}</span>
+        </button>
         {#if zoneId}
           <button
             type="button"
@@ -748,10 +760,26 @@
     {:else}
       <div class="space-y-5">
         <div
-          class="p-4 text-xs leading-relaxed"
-          style="background-color: #ffffff; border: 1.5px solid #0a0a0a; color: #0a0a0a;"
+          class="p-4 sm:p-5 flex flex-wrap items-center justify-between gap-4"
+          style="background-color: #ffffff; border: 1.5px solid #0a0a0a; box-shadow: 3px 3px 0px #0a0a0a;"
         >
-          <strong>{t.tapNote}</strong>
+          <div class="space-y-1 max-w-xl">
+            <span class="font-mono text-[10px] font-bold uppercase tracking-wider" style="color: #0c249c;">
+              INTEGRASI FISIK LAPANGAN (NFC &amp; QR)
+            </span>
+            <p class="text-xs leading-relaxed text-[#0a0a0a]">
+              <strong>{t.tapNote}</strong>
+            </p>
+          </div>
+          <button
+            type="button"
+            onclick={() => { showScanner = true; }}
+            class="brutal-press px-4 py-2.5 font-mono text-xs font-bold cursor-pointer inline-flex items-center gap-2"
+            style="background-color: #0c249c; color: #ffffff; border: 1.5px solid #0a0a0a; box-shadow: 2px 2px 0px #0a0a0a;"
+          >
+            <span>📷</span>
+            <span>{lang === 'id' ? 'Buka Kamera / Simulasi Tap NFC' : 'Open Camera / Tap NFC Sim'}</span>
+          </button>
         </div>
 
         <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
@@ -801,4 +829,13 @@
       </div>
     {/if}
   </section>
+
+  <GateScannerModal
+    isOpen={showScanner}
+    onClose={() => { showScanner = false; }}
+    onScan={(scannedZoneId) => {
+      showScanner = false;
+      openZone(scannedZoneId);
+    }}
+  />
 </div>

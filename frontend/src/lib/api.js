@@ -2,7 +2,8 @@
  * API client for Pramana backend.
  */
 
-const API_BASE = '/api/v1';
+const ENV_BASE = (import.meta.env.VITE_API_BASE_URL || '').trim().replace(/\/+$/, '');
+const API_BASE = `${ENV_BASE}/api/v1`;
 
 export async function fetchHealth() {
   const res = await fetch(`${API_BASE}/health`);
