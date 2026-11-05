@@ -8,11 +8,14 @@ falls back to deterministic keyword retrieval.
 
 import hashlib
 import json
+import logging
 import math
 import os
 from typing import Any, Dict, List, Optional
 
 import httpx
+
+logger = logging.getLogger("pramana.hybrid")
 
 from backend.services.ai_config import (
     GEMINI_EMBEDDING_MODEL,
@@ -124,6 +127,20 @@ class HybridRetriever:
     def semantic_scores(
         self, query_embedding: List[float]
     ) -> Dict[str, float]:
+        if not self._vectors:
+            return {}
+        # Dimension check against stored vector dimension
+        first_vec = next(iter(self._vectors.values()), None)
+        if first_vec and len(query_embedding) != len(first_vec):
+            logger.warning(
+                "Embedding dimension mismatch: query dim %d != stored vector dim %d",
+                len(query_embedding),
+                len(first_vec),
+            )
+            raise ValueError(
+                f"Embedding dimension mismatch: query has {len(query_embedding)} dimensions, "
+                f"stored vectors have {len(first_vec)} dimensions"
+            )
         scores = {}
         for reg_id, vector in self._vectors.items():
             if not isinstance(vector, list):
@@ -144,7 +161,11 @@ class HybridRetriever:
         keyword_by_id = {
             item["regulation"]["id"]: item for item in keyword_items
         }
-        semantic = self.semantic_scores(query_embedding)
+        try:
+            semantic = self.semantic_scores(query_embedding)
+        except ValueError as err:
+            logger.warning("Dimension mismatch in semantic search, using pure keyword: %s", err)
+            semantic = {}
 
         candidates = set(keyword_by_id) | set(semantic)
         scored = []

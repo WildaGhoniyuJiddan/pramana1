@@ -57,3 +57,31 @@ def test_hybrid_retriever_rejects_stale_embeddings(tmp_path):
     )
     retriever = HybridRetriever(corpus, str(path))
     assert retriever.vector_count == 0
+
+
+def test_hybrid_retriever_raises_on_dimension_mismatch(tmp_path):
+    corpus = CorpusManager.get_instance()
+    first = corpus.get_all()[0]
+    path = tmp_path / "embeddings.json"
+    path.write_text(
+        json.dumps({
+            "model": "test",
+            "dimension": 3,
+            "corpus_checksum": corpus_checksum(corpus),
+            "vectors": {first["id"]: [1.0, 0.0, 0.0]},
+        }),
+        encoding="utf-8",
+    )
+
+    retriever = HybridRetriever(corpus, str(path))
+    assert retriever.vector_count == 1
+
+    # Query with 2 dimensions against 3-dim stored vector must raise ValueError
+    import pytest
+    with pytest.raises(ValueError, match="Embedding dimension mismatch"):
+        retriever.semantic_scores([1.0, 0.0])
+
+    # search_scored catches mismatch gracefully and uses keyword fallback
+    results = retriever.search_scored(first["category"], [1.0, 0.0])
+    assert len(results) >= 1
+
