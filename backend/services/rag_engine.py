@@ -28,6 +28,7 @@ from backend.services.ai_pipeline import GroundedAIPipeline
 from backend.services.corpus_loader import (
     CorpusManager,
     DEFAULT_RELEVANCE_THRESHOLD,
+    STOPWORDS,
 )
 from backend.services.verifier import DualLayerVerifier
 from backend.services.ocr_masking import mask_pii
@@ -271,17 +272,31 @@ class StrictRAGEngine:
         framing_markers: List[Dict[str, str]] = []
         sensational_phrases = [
             ("semua bule", "Generalisasi terhadap seluruh wisatawan asing"),
+            ("semua turis", "Generalisasi terhadap seluruh wisatawan"),
             ("semua warga lokal", "Generalisasi terhadap warga lokal"),
+            ("usir semua", "Seruan pengusiran massal tanpa proses hukum"),
+            ("usir", "Tuntutan pengusiran sepihak"),
             ("kebal hukum", "Asumsi tanpa rujukan status penegakan hukum"),
             ("polisi diam saja", "Klaim sensasional tanpa verifikasi otoritas"),
             ("adat barbar", "Pelanggaran etika dan penghinaan budaya"),
             ("deportasi sekarang juga", "Tuntutan sepihak di luar wewenang Imigrasi"),
             ("pemerintah tidak peduli", "Klaim tanpa bukti tentang respons pemerintah"),
+            ("deport them all", "Generalization and demand for collective deportation"),
+            ("all tourists", "Generalization targeting all tourists"),
+            ("all foreigners", "Generalization targeting all foreign nationals"),
+            ("kick them out", "Call for expulsion without legal process"),
+            ("deport all", "Demand for collective deportation without due process"),
         ]
         lowered = (text or "").lower()
+        matched_spans: List[Tuple[int, int]] = []
         for phrase, reason in sensational_phrases:
-            if phrase in lowered:
-                framing_markers.append({"phrase": phrase, "reason": reason})
+            start = lowered.find(phrase)
+            if start != -1:
+                end = start + len(phrase)
+                # Suppress shorter sub-phrase if already covered by an earlier match
+                if not any(s <= start and end <= e for s, e in matched_spans):
+                    framing_markers.append({"phrase": phrase, "reason": reason})
+                    matched_spans.append((start, end))
         return framing_markers
 
     def _build_briefing_items(
@@ -843,6 +858,45 @@ class StrictRAGEngine:
         masked_text, pii_counts = mask_pii(post_content)
         framing_markers = self._detect_framing(masked_text)
 
+        # Single-token or overly short queries must abstain
+        content_tokens = [
+            t for t in re.findall(r"[a-z0-9]+", (post_content or "").lower())
+            if t not in STOPWORDS
+        ]
+        if len(content_tokens) <= 1:
+            abstain_text = (
+                "Kueri atau teks postingan terlalu singkat untuk diverifikasi "
+                "secara akurat terhadap korpus hukum. Pramana memilih abstain."
+            )
+            return {
+                "status": "TIDAK_DITEMUKAN",
+                "guard_status": "KUERI_TERLALU_PENDEK",
+                "ai_engine": "dual-layer-guard (abstain)",
+                "ai_synthesis_status": "abstain",
+                "confidence": "TIDAK_DITEMUKAN",
+                "confidence_note": CONFIDENCE_NOTE,
+                "verification_scope": "corpus",
+                "masked_post": masked_text,
+                "pii_redacted_count": sum(pii_counts.values()),
+                "neutral_summary": abstain_text,
+                "neutral_summary_en": (
+                    "Query or post content is too short to be accurately verified "
+                    "against the legal corpus. Pramana abstains."
+                ),
+                "ai_claims": [],
+                "ai_rejected_claims": 0,
+                "ai_latency_ms": 0,
+                "ai_model": "",
+                "ai_guard_status": "TIDAK_DITEMUKAN",
+                "framing_markers": framing_markers,
+                "citations": [],
+                "copyable_comment": (
+                    "Catatan Konteks (Pramana): Teks terlalu singkat untuk "
+                    "menghubungkan rujukan hukum yang spesifik."
+                ),
+                "disclaimer": DISCLAIMER,
+            }
+
         scored = self._retrieve_scored(masked_text, top_k=3)
         matched_regs = [item["regulation"] for item in scored]
         scores = [item["score"] for item in scored]
@@ -1036,8 +1090,9 @@ class StrictRAGEngine:
                 ai_result["summary_en"] or fallback_summary_en
             )
 
+        status = "BUKTI_TERBATAS" if confidence == "RENDAH" else "TERVERIFIKASI"
         return {
-            "status": "TERVERIFIKASI",
+            "status": status,
             "guard_status": guard_status,
             "ai_engine": ai_result["ai_engine"],
             "ai_synthesis_status": ai_result["ai_synthesis_status"],

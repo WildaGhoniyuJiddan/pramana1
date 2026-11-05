@@ -61,16 +61,15 @@ COVERAGE_VALUES = {"full", "excerpt", "secondary", "none"}
 
 TOKEN_PATTERN = re.compile(r"[a-z0-9]+")
 
-# Common Indonesian stopwords to prevent false-positive matching on generic
-# verbs/prepositions.
+# Common Indonesian & English stopwords to prevent false-positive matching on generic
+# verbs/prepositions/quantifiers.
 STOPWORDS = {
     "yang", "dan", "di", "ke", "dari", "pada", "untuk", "ini", "itu", "dengan",
     "atau", "bisa", "ada", "tidak", "adalah", "seperti", "membuat", "dalam",
     "akan", "oleh", "bagi", "secara", "sudah", "hanya", "serta", "saat",
     "juga", "para", "sebuah", "suatu", "agar", "karena", "tetapi", "namun",
     "tersebut", "merupakan", "dapat", "harus", "wajib", "sangat", "lebih",
-    # Title boilerplate that otherwise matches nearly every statute title.
-    "atas", "nomor", "tahun", "tentang",
+    "atas", "nomor", "tahun", "tentang", "semua",
     # Generic words that do not identify a legal rule on their own.
     "orang", "tempat", "barang", "uang", "apa", "apakah", "berapa",
     "menurut", "sedang", "boleh", "masuk", "saya", "lama", "berlaku",
@@ -80,6 +79,11 @@ STOPWORDS = {
     "aplikasi", "online", "sore", "parah", "kemacetan", "terlalu",
     "pedagang", "menjual", "taksi", "error", "memesan", "harganya",
     "tiga",
+    # English stopwords
+    "the", "and", "is", "are", "was", "were", "at", "to", "in", "for", "of",
+    "all", "do", "does", "did", "them", "they", "their", "this", "that", "it",
+    "its", "really", "have", "has", "had", "you", "your", "with", "from", "by",
+    "on", "posted", "about", "what", "how", "can", "will", "just", "out",
 }
 
 # Single-token queries made of these words are too weak to ground an answer.
@@ -87,6 +91,62 @@ GENERIC_QUERY_TOKENS = {
     "harga", "biaya", "hotel", "bandara", "penerbangan", "hari", "aplikasi",
     "online", "visa", "turis", "bintang", "mahal", "bersih", "koper",
     "delay", "restoran", "surf", "sewa", "papan", "pajak", "retribusi",
+    "pura", "bali", "pantai", "candi", "desa", "aturan", "hukum", "wisata",
+    "tourist", "temple", "indonesia", "island",
+}
+
+# Cross-lingual expansion for English viral posts and tourist queries
+EN_TO_ID_SYNONYMS: Dict[str, List[str]] = {
+    "tourist": ["wisatawan", "wisman"],
+    "tourists": ["wisatawan", "wisman"],
+    "foreign": ["wisman", "asing"],
+    "foreigner": ["wisman", "asing"],
+    "foreigners": ["wisman", "asing"],
+    "deport": ["deportasi", "keimigrasian"],
+    "deported": ["deportasi", "keimigrasian"],
+    "deportation": ["deportasi", "keimigrasian"],
+    "expel": ["deportasi", "keimigrasian"],
+    "tree": ["pohon"],
+    "trees": ["pohon"],
+    "sacred": ["suci", "kesucian", "sakral"],
+    "holy": ["suci", "sakral"],
+    "temple": ["pura", "tempat suci"],
+    "temples": ["pura", "tempat suci"],
+    "shrine": ["pura", "tempat suci"],
+    "levy": ["pungutan", "retribusi"],
+    "tax": ["pungutan"],
+    "fee": ["pungutan"],
+    "pay": ["membayar", "pembayaran", "bayar"],
+    "payment": ["pembayaran"],
+    "150k": ["150000", "150"],
+    "climb": ["memanjat", "menaiki"],
+    "climbed": ["memanjat", "menaiki"],
+    "climbing": ["memanjat", "menaiki"],
+    "naked": ["telanjang", "busana"],
+    "nude": ["telanjang", "busana"],
+    "nudity": ["telanjang", "busana"],
+    "clothes": ["busana", "pakaian"],
+    "clothing": ["busana", "pakaian"],
+    "dress": ["busana", "pakaian"],
+    "scooter": ["sepeda motor", "kendaraan"],
+    "motorbike": ["sepeda motor", "kendaraan"],
+    "motorcycle": ["sepeda motor", "kendaraan"],
+    "rental": ["rental", "sewa"],
+    "rent": ["sewa", "rental"],
+    "helmet": ["helm"],
+    "license": ["sim", "pengemudi"],
+    "driving": ["mengemudi", "berkendara"],
+    "nyepi": ["nyepi", "catur brata"],
+    "silent": ["nyepi", "penyepian"],
+    "drone": ["drone", "pesawat tanpa awak"],
+    "visa": ["visa", "keimigrasian", "izin tinggal"],
+    "overstay": ["keimigrasian", "izin tinggal"],
+    "work": ["bekerja", "usaha"],
+    "working": ["bekerja", "usaha"],
+    "illegal": ["tanpa izin", "melanggar"],
+    "trash": ["sampah"],
+    "littering": ["sampah"],
+    "plastic": ["plastik"],
 }
 
 MIN_TOKEN_COVERAGE = 0.34
@@ -401,20 +461,22 @@ class CorpusManager:
             weights: List[float] = []
 
             for token in tokens:
+                candidates = [token] + EN_TO_ID_SYNONYMS.get(token, [])
                 best_weight = 0.0
 
-                # 1. Official keyword list (strongest signal).
-                if any(token in keyword for keyword in keywords):
-                    best_weight = max(best_weight, 1.0)
-                # 2. Document title.
-                if token in title_lower:
-                    best_weight = max(best_weight, 0.85)
-                # 3. Category.
-                if token in cat_lower:
-                    best_weight = max(best_weight, 0.7)
-                # 4. Main text (weakest signal).
-                if token in text_lower:
-                    best_weight = max(best_weight, 0.55)
+                for cand in candidates:
+                    # 1. Official keyword list (strongest signal).
+                    if any(cand in keyword for keyword in keywords):
+                        best_weight = max(best_weight, 1.0)
+                    # 2. Document title.
+                    if cand in title_lower:
+                        best_weight = max(best_weight, 0.85)
+                    # 3. Category.
+                    if cand in cat_lower:
+                        best_weight = max(best_weight, 0.7)
+                    # 4. Main text (weakest signal).
+                    if cand in text_lower:
+                        best_weight = max(best_weight, 0.55)
 
                 if best_weight > 0:
                     matched_terms.append(token)
@@ -429,12 +491,18 @@ class CorpusManager:
             # A single generic word is not enough evidence. Multi-token queries
             # must cover a meaningful share of their tokens.
             if len(tokens) == 1:
-                if tokens[0] in GENERIC_QUERY_TOKENS or best_weight < 0.85:
+                if tokens[0] in GENERIC_QUERY_TOKENS or best_weight < 0.90:
                     continue
             elif coverage < MIN_TOKEN_COVERAGE:
                 continue
 
             score = best_weight * (0.6 + 0.4 * coverage)
+
+            # Demote explanation/elucidation chunks unless explicitly requested
+            if reg["id"].endswith("_PENJELASAN_UMUM") or "penjelasan" in reg.get("pasal", "").lower():
+                q_lower = query.lower()
+                if "penjelasan" not in q_lower and "elucidation" not in q_lower:
+                    score *= 0.6
 
             if score >= min_score:
                 scored_results.append({

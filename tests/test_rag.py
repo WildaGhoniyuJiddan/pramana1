@@ -199,3 +199,34 @@ def test_mode2_ai_abstain_returns_tidak_ditemukan(engine, monkeypatch):
     assert result["ai_synthesis_status"] == "abstain"
     assert result["ai_claims"] == []
     assert result["citations"] == []
+
+
+def test_mode2_weak_match_not_positive_status_and_detects_framing(engine):
+    post = 'Turis bule telanjang di Pura Besakih, usir semua turis asing dari Bali!'
+    result = engine.analyze_viral_post(post)
+
+    assert result['status'] != 'TERVERIFIKASI'
+    assert result['status'] == 'BUKTI_TERBATAS'
+    assert result['confidence'] == 'RENDAH'
+    assert len(result['framing_markers']) >= 1
+    assert any(
+        'usir' in m['phrase'] or 'semua turis' in m['phrase']
+        for m in result['framing_markers']
+    )
+    assert result['citations']
+    assert result['citations'][0]['reg_id'] != 'PERDA_BALI_06_2023_PENJELASAN_UMUM'
+
+
+def test_mode2_english_framing_and_retrieval(engine):
+    post = 'Tourist climbed a sacred tree at a Bali temple and posted it. Deport them all!'
+    result = engine.analyze_viral_post(post)
+
+    assert any(m['phrase'] == 'deport them all' for m in result['framing_markers'])
+    assert any(c['reg_id'] == 'SE_GUB_04_2023_DONT' for c in result['citations'])
+
+
+def test_mode2_single_word_abstains(engine):
+    result = engine.analyze_viral_post('pura')
+    assert result['status'] == 'TIDAK_DITEMUKAN'
+    assert result['guard_status'] == 'KUERI_TERLALU_PENDEK'
+    assert result['citations'] == []
