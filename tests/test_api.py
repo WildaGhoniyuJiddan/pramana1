@@ -14,6 +14,7 @@ client = TestClient(app)
 
 @pytest.fixture(autouse=True)
 def _disable_gemini(monkeypatch):
+    monkeypatch.setenv("AI_MODE", "optional")
     monkeypatch.delenv("GEMINI_API_KEY", raising=False)
 
 
@@ -22,15 +23,32 @@ def test_healthcheck_endpoint():
     assert response.status_code == 200
     data = response.json()
     assert data["status"] == "healthy"
-    assert data["version"] == "1.3.0"
-    assert data["total_regulations_indexed"] == 10
-    assert data["total_documents_registered"] == 22
+    assert data["version"] == "1.4.0"
+    assert data["total_regulations_indexed"] == 40
+    assert data["total_documents_registered"] == 29
     assert data["total_manifest_documents"] == 21
     assert data["total_smart_gate_zones"] == 3
     assert data["smart_gate_version"] == "1.0.0"
-    assert data["corpus_version"] == "1.2.0"
+    assert data["corpus_version"] == "1.3.0"
+    assert data["ai_mode"] == "optional"
+    assert data["ai_enabled"] is False
+    assert data["ai_model"] == "gemini-2.5-flash"
     assert data["calendar_coverage"] == "2025-2028"
     assert data["verification_scope"] == "corpus"
+
+
+def test_ai_status_endpoint():
+    response = client.get("/api/v1/ai/status")
+    assert response.status_code == 200
+    data = response.json()
+    assert data["mode"] == "optional"
+    assert data["enabled"] is False
+    assert data["model"] == "gemini-2.5-flash"
+    assert "calls" in data
+    assert "guard_rejections" in data
+    assert "last_error" in data
+    assert data["hybrid_retrieval_available"] is False
+    assert data["embedding_vectors_loaded"] == 0
 
 
 def test_security_headers_present():
@@ -47,9 +65,9 @@ def test_get_corpus_endpoint():
     data = response.json()
     assert "metadata" in data
     assert "tiers" in data
-    assert data["metadata"]["version"] == "1.2.0"
-    assert len(data["regulations"]) == 10
-    assert len(data["documents"]) == 22
+    assert data["metadata"]["version"] == "1.3.0"
+    assert len(data["regulations"]) == 40
+    assert len(data["documents"]) == 29
 
     documents_by_id = {doc["id"]: doc for doc in data["documents"]}
     for regulation in data["regulations"]:
@@ -59,8 +77,9 @@ def test_get_corpus_endpoint():
         assert document["retrieval_eligible"] is True
 
     tourism_law = documents_by_id["uu-18-2025"]
-    assert tourism_law["text_status"] == "belum-diambil"
-    assert tourism_law["retrieval_eligible"] is False
+    assert tourism_law["text_status"] == "verbatim-ocr-dibersihkan"
+    assert tourism_law["retrieval_eligible"] is True
+    assert len(tourism_law["regulation_ids"]) == 7
 
 
 def test_zone_list_endpoint():
@@ -131,6 +150,10 @@ def test_totem_brief_endpoint_uses_deterministic_fallback():
     assert data["ai_synthesis_status"] == "deterministic"
     assert data["guard_status"] == "FALLBACK_DETERMINISTIK"
     assert data["brief"]
+    assert data["brief_id"]
+    assert data["brief_en"]
+    assert data["claims"] == []
+    assert data["rejected_claims"] == 0
     assert len(data["citation_ids"]) == 3
 
 
@@ -174,9 +197,15 @@ def test_trip_brief_endpoint():
     assert data["verification_scope"] == "corpus"
     assert data["confidence"] in {"SEDANG", "RENDAH"}
     assert data["disclaimer"]
+    assert data["ai_synthesis_status"] == "deterministic"
+    assert data["ai_guard_status"] == "FALLBACK_DETERMINISTIK"
+    assert data["ai_claims"] == []
+    assert data["ai_synthesis_en"]
     for item in data["briefing_items"]:
         assert item["document_id"]
-        assert item["text_status"] in {"verbatim", "compilation"}
+        assert item["text_status"] in {
+            "verbatim", "verbatim-ocr-dibersihkan", "compilation",
+        }
         assert item["source_type"]
 
 
@@ -196,11 +225,17 @@ def test_context_note_endpoint():
     assert data["verification_scope"] == "corpus"
     assert data["confidence"] in {"SEDANG", "RENDAH"}
     assert data["disclaimer"]
+    assert data["ai_synthesis_status"] == "deterministic"
+    assert data["ai_guard_status"] == "FALLBACK_DETERMINISTIK"
+    assert data["ai_claims"] == []
+    assert data["neutral_summary_en"]
     for citation in data["citations"]:
         assert citation["verified_layer1"] is True
         assert len(citation["quote_sha256"]) == 64
         assert citation["document_id"]
-        assert citation["text_status"] in {"verbatim", "compilation"}
+        assert citation["text_status"] in {
+            "verbatim", "verbatim-ocr-dibersihkan", "compilation",
+        }
 
 
 def test_context_note_abstain_endpoint():
@@ -212,6 +247,9 @@ def test_context_note_abstain_endpoint():
     data = response.json()
     assert data["status"] == "TIDAK_DITEMUKAN"
     assert data["citations"] == []
+    assert data["ai_synthesis_status"] == "abstain"
+    assert data["ai_claims"] == []
+    assert data["neutral_summary_en"]
 
 
 @pytest.mark.parametrize(

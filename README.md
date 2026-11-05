@@ -13,18 +13,19 @@ Bali DigiFest 2026 — AI Web Innovation Challenge
 | Bagian | Status | Catatan |
 | :--- | :--- | :--- |
 | Retrieval deterministik + abstain (Layer-2) | ✅ Live | Ambang relevansi normalisasi `0.5` + pemotongan relatif `0.75` dari skor teratas |
-| Registry provenance korpus | ✅ Live | 22 dokumen registry, 10 chunk retrieval, validasi silang `document_id` dan status teks |
+| Registry provenance korpus | ✅ Live | 29 dokumen registry, 40 chunk retrieval, validasi silang `document_id`, status teks, dan amendment |
 | PII masking (5 kategori) | ✅ Live | Email, telepon, kode booking, kartu, paspor. Bersifat best-effort, bukan DLP penuh |
 | Kalender Nyepi & Pawukon | ✅ Live | Cakupan deterministik 2025–2028, jendela Nyepi 24 jam |
 | Ekspor `.ics` (RFC 5545) | ✅ Live | Escaping teks, line folding, UID stabil, validasi tanggal |
-| Mode 1 — Trip Brief | 🟡 Prototype | Retrieval, kalender, PII, ICS, teks WhatsApp; ringkasan AI opsional |
-| Mode 2 — Context Note | 🟡 Prototype | Sitasi korpus, deteksi framing, abstain; ringkasan AI opsional |
+| AI Core Hardening | ✅ Live | Structured output, evidence span, claim verifier, `AI_MODE`, telemetri, eval harness |
+| Mode 1 — Trip Brief | 🟡 Prototype | Retrieval, kalender, PII, ICS, teks WhatsApp; AI-first dengan fallback dev |
+| Mode 2 — Context Note | 🟡 Prototype | Sitasi korpus, deteksi framing, claim verifier, abstain; AI-first |
 | Mode 3 — Smart Gate (NFC/QR) | 🟡 Prototype | 3 zona, kartu deterministik, AI brief grounded, TTS, QR; offline belum |
 | Corpus Explorer | 🟡 Prototype | Menampilkan registry dokumen, chunk retrieval, provenance, dan keterbatasan korpus |
-| Sintesis Gemini | 🟡 Prototype | Butuh `GEMINI_API_KEY`; test otomatis memakai fallback deterministik |
+| Sintesis Gemini | 🟡 Prototype | Structured JSON + evidence span; `AI_MODE=required` di submission |
 | Verifikasi silang JDIH real-time | ⚪ Planned | Belum diimplementasikan |
-| Benchmark publik | ⚪ Planned | Belum ada angka akurasi/halusinasi yang diukur |
-| Antarmuka bilingual ID/EN | 🟡 Prototype | Smart Gate sudah ID/EN; Mode 1 dan 2 masih Bahasa Indonesia |
+| Benchmark publik | 🟡 Internal eval | 40 kasus berlabel; baseline retrieval-only di `eval/results/`; belum benchmark publik |
+| Antarmuka bilingual ID/EN | 🟡 Prototype | Smart Gate ID/EN; ringkasan AI Mode 1/2 punya toggle ID/EN |
 
 ---
 
@@ -77,7 +78,7 @@ Pramana sengaja membedakan beberapa tingkat klaim:
 | **Layer-2 guard** | Tidak ada hasil retrieval yang melewati ambang skor, sehingga sistem abstain sebelum memanggil LLM. |
 | **`is_verbatim: true`** | Entri korpus disimpan sebagai kutipan teks, bukan ringkasan. |
 | **`is_verbatim: false`** | Entri adalah ringkasan/kompilasi. UI tidak menampilkannya sebagai bunyi pasal verbatim. |
-| **`text_status`** | Status teks eksplisit: `verbatim`, `compilation`, `non-verbatim`, atau `belum-diambil`. Chunk `compilation` tidak boleh dikutip sebagai bunyi pasal. |
+| **`text_status`** | Status teks eksplisit: `verbatim`, `verbatim-ocr-dibersihkan`, `compilation`, `non-verbatim`, atau `belum-diambil`. Chunk `compilation` tidak boleh dikutip sebagai bunyi pasal. |
 | **`retrieval_eligible`** | Hanya `true` untuk dokumen yang memiliki chunk teks tersimpan. Dokumen `belum-diambil`/`non-verbatim` tidak menambah hasil retrieval. |
 | **`confidence`** | Dihitung dari skor kecocokan kata kunci. Nilai tertinggi yang diberikan adalah `SEDANG`; sistem tidak mengklaim `TINGGI`. |
 | **`ai_synthesis_status: llm`** | Ringkasan disusun LLM dan **tidak** diverifikasi Layer-1. Hanya kutipan pasal yang diverifikasi terhadap korpus. |
@@ -95,36 +96,70 @@ Pemotongan relatif mencegah entri lemah ikut tersitasi hanya karena berbagi satu
 
 ---
 
+## AI Core dan Evaluasi
+
+Pramana memakai `AI_MODE` untuk mencegah AI “menghilang” diam-diam:
+
+| Mode | Perilaku |
+| :--- | :--- |
+| `required` | AI wajib. Jika AI gagal, respons menjadi `unavailable`; tidak ada template yang menyamar sebagai jawaban AI. |
+| `optional` | Fallback deterministik diizinkan untuk pengembangan/test. |
+| `disabled` | AI dilewati; dipakai untuk baseline retrieval-only. |
+
+Alur AI:
+
+1. Retrieval deterministik + Layer-2 guard.
+2. Sitasi diverifikasi Layer-1.
+3. Gemini menerima sitasi + evidence span IDs, lalu mengembalikan JSON `summary_id`, `summary_en`, `claims[]`.
+4. Python memverifikasi setiap claim: `citation_id` valid, `span_ids` milik sitasi, tidak ada pasal/rupiah liar.
+5. AI bisa `abstain` untuk prompt injection atau permintaan yang tidak didukung bukti.
+
+Telemetri tersedia di `GET /api/v1/ai/status` (tanpa prompt/PII). Hybrid retrieval opsional memakai embedding korpus yang dihitung offline:
+
+```bash
+python scripts/build_embeddings.py   # butuh GEMINI_API_KEY
+```
+
+Hasilnya `corpus/embeddings.json`; runtime menghitung cosine query + keyword, dan otomatis kembali ke keyword jika file/API tidak tersedia. Eval harness ada di `eval/run_eval.py`; baseline retrieval-only dijalankan dengan:
+
+```bash
+python eval/run_eval.py --retrieval-only
+```
+
+Baseline internal 40 kasus: 20 in-scope, 12 out-of-scope, 3 adversarial, 5 PII. Baseline retrieval-only saat ini 40/40 pada set internal; **ini bukan benchmark publik** dan tidak mengklaim “nol halusinasi”. Hasil lengkap ada di [`eval/results/latest.md`](eval/results/latest.md).
+
+---
+
 ## Korpus dan Kalender
 
-### Korpus regulasi (`corpus/bali_regulations.json` v1.2.0)
+### Korpus regulasi (`corpus/bali_regulations.json` v1.3.0)
 
 Korpus memakai dua lapis yang sengaja dipisahkan:
 
-- **`documents` — registry provenance (22 dokumen):** 21 entri manifest bantuan yang diaudit pada 5 November 2026, ditambah dokumen legacy SE Gubernur Bali No. 4 Tahun 2023 karena dua chunk Phase 0 merujuk padanya. Registry mencatat status teks, cakupan, sumber PDF, SHA-256, dan keputusan audit. **Registry bukan bukti kutipan dan tidak menambah hasil retrieval.**
-- **`regulations` — chunk retrieval (10 chunk):** hanya chunk yang teksnya tersimpan dan boleh diverifikasi Layer-1.
+- **`documents` — registry provenance (29 dokumen):** 21 entri manifest awal, dokumen legacy SE Gubernur Bali No. 4 Tahun 2023, dan 7 dokumen tambahan Phase 2C. Registry mencatat status teks, cakupan, sumber PDF, SHA-256, dan keputusan audit. **Registry bukan bukti kutipan dan tidak menambah hasil retrieval.**
+- **`regulations` — chunk retrieval (40 chunk):** hanya chunk yang teksnya tersimpan dan boleh diverifikasi Layer-1.
 
-Sepuluh chunk yang diindeks:
+Cakupan chunk:
 
-1. SE Gubernur Bali No. 4 Tahun 2023 — kewajiban wisatawan mancanegara (`verbatim`).
-2. SE Gubernur Bali No. 4 Tahun 2023 — larangan wisatawan mancanegara (`verbatim`).
-3. Perda Bali No. 5 Tahun 2020 Pasal 15 — kewajiban pengunjung (`verbatim`).
-4. Perda Bali No. 6 Tahun 2023 jo. No. 2 Tahun 2025 Pasal 4A, 5, dan 16A — pungutan wisatawan asing (`verbatim`; ID lama `PERDA_BALI_06_2023_LEVY` dipertahankan untuk kompatibilitas, alias `PERDA_BALI_02_2025_LEVY` tersedia).
-5. UU No. 6 Tahun 2011 Pasal 75 — tindakan administratif keimigrasian (`verbatim`).
-6. Ketentuan Hari Suci Nyepi — kompilasi pedoman tahunan (`compilation`, non-verbatim).
-7. UU No. 15 Tahun 2023 Pasal 8 ayat (3)–(4) — dasar kewenangan pungutan (`verbatim`).
-8. Pergub Bali No. 25 Tahun 2025 Pasal 9 dan 12 — data serta waktu pembayaran pungutan (`verbatim`).
-9. Pergub Bali No. 25 Tahun 2020 Pasal 45–46 — larangan dan sanksi pelindungan Pura (`verbatim`).
-10. Perda Bali No. 4 Tahun 2019 Pasal 1 — definisi Desa Adat, Awig-awig, dan Pararem (`verbatim`).
+- **Kepariwisataan & pungutan:** SE 4/2023, Perda 5/2020, Perda 6/2023 (pasal yang tidak diubah), Perda 2/2025, Pergub 2/2024 (pasal yang tidak diubah), Pergub 25/2025, Pergub 25/2020, Perda 4/2019, UU 15/2023, UU 18/2025.
+- **Wacana publik & diskriminasi:** UU 40/2008, UU 1/2024 (ITE), UU 1/2023 (KUHP), UU 39/1999 (HAM), UU 8/1999 (Perlindungan Konsumen).
+- **Non-verbatim:** kompilasi Nyepi. SE 7/2025, SE Kapolri 6/2015, dan SKB ITE 2021 tetap registry-only.
+
+Status teks:
+
+- `verbatim` — kutipan dari PDF resmi.
+- `verbatim-ocr-dibersihkan` — teks PDF dengan artefak OCR dibersihkan; bukan transkripsi mentah.
+- `compilation` — kompilasi pedoman tahunan.
+- `non-verbatim` — ringkasan/sumber sekunder.
+- `belum-diambil` — teks belum tersedia.
 
 Catatan penting:
 
-- **SE Gubernur Bali No. 4 Tahun 2023 telah disempurnakan oleh SE No. 7 Tahun 2025.** Teks lama tetap disimpan sebagai rujukan historis dengan `status: "Disempurnakan"`. SE 7/2025 hanya ada di registry (`non-verbatim`, `retrieval_eligible: false`) karena PDF resminya belum diperoleh.
-- Entri pungutan kini berupa **kutipan verbatim** Pasal 4A, 5, dan 16A Perda No. 2 Tahun 2025, bukan parafrase. Teks asli Perda 6/2023 tidak digabung ke dalam kutipan.
-- Perda Bali No. 6 Tahun 2023 dan UU No. 18 Tahun 2025 sudah diunduh PDF resminya, tetapi belum dijadikan chunk karena teks lengkapnya belum lolos verifikasi karakter. Keduanya berstatus `belum-diambil` di registry.
-- Awig-awig Penglipuran dan Tenganan hanya tersedia lewat literatur akademik sekunder; keduanya berstatus `non-verbatim`, Tier 3, dan tidak diindeks.
-- Setiap chunk mencantumkan `document_id`, `text_status`, `source_type`, dan bila relevan `source_pdf_url`, `source_pdf_sha256`, serta `related_document_ids`.
-- Audit lengkap 21 entri manifest, termasuk URL dan keputusan pemetaan tier, ada di [`docs/CORPUS_PROVENANCE.md`](docs/CORPUS_PROVENANCE.md).
+- **Pasal yang diubah/dihapus tidak dimasukkan sebagai aturan aktif.** Perda 2/2025 mengubah Perda 6/2023 Pasal 1, 4, 5, 6, 7; Pergub 25/2025 mengubah Pergub 2/2024 Pasal 9, 12 dan menghapus Pasal 23.
+- UU 18/2025 Pasal 20 dan Pasal 24 tidak dimasukkan karena cacat teks pada PDF/OCR; 7 pasal lain masuk dengan status `verbatim-ocr-dibersihkan`.
+- SE Gubernur Bali No. 4 Tahun 2023 tetap disimpan sebagai rujukan historis; SE 7/2025 tidak diindeks karena tidak ada PDF resmi.
+- Setiap chunk mencantumkan `document_id`, `text_status`, `source_type`, `source_chunk_id`, `ocr_cleaned`, dan `amendment_status`.
+- Audit lengkap ada di [`docs/CORPUS_PROVENANCE.md`](docs/CORPUS_PROVENANCE.md).
 
 ### Kalender deterministik
 
@@ -141,7 +176,8 @@ Catatan penting:
 - **Frontend:** Svelte 5 (runes), Vite 5.4.x, Tailwind CSS 3, Web Speech API, `qrcode`.
 - **Backend:** Python 3.11+ (diuji pada 3.12.10), FastAPI, Pydantic v2, Uvicorn, HTTPX.
 - **Penyimpanan:** JSON korpus terstruktur dan zone registry di memori; tidak ada database.
-- **AI opsional:** Google Gemini API (`gemini-2.5-flash`, `temperature=0.1`). Tanpa API key, sistem memakai ringkasan deterministik.
+- **AI:** Google Gemini API (`gemini-2.5-flash`, `temperature=0.1`) dengan structured JSON + evidence span verifier. `AI_MODE=required` untuk submission; `optional` untuk pengembangan.
+- **Evaluasi:** `eval/run_eval.py`, 40 kasus berlabel, baseline retrieval-only dan metrik AI bila API key tersedia.
 - **Testing:** Pytest + FastAPI TestClient.
 
 ---
@@ -226,7 +262,7 @@ npm run build
 pytest -q
 ```
 
-Status terakhir dijalankan (5 November 2026): **89 passed**. Build frontend dengan Vite 5.4.21 juga berhasil. Dua peringatan deprecation berasal dari kombinasi Starlette/HTTPX di lingkungan test, bukan kegagalan aplikasi.
+Status terakhir dijalankan (5 November 2026): **106 passed**. Build frontend dengan Vite 5.4.21 juga berhasil. Dua peringatan deprecation berasal dari kombinasi Starlette/HTTPX di lingkungan test, bukan kegagalan aplikasi.
 
 ---
 
@@ -234,7 +270,10 @@ Status terakhir dijalankan (5 November 2026): **89 passed**. Build frontend deng
 
 | Variabel | Default | Fungsi |
 | :--- | :--- | :--- |
-| `GEMINI_API_KEY` | kosong | Opsional. Tanpa nilai, sintesis memakai fallback deterministik. |
+| `AI_MODE` | `optional` | `required` untuk submission; `optional` untuk dev; `disabled` untuk eval retrieval-only. |
+| `GEMINI_API_KEY` | kosong | Wajib untuk AI. Jangan commit nilai asli. |
+| `GEMINI_MODEL` | `gemini-2.5-flash` | Model generasi. |
+| `GEMINI_EMBEDDING_MODEL` | `text-embedding-004` | Diverifikasi ulang sebelum membangun embedding. |
 | `GEMINI_MODEL` | `gemini-2.5-flash` | Model Gemini yang dipakai. |
 | `PRAMANA_PUBLIC_URL` | kosong | Opsional. Ditambahkan ke teks WhatsApp sebagai tautan verifikasi. |
 | `CORS_ALLOW_ORIGINS` | `http://localhost:5173,http://127.0.0.1:5173` | Daftar origin yang diizinkan, dipisahkan koma. |
@@ -251,7 +290,8 @@ Jangan commit `.env` atau kunci API nyata.
 
 | Metode | Path | Keterangan |
 | :--- | :--- | :--- |
-| `GET` | `/api/v1/health` | Status, versi korpus, jumlah chunk/dokumen, cakupan kalender, dan scope verifikasi. |
+| `GET` | `/api/v1/health` | Status, versi korpus, jumlah chunk/dokumen, status AI, cakupan kalender, dan scope verifikasi. |
+| `GET` | `/api/v1/ai/status` | Telemetri AI: mode, model, calls, failures, guard rejections, latency. |
 | `GET` | `/api/v1/corpus` | Metadata korpus, tier, chunk retrieval, dan registry dokumen. |
 | `GET` | `/api/v1/zones` | Direktori zona Smart Gate. |
 | `GET` | `/api/v1/totem/{zone_id}?lang=id\|en` | Kartu zona deterministik + sitasi Layer-1. |
@@ -280,20 +320,22 @@ Kode kesalahan yang relevan: `404` untuk zona tidak dikenal, `422` untuk input/l
 
 ## Keterbatasan yang Diketahui
 
-1. **Korpus retrieval kecil dan terkurasi manual**: 10 chunk dari 22 dokumen registry. Belum mencakup seluruh Perda, Pergub, SE, dan awig-awig desa adat.
+1. **Korpus retrieval masih terkurasi manual**: 40 chunk dari 29 dokumen registry. Belum mencakup seluruh Perda, Pergub, SE, dan awig-awig desa adat.
 2. **Retrieval berbasis kata kunci**, bukan embedding atau entailment semantik. Kueri dengan sinonim jauh dapat gagal retrieval dan memicu abstain.
 3. **Tidak ada verifikasi real-time ke JDIH.** Layer-1 hanya mencocokkan kutipan dengan teks yang tersimpan di korpus.
-4. **Ringkasan LLM tidak diverifikasi Layer-1.** UI menandai `ai_synthesis_status` agar pengguna tahu sumber ringkasan.
-5. **Kunci Gemini tidak tersedia di test otomatis**, sehingga jalur LLM belum diuji end-to-end. Fallback deterministik yang diuji.
+4. **Ringkasan AI tidak diverifikasi Layer-1.** AI claims diverifikasi terhadap evidence span; kebenaran parafrase tetap terbatas.
+5. **Kunci Gemini tidak tersedia di test otomatis**, sehingga jalur LLM end-to-end belum diuji tanpa key. Fallback deterministik yang diuji.
 6. **Satu chunk non-verbatim** (kompilasi Nyepi). Chunk itu ditandai `compilation` dan tidak boleh dikutip sebagai bunyi pasal.
-7. **Smart Gate baru mencakup 3 zona.** Pura Besakih dan Pantai Melasti memakai aturan umum serta rujukan historis; aturan busana terbaru (SE 7/2025) belum tersedia di korpus.
-8. **TTS bergantung pada browser/perangkat.** Tidak semua browser memiliki suara ID/EN; teks panduan tetap tersedia.
-9. **Belum ada mode offline/PWA.** Smart Gate membutuhkan koneksi ke backend; offline ditunda.
-10. **Kunci Gemini di deployment harus diset agar AI brief aktif.** Tanpa kunci, Smart Gate tetap berfungsi dengan template deterministik.
-11. **SE Gubernur Bali No. 7 Tahun 2025 hanya ada di registry**, bukan chunk retrieval, karena PDF resminya belum diperoleh.
-12. **Kalender hanya 2025–2028.** Di luar rentang itu, hasil tidak lengkap dan diberi peringatan.
-13. **Belum ada benchmark publik.** Tidak ada klaim akurasi, presisi, atau “nol halusinasi” yang diukur.
-14. **Belum ada QR/NFC verifikasi dokumen fisik.** QR/NFC hanya membuka URL; tidak memverifikasi identitas atau pembayaran.
+7. **UU 18/2025 memakai `verbatim-ocr-dibersihkan`.** Pasal 20 dan 24 tidak dimasukkan karena cacat teks.
+8. **Pasal yang diubah/dihapus tidak diindeks.** Perda 6/2023 dan Pergub 2/2024 hanya memuat pasal yang tidak diubah/dihapus.
+9. **Smart Gate baru mencakup 3 zona.** Pura Besakih dan Pantai Melasti memakai aturan umum serta rujukan historis.
+10. **TTS bergantung pada browser/perangkat.** Tidak semua browser memiliki suara ID/EN; teks panduan tetap tersedia.
+11. **Belum ada mode offline/PWA.** Smart Gate membutuhkan koneksi ke backend; offline ditunda.
+12. **Kunci Gemini di deployment harus diset agar AI aktif.** Dengan `AI_MODE=required`, kegagalan AI menghasilkan status `unavailable`, bukan template.
+13. **SE Gubernur Bali No. 7 Tahun 2025 hanya ada di registry**, bukan chunk retrieval, karena PDF resminya belum diperoleh.
+14. **Kalender hanya 2025–2028.** Di luar rentang itu, hasil tidak lengkap dan diberi peringatan.
+15. **Belum ada benchmark publik.** Eval internal 40 kasus bukan klaim akurasi universal.
+16. **Belum ada QR/NFC verifikasi dokumen fisik.** QR/NFC hanya membuka URL; tidak memverifikasi identitas atau pembayaran.
 
 ---
 
@@ -317,6 +359,11 @@ Sumber yang dipakai saat verifikasi:
 - Disparda Bali: `https://disparda.baliprov.go.id/peraturan-daerah`
 - Kesbangpol Bali (Nyepi 2026): `https://kesbangpol.baliprov.go.id/seruan-bersama-tentang-pelaksanaan-hari-suci-nyepi-tahun-baru-caka-1948-tahun-2026`
 - UU No. 6 Tahun 2011: `https://peraturan.go.id/id/uu-no-6-tahun-2011`
+- UU No. 40 Tahun 2008: `https://peraturan.bpk.go.id/Details/39733/uu-no-40-tahun-2008`
+- UU No. 1 Tahun 2024 (ITE): `https://peraturan.bpk.go.id/Details/274494/uu-no-1-tahun-2024`
+- UU No. 1 Tahun 2023 (KUHP): `https://peraturan.bpk.go.id/Details/234935/uu-no-1-tahun-2023`
+- UU No. 39 Tahun 1999 (HAM): `https://peraturan.bpk.go.id/Details/45361/uu-no-39-tahun-1999`
+- UU No. 8 Tahun 1999 (Perlindungan Konsumen): `https://peraturan.bpk.go.id/Details/45288/uu-no-8-tahun-1999`
 
 Rincian audit per dokumen, status teks, dan keputusan pemetaan tier: [`docs/CORPUS_PROVENANCE.md`](docs/CORPUS_PROVENANCE.md).
 
@@ -333,8 +380,8 @@ Pustaka open-source: FastAPI, Pydantic, Uvicorn, HTTPX, Pytest, Svelte 5, Vite, 
 | **Backend / Runtime** | Python 3.11+, FastAPI, Uvicorn |
 | **Database / Storage** | JSON korpus dan zone registry di memori (`corpus/bali_regulations.json`, `corpus/zones.json`); tidak ada database |
 | **Hosting / Deployment** | Belum ada deployment publik yang diverifikasi; jalankan secara lokal atau self-hosted |
-| **AI Model / API** | Gemini API opsional (`gemini-2.5-flash`) + retrieval deterministik + Layer-1/Layer-2 guard + template fallback |
-| **Peran AI** | Menyusun ringkasan eksekutif (Mode 1), catatan konteks netral (Mode 2), dan AI brief Smart Gate (Mode 3) dari entri korpus yang sudah lolos guard. Tanpa API key, ringkasan dibuat deterministik. |
+| **AI Model / API** | Gemini API (`gemini-2.5-flash`) dengan structured JSON + evidence span verifier + Layer-1/Layer-2 guard |
+| **Peran AI** | Menyusun ringkasan eksekutif (Mode 1), catatan konteks netral (Mode 2), dan AI brief Smart Gate (Mode 3) dari sitasi terverifikasi. AI tidak membuat sitasi; setiap claim harus menunjuk evidence span. `AI_MODE=required` di submission. |
 | **Phygital Interface** | URL record NFC NTAG213 / QR, Web Speech API (TTS). Tidak memakai Web NFC API dan tidak memverifikasi identitas. |
 | **Dataset** | Korpus kurasi manual dari sumber resmi; lihat bagian Sumber Data |
 | **Open-source Libraries** | `fastapi`, `pydantic`, `uvicorn`, `httpx`, `python-dotenv`, `pytest`, `svelte`, `vite`, `tailwindcss`, `qrcode`, `lucide-svelte` |

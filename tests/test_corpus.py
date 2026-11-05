@@ -21,13 +21,13 @@ def corpus_mgr():
 
 
 def test_corpus_loading_and_metadata(corpus_mgr):
-    assert corpus_mgr.metadata["version"] == "1.2.0"
+    assert corpus_mgr.metadata["version"] == "1.3.0"
     assert corpus_mgr.metadata["last_verified_date"] == "2026-11-05"
-    assert len(corpus_mgr.regulations) == 10
-    assert len(corpus_mgr.documents) == 22
-    assert corpus_mgr.metadata["total_documents"] == 22
+    assert len(corpus_mgr.regulations) == 40
+    assert len(corpus_mgr.documents) == 29
+    assert corpus_mgr.metadata["total_documents"] == 29
     assert corpus_mgr.metadata["total_manifest_documents"] == 21
-    assert corpus_mgr.metadata["total_regulation_chunks"] == 10
+    assert corpus_mgr.metadata["total_regulation_chunks"] == 40
     assert corpus_mgr.metadata["document_registry"]["url_check"]["checked_date"] == "2026-11-05"
     assert "1A" in corpus_mgr.tiers
     assert "1B" in corpus_mgr.tiers
@@ -59,7 +59,7 @@ def test_all_regulations_have_required_fields(corpus_mgr):
 
 
 def test_document_registry_matches_chunks(corpus_mgr):
-    assert len({doc["id"] for doc in corpus_mgr.documents}) == 22
+    assert len({doc["id"] for doc in corpus_mgr.documents}) == 29
     assert sum(1 for doc in corpus_mgr.documents if doc["in_manifest"]) == 21
 
     legacy = corpus_mgr.get_document("se-gubernur-bali-4-2023")
@@ -86,9 +86,14 @@ def test_document_registry_matches_chunks(corpus_mgr):
 
 def test_unretrieved_documents_are_honestly_marked(corpus_mgr):
     tourism_law = corpus_mgr.get_document("uu-18-2025")
-    assert tourism_law["text_status"] == "belum-diambil"
-    assert tourism_law["retrieval_eligible"] is False
-    assert tourism_law["regulation_ids"] == []
+    assert tourism_law["text_status"] == "verbatim-ocr-dibersihkan"
+    assert tourism_law["retrieval_eligible"] is True
+    assert tourism_law["regulation_ids"]
+
+    pending = corpus_mgr.get_document("pergub-bali-52-2021")
+    assert pending["text_status"] == "belum-diambil"
+    assert pending["retrieval_eligible"] is False
+    assert pending["regulation_ids"] == []
 
     circular = corpus_mgr.get_document("se-gubernur-bali-7-2025")
     assert circular["text_status"] == "non-verbatim"
@@ -184,6 +189,20 @@ def test_provenance_and_non_verbatim_flags(corpus_mgr):
     assert se_do["superseded_by_url"].startswith("https://")
 
 
+def test_ocr_cleaned_status_and_amended_articles(corpus_mgr):
+    tourism = corpus_mgr.get_by_id("UU_18_2025_PASAL_57A")
+    assert tourism is not None
+    assert tourism["text_status"] == "verbatim-ocr-dibersihkan"
+    assert tourism["is_verbatim"] is True
+    assert tourism["ocr_cleaned"] is True
+
+    # Articles amended or deleted by the amending statutes must not be
+    # discoverable as current chunks.
+    assert corpus_mgr.get_by_id("PERDA_BALI_06_2023_PASAL_5") is None
+    assert corpus_mgr.get_by_id("PERGUB_BALI_02_2024_PASAL_9") is None
+    assert corpus_mgr.get_by_id("PERGUB_BALI_02_2024_PASAL_23") is None
+
+
 def test_legacy_levy_alias_resolves_to_canonical_id(corpus_mgr):
     canonical = corpus_mgr.get_by_id("PERDA_BALI_06_2023_LEVY")
     alias = corpus_mgr.get_by_id("PERDA_BALI_02_2025_LEVY")
@@ -210,7 +229,7 @@ def _write_corpus_copy(tmp_path: Path, mutate) -> str:
 def test_loader_rejects_retrieval_eligible_document_without_chunks(tmp_path):
     def mutate(data):
         document = next(
-            doc for doc in data["documents"] if doc["id"] == "uu-18-2025"
+            doc for doc in data["documents"] if doc["id"] == "pergub-bali-52-2021"
         )
         document["retrieval_eligible"] = True
 

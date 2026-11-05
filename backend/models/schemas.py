@@ -85,6 +85,14 @@ class TripBriefRequest(BaseModel):
         return self
 
 
+class AIClaim(BaseModel):
+    claim_text: str
+    claim_text_en: Optional[str] = None
+    citation_id: str
+    span_ids: List[str] = Field(default_factory=list)
+    verified: bool = True
+
+
 class BriefingItem(BaseModel):
     id: str
     title: str
@@ -123,6 +131,12 @@ class TripBriefResponse(BaseModel):
     calendar_conflicts: Dict[str, Any]
     briefing_items: List[BriefingItem]
     ai_synthesis: Optional[str] = None
+    ai_synthesis_en: Optional[str] = None
+    ai_claims: List[AIClaim] = Field(default_factory=list)
+    ai_rejected_claims: int = 0
+    ai_latency_ms: int = 0
+    ai_model: Optional[str] = None
+    ai_guard_status: Optional[str] = None
     whatsapp_text: str
     ics_content: str
     disclaimer: str
@@ -185,12 +199,19 @@ class ContextNoteResponse(BaseModel):
     status: str
     guard_status: str
     ai_engine: str = "deterministic-strict-rag"
+    ai_synthesis_status: str = "deterministic"
     confidence: str
     confidence_note: Optional[str] = None
     verification_scope: str = "corpus"
     masked_post: str
     pii_redacted_count: Optional[int] = 0
     neutral_summary: str
+    neutral_summary_en: Optional[str] = None
+    ai_claims: List[AIClaim] = Field(default_factory=list)
+    ai_rejected_claims: int = 0
+    ai_latency_ms: int = 0
+    ai_model: Optional[str] = None
+    ai_guard_status: Optional[str] = None
     framing_markers: List[FramingMarker]
     citations: List[CitationItem]
     copyable_comment: Optional[str] = None
@@ -248,10 +269,16 @@ class ZoneBriefResponse(BaseModel):
     zone_id: str
     language: str
     brief: str
+    brief_id: Optional[str] = None
+    brief_en: Optional[str] = None
     ai_engine: str
     ai_synthesis_status: str
     guard_status: str
     citation_ids: List[str] = Field(default_factory=list)
+    claims: List[AIClaim] = Field(default_factory=list)
+    rejected_claims: int = 0
+    ai_latency_ms: int = 0
+    model: Optional[str] = None
     disclaimer: str
     verification_scope: str = "corpus"
 

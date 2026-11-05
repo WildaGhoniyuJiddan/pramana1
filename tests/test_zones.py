@@ -8,6 +8,7 @@ from pathlib import Path
 import pytest
 
 from backend.services.corpus_loader import CorpusManager
+from backend.services.evidence_spans import build_span_index
 from backend.services.rag_engine import StrictRAGEngine
 from backend.services.zone_registry import (
     ZONES_PATH,
@@ -18,6 +19,7 @@ from backend.services.zone_registry import (
 
 @pytest.fixture
 def engine(monkeypatch):
+    monkeypatch.setenv("AI_MODE", "optional")
     monkeypatch.delenv("GEMINI_API_KEY", raising=False)
     return StrictRAGEngine()
 
@@ -112,19 +114,37 @@ def test_zone_brief_falls_back_without_gemini(engine):
 
     assert result["ai_synthesis_status"] == "deterministic"
     assert result["guard_status"] == "FALLBACK_DETERMINISTIK"
-    assert result["ai_engine"] == "deterministic-zone-template"
+    assert result["ai_engine"] == "deterministic-template"
     assert result["brief"]
     assert "IDR 150,000" in result["brief"]
     assert len(result["citation_ids"]) == 3
 
 
 def test_zone_brief_rejects_hallucinated_article(engine, monkeypatch):
+    card = engine.get_zone_card("bandara-ngurah-rai", "en")
+    span_index = build_span_index(card["citations"])
+    span_id = next(
+        key for key in span_index
+        if key.startswith("PERDA_BALI_06_2023_LEVY#")
+    )
+    parsed = {
+        "abstain": False,
+        "summary_id": "You must pay under Pasal 999 and Rp999.000.",
+        "summary_en": "You must pay under Pasal 999 and Rp999.000.",
+        "claims": [{
+            "claim_text_id": "Pasal 999 mewajibkan Rp999.000.",
+            "claim_text_en": "Pasal 999 requires Rp999.000.",
+            "citation_id": "PERDA_BALI_06_2023_LEVY",
+            "span_ids": [span_id],
+        }],
+    }
     monkeypatch.setattr(
-        engine,
-        "_call_gemini_strict",
+        engine.ai_pipeline,
+        "call_model",
         lambda *args, **kwargs: (
-            "You must pay under Pasal 999 and Rp999.000.",
+            parsed,
             "mock-gemini",
+            {"latency_ms": 1, "model": "mock"},
         ),
     )
 
@@ -137,14 +157,37 @@ def test_zone_brief_rejects_hallucinated_article(engine, monkeypatch):
 
 
 def test_zone_brief_accepts_safe_llm_output(engine, monkeypatch):
+    card = engine.get_zone_card("bandara-ngurah-rai", "en")
+    span_index = build_span_index(card["citations"])
+    span_id = next(
+        key for key in span_index
+        if key.startswith("PERDA_BALI_06_2023_LEVY#")
+    )
     safe_text = (
         "Pay Rp150.000 before or during your stay and keep the electronic "
         "proof. The original Indonesian legal text remains authoritative."
     )
+    parsed = {
+        "abstain": False,
+        "summary_id": "Wisatawan asing wajib membayar pungutan Rp150.000.",
+        "summary_en": safe_text,
+        "claims": [{
+            "claim_text_id": (
+                "Wisatawan asing wajib membayar pungutan Rp150.000."
+            ),
+            "claim_text_en": safe_text,
+            "citation_id": "PERDA_BALI_06_2023_LEVY",
+            "span_ids": [span_id],
+        }],
+    }
     monkeypatch.setattr(
-        engine,
-        "_call_gemini_strict",
-        lambda *args, **kwargs: (safe_text, "mock-gemini"),
+        engine.ai_pipeline,
+        "call_model",
+        lambda *args, **kwargs: (
+            parsed,
+            "mock-gemini",
+            {"latency_ms": 1, "model": "mock"},
+        ),
     )
 
     result = engine.analyze_zone_brief("bandara-ngurah-rai", "en")
@@ -153,6 +196,30 @@ def test_zone_brief_accepts_safe_llm_output(engine, monkeypatch):
     assert result["guard_status"] == "LLM_GROUNDED"
     assert result["brief"] == safe_text
     assert result["ai_engine"] == "mock-gemini"
+    assert len(result["claims"]) == 1
+
+
+def test_zone_brief_supports_ai_abstain(engine, monkeypatch):
+    monkeypatch.setattr(
+        engine.ai_pipeline,
+        "call_model",
+        lambda *args, **kwargs: (
+            {
+                "abstain": True,
+                "summary_id": "",
+                "summary_en": "",
+                "claims": [],
+            },
+            "mock-gemini",
+            {"latency_ms": 1, "model": "mock"},
+        ),
+    )
+
+    result = engine.analyze_zone_brief("bandara-ngurah-rai", "en")
+
+    assert result["ai_synthesis_status"] == "abstain"
+    assert result["guard_status"] == "AI_ABSTAIN"
+    assert result["claims"] == []
 
 
 def _write_zone_copy(tmp_path: Path, mutate) -> str:

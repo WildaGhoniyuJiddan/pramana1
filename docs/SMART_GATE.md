@@ -53,20 +53,24 @@ Respons kartu memuat:
 Urutan:
 
 1. Ambil kartu deterministik dan sitasi Layer-1.
-2. Kirim hanya sitasi aktif + checklist ke Gemini.
-3. Minta 2–3 kalimat dalam bahasa target.
-4. Tolak output jika:
-   - menyebut nomor pasal di luar sitasi;
-   - menyebut nominal rupiah di luar sitasi;
-   - terlalu pendek/panjang.
-5. Jika AI tidak tersedia atau output ditolak, pakai template deterministik.
+2. Bangun evidence span IDs dari teks sitasi.
+3. Kirim hanya sitasi aktif + span IDs + checklist ke Gemini dalam satu panggilan.
+4. Minta JSON `summary_id`, `summary_en`, `claims[]` dengan `citation_id` dan `span_ids`.
+5. Verifier Python memeriksa:
+   - `citation_id` ada di hasil retrieval;
+   - `span_ids` benar-benar milik sitasi tersebut;
+   - tidak ada nomor pasal/nominal rupiah di luar bukti;
+   - claim memakai span yang valid.
+6. Jika `AI_MODE=required` dan AI gagal/abstain, UI menampilkan status eksplisit; template deterministik tidak menyamar sebagai jawaban AI. Jika `optional`, template dipakai untuk pengembangan.
 
 Status yang dikembalikan:
 
 - `ai_synthesis_status: "llm"` + `guard_status: "LLM_GROUNDED"`;
 - `ai_synthesis_status: "deterministic"` + `guard_status: "FALLBACK_DETERMINISTIK"`;
 - `ai_synthesis_status: "deterministic"` + `guard_status: "FALLBACK_GUARD"` bila
-  output AI ditolak.
+  output AI ditolak;
+- `ai_synthesis_status: "unavailable"` + `guard_status: "AI_TIDAK_TERSEDIA"`;
+- `ai_synthesis_status: "abstain"` + `guard_status: "AI_ABSTAIN"`.
 
 ## 5. UI
 

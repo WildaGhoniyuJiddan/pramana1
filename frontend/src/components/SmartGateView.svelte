@@ -474,9 +474,19 @@
                   class="font-mono text-[10px] font-bold px-2 py-0.5"
                   style={brief?.ai_synthesis_status === 'llm'
                     ? 'background-color: #0c249c; color: #ffffff; border: 1px solid #0a0a0a;'
-                    : 'background-color: #f3f1eb; color: #5c5952; border: 1px solid #8c877c;'}
+                    : brief?.ai_synthesis_status === 'unavailable'
+                      ? 'background-color: #fff3cd; color: #8a3b00; border: 1px solid #8a3b00;'
+                      : brief?.ai_synthesis_status === 'abstain'
+                        ? 'background-color: #8a3b00; color: #ffffff; border: 1px solid #0a0a0a;'
+                        : 'background-color: #f3f1eb; color: #5c5952; border: 1px solid #8c877c;'}
                 >
-                  {brief?.ai_synthesis_status === 'llm' ? t.aiBadge : t.templateBadge}
+                  {brief?.ai_synthesis_status === 'llm'
+                    ? t.aiBadge
+                    : brief?.ai_synthesis_status === 'unavailable'
+                      ? 'AI OFF'
+                      : brief?.ai_synthesis_status === 'abstain'
+                        ? 'ABSTAIN'
+                        : t.templateBadge}
                 </span>
               </div>
 
@@ -489,8 +499,25 @@
                   {brief.brief}
                 </p>
                 <p class="font-mono text-[10px] leading-snug" style="color: #8a3b00;">
-                  {brief.ai_synthesis_status === 'llm' ? t.aiNote : t.templateNote}
+                  {#if brief.ai_synthesis_status === 'llm'}
+                    {t.aiNote}
+                  {:else if brief.ai_synthesis_status === 'unavailable'}
+                    {lang === 'id'
+                      ? 'AI tidak tersedia; checklist dan sitasi terverifikasi tetap dapat digunakan.'
+                      : 'AI is unavailable; the verified checklist and citations remain usable.'}
+                  {:else if brief.ai_synthesis_status === 'abstain'}
+                    {lang === 'id'
+                      ? 'AI memilih abstain karena permintaan tidak dapat dijawab aman dari bukti korpus.'
+                      : 'AI abstained because the request cannot be safely answered from the corpus evidence.'}
+                  {:else}
+                    {t.templateNote}
+                  {/if}
                 </p>
+                {#if brief.claims?.length}
+                  <p class="font-mono text-[10px]" style="color: #0c249c;">
+                    {brief.claims.length} {lang === 'id' ? 'klaim terverifikasi' : 'verified claims'}
+                  </p>
+                {/if}
               {:else if briefError}
                 <p class="text-xs leading-relaxed" style="color: #8a3b00;" aria-live="polite">
                   {briefError}
@@ -703,6 +730,8 @@
                 <p>{t.lastVerified}: {card.zone.last_verified_date}</p>
                 <p>{t.citations}: {card.citations.length}</p>
                 <p>{t.historical}: {card.historical_citations.length}</p>
+                <p>AI claims: {brief?.claims?.length || 0}</p>
+                <p>AI status: {brief?.ai_synthesis_status || '-'}</p>
                 <p>ID: {card.zone.id}</p>
               </div>
             </div>

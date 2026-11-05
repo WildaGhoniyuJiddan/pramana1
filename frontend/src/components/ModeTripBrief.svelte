@@ -15,6 +15,7 @@
   let showTechAudit = $state(false);
   let activePresetIdx = $state(0);
   let activeRuleIdx = $state(0);
+  let summaryLang = $state('id');
 
   const PRESETS = [
     {
@@ -343,13 +344,59 @@
               </span>
             </div>
 
-            <p class="text-xs sm:text-[13px] leading-relaxed" style="color: #0a0a0a;">
-              {result.ai_synthesis}
-            </p>
+            <div class="flex flex-wrap items-start justify-between gap-2">
+              <p class="text-xs sm:text-[13px] leading-relaxed flex-1" style="color: #0a0a0a;">
+                {summaryLang === 'en' && result.ai_synthesis_en
+                  ? result.ai_synthesis_en
+                  : result.ai_synthesis}
+              </p>
+              {#if result.ai_synthesis_en}
+                <div class="flex gap-1 shrink-0">
+                  <button
+                    type="button"
+                    onclick={() => (summaryLang = 'id')}
+                    class="brutal-press px-2 py-0.5 font-mono text-[9px] font-bold cursor-pointer"
+                    style={summaryLang === 'id'
+                      ? 'background-color: #0c249c; color: #ffffff; border: 1px solid #0a0a0a;'
+                      : 'background-color: #ffffff; color: #0a0a0a; border: 1px solid #0a0a0a;'}
+                  >
+                    ID
+                  </button>
+                  <button
+                    type="button"
+                    onclick={() => (summaryLang = 'en')}
+                    class="brutal-press px-2 py-0.5 font-mono text-[9px] font-bold cursor-pointer"
+                    style={summaryLang === 'en'
+                      ? 'background-color: #0c249c; color: #ffffff; border: 1px solid #0a0a0a;'
+                      : 'background-color: #ffffff; color: #0a0a0a; border: 1px solid #0a0a0a;'}
+                  >
+                    EN
+                  </button>
+                </div>
+              {/if}
+            </div>
 
             {#if result.ai_synthesis_status === 'llm'}
               <p class="text-[11px] font-mono" style="color: #8a3b00;">
                 Ringkasan AI tidak diverifikasi Layer-1. Hanya kutipan pasal yang diverifikasi terhadap korpus.
+              </p>
+            {:else if result.ai_synthesis_status === 'unavailable'}
+              <p class="text-[11px] font-mono" style="color: #8a3b00;">
+                AI tidak tersedia. Sistem tidak menampilkan ringkasan template sebagai jawaban AI; sitasi terverifikasi tetap ditampilkan.
+              </p>
+            {:else if result.ai_synthesis_status === 'abstain'}
+              <p class="text-[11px] font-mono" style="color: #8a3b00;">
+                AI memilih abstain karena permintaan tidak dapat dijawab aman dari bukti korpus.
+              </p>
+            {:else}
+              <p class="text-[11px] font-mono" style="color: #5c5952;">
+                Template deterministik dipakai karena AI_MODE=optional atau API key tidak tersedia.
+              </p>
+            {/if}
+
+            {#if result.ai_claims?.length}
+              <p class="font-mono text-[10px]" style="color: #0c249c;">
+                {result.ai_claims.length} klaim AI terverifikasi terhadap evidence span.
               </p>
             {/if}
 
@@ -625,6 +672,9 @@
               <div class="p-3 bg-white font-mono text-[11px] space-y-1" style="border: 1px solid #0a0a0a;">
                 <div>ENGINE: <strong>{result.ai_engine}</strong></div>
                 <div>AI SYNTHESIS: <strong>{result.ai_synthesis_status || 'deterministic'}</strong></div>
+                <div>AI GUARD: <strong>{result.ai_guard_status || '-'}</strong></div>
+                <div>AI CLAIMS: <strong>{result.ai_claims?.length || 0}</strong></div>
+                <div>AI MODEL: <strong>{result.ai_model || '-'}</strong></div>
                 <div>GUARD: <strong>{result.guard_status}</strong></div>
                 <div>CONFIDENCE: <strong>{result.confidence}</strong></div>
                 <div>SCOPE: <strong>{result.verification_scope || 'corpus'}</strong></div>

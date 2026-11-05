@@ -18,9 +18,17 @@ from typing import Dict, Any, Tuple
 
 EMAIL_PATTERN = re.compile(r'\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}\b')
 PHONE_PATTERN = re.compile(r'(?:\+?62|08|0)[0-9\s\-]{8,14}[0-9]')
-BOOKING_CODE_PATTERN = re.compile(r'\b(?:Booking|Kode\s*Booking|PNR|E-ticket|Ticket|Kode\s*Pemesanan)[\s:#]+([A-Z0-9]{5,8})\b', re.IGNORECASE)
+BOOKING_CODE_PATTERN = re.compile(
+    r'\b(?:Booking|Kode\s*Booking|PNR|E-ticket|Ticket|Kode\s*Pemesanan)'
+    r'[^\n]{0,25}?\b(?=[A-Z0-9]*\d)([A-Z0-9]{5,8})\b',
+    re.IGNORECASE,
+)
 CARD_PATTERN = re.compile(r'\b(?:\d{4}[-\s]?){3}\d{4}\b')
-PASSPORT_PATTERN = re.compile(r'\b(?:Passport|Paspor|No\s*Paspor)[\s:#]+([A-Z0-9]{7,10})\b', re.IGNORECASE)
+PASSPORT_PATTERN = re.compile(
+    r'\b(?:Passport|Paspor|No\.?\s*Paspor|Nomor\s*Paspor)'
+    r'[^\n]{0,25}?\b([A-Z0-9]{7,10})\b',
+    re.IGNORECASE,
+)
 
 
 def mask_pii(text: str) -> Tuple[str, Dict[str, int]]:

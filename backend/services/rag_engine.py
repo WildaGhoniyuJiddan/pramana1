@@ -9,13 +9,22 @@ The engine is deliberately conservative: if no corpus chunk clears the
 relevance threshold, it abstains instead of generating an unsupported answer.
 """
 
+import json
 import os
 import re
+import time
 from typing import Dict, Any, List, Optional, Tuple
 
 import httpx
 from dotenv import load_dotenv
 
+from backend.services import ai_metrics
+from backend.services.ai_config import (
+    GEMINI_MODEL,
+    get_ai_mode,
+    get_gemini_api_key,
+)
+from backend.services.ai_pipeline import GroundedAIPipeline
 from backend.services.corpus_loader import (
     CorpusManager,
     DEFAULT_RELEVANCE_THRESHOLD,
@@ -26,11 +35,11 @@ from backend.services.calendar_service import (
     check_holiday_conflicts,
     generate_ics_calendar,
 )
+from backend.services.hybrid_retrieval import HybridRetriever, embed_text
 from backend.services.zone_registry import ZoneRegistry
 
 load_dotenv()
 
-GEMINI_MODEL = os.getenv("GEMINI_MODEL", "gemini-2.5-flash")
 GEMINI_API_URL = (
     f"https://generativelanguage.googleapis.com/v1beta/models/"
     f"{GEMINI_MODEL}:generateContent"
@@ -80,24 +89,58 @@ class StrictRAGEngine:
         self.corpus_mgr = CorpusManager.get_instance()
         self.verifier = DualLayerVerifier(self.corpus_mgr)
         self.zone_registry = ZoneRegistry.get_instance()
+        self.hybrid = HybridRetriever(self.corpus_mgr)
         self._zone_brief_cache: Dict[Tuple[str, str, str], Dict[str, Any]] = {}
+        self.ai_pipeline = GroundedAIPipeline(self._call_gemini_structured)
 
-    def _call_gemini_strict(
+    @staticmethod
+    def _parse_json_object(text: str) -> Optional[Dict[str, Any]]:
+        clean = (text or "").strip()
+        if clean.startswith("```"):
+            clean = re.sub(r"^```(?:json)?\s*", "", clean)
+            clean = re.sub(r"\s*```$", "", clean)
+
+        try:
+            value = json.loads(clean)
+            return value if isinstance(value, dict) else None
+        except json.JSONDecodeError:
+            match = re.search(r"\{.*\}", clean, re.DOTALL)
+            if not match:
+                return None
+            try:
+                value = json.loads(match.group(0))
+                return value if isinstance(value, dict) else None
+            except json.JSONDecodeError:
+                return None
+
+    def _call_gemini_structured(
         self,
         system_instruction: str,
         user_prompt: str,
-    ) -> Tuple[Optional[str], str]:
-        """
-        Call Gemini REST API with strict grounding constraints.
+        response_schema: Dict[str, Any],
+    ) -> Tuple[Optional[Dict[str, Any]], str, Dict[str, Any]]:
+        """Call Gemini once with a JSON response schema.
 
-        The API key is sent in the x-goog-api-key header, never in the URL.
-        Returns (summary, engine_label); summary is None when the local
-        deterministic fallback must be used.
+        Returns (parsed_object, engine_label, metadata). The API key is sent in
+        the x-goog-api-key header, never in the URL. No prompt or response body
+        is written to logs.
         """
-        api_key = os.getenv("GEMINI_API_KEY", "").strip()
-        if not api_key or api_key == "your_gemini_api_key_here":
-            return None, "deterministic-strict-rag (local fallback)"
+        api_key = get_gemini_api_key()
+        if get_ai_mode() == "disabled":
+            return None, "ai-disabled", {
+                "error": "AI_MODE=disabled",
+                "latency_ms": 0,
+                "model": GEMINI_MODEL,
+            }
+        if not api_key:
+            return None, "ai-unavailable", {
+                "error": "GEMINI_API_KEY tidak tersedia",
+                "latency_ms": 0,
+                "model": GEMINI_MODEL,
+            }
 
+        ai_metrics.record_call()
+        started = time.monotonic()
         payload = {
             "system_instruction": {
                 "parts": [{"text": system_instruction}]
@@ -107,13 +150,15 @@ class StrictRAGEngine:
             ],
             "generationConfig": {
                 "temperature": 0.1,
-                "maxOutputTokens": 450,
+                "maxOutputTokens": 1200,
+                "responseMimeType": "application/json",
+                "responseSchema": response_schema,
             },
         }
 
         try:
-            with httpx.Client(timeout=8.0) as client:
-                resp = client.post(
+            with httpx.Client(timeout=20.0) as client:
+                response = client.post(
                     GEMINI_API_URL,
                     json=payload,
                     headers={
@@ -121,19 +166,47 @@ class StrictRAGEngine:
                         "x-goog-api-key": api_key,
                     },
                 )
-                if resp.status_code == 200:
-                    data = resp.json()
-                    candidates = data.get("candidates", [])
-                    if candidates:
-                        parts = candidates[0].get("content", {}).get("parts", [])
-                        if parts and "text" in parts[0]:
-                            return (
-                                parts[0]["text"].strip(),
-                                f"{GEMINI_MODEL} + dual-layer-verifier",
-                            )
-                return None, "deterministic-strict-rag (api fallback)"
-        except Exception:
-            return None, "deterministic-strict-rag (error fallback)"
+            latency_ms = int((time.monotonic() - started) * 1000)
+
+            if response.status_code != 200:
+                ai_metrics.record_failure(f"HTTP {response.status_code}")
+                return None, f"{GEMINI_MODEL} (http error)", {
+                    "error": f"HTTP {response.status_code}",
+                    "latency_ms": latency_ms,
+                    "model": GEMINI_MODEL,
+                }
+
+            data = response.json()
+            candidates = data.get("candidates", [])
+            parts = (
+                candidates[0].get("content", {}).get("parts", [])
+                if candidates
+                else []
+            )
+            text = parts[0].get("text", "") if parts else ""
+            parsed = self._parse_json_object(text)
+            if not parsed:
+                ai_metrics.record_failure("invalid_json")
+                return None, f"{GEMINI_MODEL} (invalid json)", {
+                    "error": "invalid_json",
+                    "latency_ms": latency_ms,
+                    "model": GEMINI_MODEL,
+                }
+
+            ai_metrics.record_success(latency_ms)
+            return parsed, f"{GEMINI_MODEL} + span-verifier", {
+                "error": "",
+                "latency_ms": latency_ms,
+                "model": GEMINI_MODEL,
+            }
+        except Exception as exc:  # noqa: BLE001 - classified for telemetry
+            latency_ms = int((time.monotonic() - started) * 1000)
+            ai_metrics.record_failure(type(exc).__name__)
+            return None, f"{GEMINI_MODEL} (error fallback)", {
+                "error": type(exc).__name__,
+                "latency_ms": latency_ms,
+                "model": GEMINI_MODEL,
+            }
 
     @staticmethod
     def _is_international(origin: str) -> bool:
@@ -247,6 +320,34 @@ class StrictRAGEngine:
                 "superseded_by_url": reg.get("superseded_by_url"),
             })
         return briefing_items
+
+    def _retrieve_scored(
+        self,
+        query: str,
+        top_k: int = 5,
+    ) -> List[Dict[str, Any]]:
+        """Hybrid retrieval when embeddings are available; keyword otherwise."""
+        if self.hybrid.available:
+            try:
+                query_embedding = embed_text(query)
+                hybrid_results = self.hybrid.search_scored(
+                    query, query_embedding, top_k=top_k
+                )
+                if hybrid_results:
+                    return hybrid_results
+            except Exception:  # noqa: BLE001 - fall back to keyword
+                pass
+        return self.corpus_mgr.search_regulations_scored(query, top_k=top_k)
+
+    def _build_citations_for_regulations(
+        self,
+        regulations: List[Dict[str, Any]],
+    ) -> List[Dict[str, Any]]:
+        raw_citations = [
+            {"reg_id": reg["id"], "quoted_text": reg["text"]}
+            for reg in regulations
+        ]
+        return self.verifier.verify_and_filter_citations(raw_citations)
 
     @staticmethod
     def _validate_zone_language(lang: str) -> str:
@@ -420,89 +521,105 @@ class StrictRAGEngine:
     ) -> Dict[str, Any]:
         """Generate a grounded, bilingual Smart Gate brief.
 
-        Gemini only rewrites the verified citations into practical guidance.
-        It never creates citations. If the LLM is unavailable or its output
-        mentions unsupported article numbers/amounts, a deterministic template
-        is returned instead.
+        The model receives verified citations and evidence-span IDs. Python
+        verifies every claim. If AI is required but unavailable, the response
+        is an explicit unavailable state, not a silent template posing as AI.
         """
         lang = self._validate_zone_language(lang)
         card = self.get_zone_card(zone_id, lang)
-        zone = card["zone"]
         citations = card["citations"]
+        raw_zone = self.zone_registry.get_zone_or_raise(zone_id)
 
-        cache_key = (zone_id, lang, zone["rules_version"])
+        cache_key = (zone_id, lang, raw_zone["rules_version"])
         cached = self._zone_brief_cache.get(cache_key)
         if cached:
             return cached
 
-        deterministic_brief = self._deterministic_zone_brief(
-            zone, citations, lang
+        zone_id_view = {
+            "name": raw_zone["name"]["id"],
+            "practical_checks": [
+                item["id"] for item in raw_zone["practical_checks"]
+            ],
+        }
+        zone_en_view = {
+            "name": raw_zone["name"]["en"],
+            "practical_checks": [
+                item["en"] for item in raw_zone["practical_checks"]
+            ],
+        }
+        fallback_id = self._deterministic_zone_brief(
+            zone_id_view, citations, "id"
         )
-        context = "\n".join(
-            f"- [{citation['official_doc_title']}] "
-            f"({citation['pasal']}) status: {citation['text_status']} | "
-            f"{citation['quoted_text']}"
-            for citation in citations
+        fallback_en = self._deterministic_zone_brief(
+            zone_en_view, citations, "en"
         )
-        language_name = "Bahasa Indonesia" if lang == "id" else "English"
+
         system_prompt = (
             "You are the Pramana Smart Gate compliance guide at a Bali "
-            "tourist site. Use ONLY the verified legal excerpts supplied by "
-            "the user. Do not invent rules, article numbers, sanctions, or "
-            "fees. Write 2-3 sentences of practical guidance in "
-            f"{language_name}. Do not quote long passages; summarize. Mention "
-            "that the original Indonesian legal text is authoritative. If the "
-            "excerpts do not cover a topic, say the card does not cover it."
+            "tourist site. Use ONLY the verified citations and evidence spans "
+            "supplied by the user. Do not invent rules, article numbers, "
+            "sanctions, or fees. Return JSON with summary_id, summary_en, and "
+            "claims. Each claim must cite one citation_id and one or more "
+            "span_ids from that citation. Keep each summary to 2-3 sentences. "
+            "State that the original Indonesian legal text is authoritative."
         )
         user_prompt = (
-            f"Zone: {zone['name']} ({zone['category']})\n"
-            f"Location: {zone['location_note']}\n"
-            f"Scope note: {zone['scope_note']}\n"
-            "Practical checklist:\n- "
-            + "\n- ".join(zone["practical_checks"])
-            + f"\nVerified excerpts:\n{context}"
+            f"Zone ID: {raw_zone['id']}\n"
+            f"Zone name: {raw_zone['name']['id']} / {raw_zone['name']['en']}\n"
+            f"Category: {raw_zone['category']}\n"
+            f"Location: {raw_zone['location_note']['id']} / "
+            f"{raw_zone['location_note']['en']}\n"
+            f"Scope note: {raw_zone['scope_note']['id']} / "
+            f"{raw_zone['scope_note']['en']}\n"
+            "Practical checklist (ID):\n- "
+            + "\n- ".join(zone_id_view["practical_checks"])
+            + "\nPractical checklist (EN):\n- "
+            + "\n- ".join(zone_en_view["practical_checks"])
+        )
+        result = self.ai_pipeline.answer(
+            citations=citations,
+            system_prompt=system_prompt,
+            user_prompt=user_prompt,
+            fallback_summary=fallback_id,
+            fallback_summary_en=fallback_en,
         )
 
-        llm_summary, engine_label = self._call_gemini_strict(
-            system_prompt, user_prompt
+        selected_summary = (
+            result["summary_id"] if lang == "id" else result["summary_en"]
         )
+        if result["ai_synthesis_status"] == "unavailable":
+            brief = (
+                "Ringkasan AI tidak tersedia. Gunakan checklist dan sitasi "
+                "terverifikasi di bawah."
+                if lang == "id"
+                else "AI summary is unavailable. Use the verified checklist "
+                "and citations below."
+            )
+        else:
+            brief = selected_summary or (
+                fallback_id if lang == "id" else fallback_en
+            )
 
-        if llm_summary and self._zone_brief_is_safe(llm_summary, citations):
-            result = {
-                "zone_id": zone_id,
-                "language": lang,
-                "brief": llm_summary.strip(),
-                "ai_engine": engine_label,
-                "ai_synthesis_status": "llm",
-                "guard_status": "LLM_GROUNDED",
-                "citation_ids": [
-                    citation["reg_id"] for citation in citations
-                ],
-                "disclaimer": ZONE_DISCLAIMER[lang],
-                "verification_scope": "corpus",
-            }
-            self._zone_brief_cache[cache_key] = result
-            return result
-
-        return {
+        response = {
             "zone_id": zone_id,
             "language": lang,
-            "brief": deterministic_brief,
-            "ai_engine": (
-                "deterministic-zone-template"
-                if not llm_summary
-                else f"{engine_label} (rejected by citation guard)"
-            ),
-            "ai_synthesis_status": "deterministic",
-            "guard_status": (
-                "FALLBACK_DETERMINISTIK"
-                if not llm_summary
-                else "FALLBACK_GUARD"
-            ),
+            "brief": brief,
+            "brief_id": result["summary_id"] or fallback_id,
+            "brief_en": result["summary_en"] or fallback_en,
+            "ai_engine": result["ai_engine"],
+            "ai_synthesis_status": result["ai_synthesis_status"],
+            "guard_status": result["guard_status"],
             "citation_ids": [citation["reg_id"] for citation in citations],
+            "claims": result["claims"],
+            "rejected_claims": result["rejected_claims"],
+            "ai_latency_ms": result["latency_ms"],
+            "model": result["model"],
             "disclaimer": ZONE_DISCLAIMER[lang],
             "verification_scope": "corpus",
         }
+        if result["ai_synthesis_status"] == "llm":
+            self._zone_brief_cache[cache_key] = response
+        return response
 
     def analyze_trip_itinerary(
         self,
@@ -528,19 +645,19 @@ class StrictRAGEngine:
 
         # Primary retrieval plus deterministic query expansion for common
         # travel triggers. Every expansion still has to clear the score guard.
-        scored = self.corpus_mgr.search_regulations_scored(masked_text, top_k=4)
+        scored = self._retrieve_scored(masked_text, top_k=4)
         lowered = masked_text.lower()
 
         if any(trigger in lowered for trigger in TEMPLE_TRIGGERS):
             scored = self._merge_scored(
                 scored,
-                self.corpus_mgr.search_regulations_scored(TEMPLE_QUERY, top_k=4),
+                self._retrieve_scored(TEMPLE_QUERY, top_k=4),
             )
 
         if any(trigger in lowered for trigger in TRAFFIC_TRIGGERS):
             scored = self._merge_scored(
                 scored,
-                self.corpus_mgr.search_regulations_scored(TRAFFIC_QUERY, top_k=2),
+                self._retrieve_scored(TRAFFIC_QUERY, top_k=2),
             )
 
         matched_regs = [item["regulation"] for item in scored]
@@ -574,7 +691,7 @@ class StrictRAGEngine:
                 "status": "TIDAK_DITEMUKAN",
                 "guard_status": guard_status,
                 "ai_engine": "dual-layer-guard (abstain)",
-                "ai_synthesis_status": "deterministic",
+                "ai_synthesis_status": "abstain",
                 "masked_itinerary": masked_text,
                 "pii_redacted_count": sum(pii_counts.values()),
                 "start_date": start_date,
@@ -582,6 +699,15 @@ class StrictRAGEngine:
                 "calendar_conflicts": calendar_check,
                 "briefing_items": [],
                 "ai_synthesis": abstain_summary,
+                "ai_synthesis_en": (
+                    "No specific rule in the Pramana corpus matched this "
+                    "itinerary. The system does not add legal claims."
+                ),
+                "ai_claims": [],
+                "ai_rejected_claims": 0,
+                "ai_latency_ms": 0,
+                "ai_model": "",
+                "ai_guard_status": "TIDAK_DITEMUKAN",
                 "whatsapp_text": self._build_whatsapp_text(
                     masked_text,
                     start_date,
@@ -607,43 +733,60 @@ class StrictRAGEngine:
 
         briefing_items = self._build_briefing_items(matched_regs)
         confidence = self._confidence_label(scores)
+        citations = self._build_citations_for_regulations(matched_regs)
 
-        corpus_context = "\n".join(
-            f"- [{reg['id']}] {reg['doc_title']} ({reg.get('pasal', '')}) "
-            f"| status: {reg.get('status', '-')} | teks: {reg['text']}"
-            for reg in matched_regs
+        calendar_note = self._calendar_note(calendar_check)
+        categories = ", ".join(
+            item["category"] for item in briefing_items[:3]
         )
-        sys_prompt = (
-            "Anda adalah mesin kepatuhan hukum Strict-RAG Pramana. "
-            "Susun ringkasan eksekutif perjalanan 2-3 kalimat, bahasa Indonesia "
-            "formal, tanpa emoji. Gunakan HANYA regulasi terlampir dan status "
-            "kalender Bali. Jangan mengarang pasal, sanksi, atau nomor peraturan "
-            "di luar daftar."
+        fallback_summary = (
+            f"{calendar_note} Berdasarkan korpus regulasi Pramana, ditemukan "
+            f"{len(briefing_items)} instrumen yang relevan: {categories}. "
+            "Cakupan verifikasi terbatas pada korpus lokal; periksa tautan "
+            "sumber resmi pada setiap butir."
+        ).strip()
+        fallback_summary_en = (
+            f"Based on the Pramana corpus, {len(briefing_items)} relevant "
+            f"instruments were found: {categories}. Verification is limited "
+            "to the local corpus; check the official source links."
+        )
+        system_prompt = (
+            "You are the Pramana Strict-RAG trip compliance engine. Return "
+            "JSON with summary_id, summary_en, and claims. Use ONLY the "
+            "supplied citations and evidence spans. Each claim must cite one "
+            "citation_id and one or more span_ids. Do not invent articles, "
+            "sanctions, or fees. Mention the calendar status only when it is "
+            "provided in the user prompt."
         )
         user_prompt = (
             f"Rencana Perjalanan (Disamarkan PII): {masked_text}\n"
             f"Tanggal: {start_date} s/d {effective_end_date} | "
             f"Status Wisman: {traveler_origin}\n"
             f"Bentrok Nyepi: {calendar_check.get('has_nyepi', False)}\n"
-            f"Regulasi Resmi Terkait:\n{corpus_context}"
+            f"Catatan Kalender: {calendar_note or 'Tidak ada peringatan.'}"
         )
-        llm_summary, engine_label = self._call_gemini_strict(sys_prompt, user_prompt)
+        ai_result = self.ai_pipeline.answer(
+            citations=citations,
+            system_prompt=system_prompt,
+            user_prompt=user_prompt,
+            fallback_summary=fallback_summary,
+            fallback_summary_en=fallback_summary_en,
+        )
 
-        if llm_summary:
-            ai_synthesis = llm_summary
-            ai_synthesis_status = "llm"
-        else:
-            calendar_note = self._calendar_note(calendar_check)
-            categories = ", ".join(
-                item["category"] for item in briefing_items[:3]
-            )
+        if ai_result["ai_synthesis_status"] == "unavailable":
             ai_synthesis = (
-                f"{calendar_note} Berdasarkan korpus regulasi Pramana, ditemukan "
-                f"{len(briefing_items)} instrumen yang relevan: {categories}. "
-                "Cakupan verifikasi terbatas pada korpus lokal; periksa tautan "
-                "sumber resmi pada setiap butir."
-            ).strip()
-            ai_synthesis_status = "deterministic"
+                "Ringkasan AI tidak tersedia. Sitasi terverifikasi tetap "
+                "ditampilkan di bawah."
+            )
+            ai_synthesis_en = (
+                "AI summary is unavailable. The verified citations are still "
+                "shown below."
+            )
+        else:
+            ai_synthesis = ai_result["summary_id"] or fallback_summary
+            ai_synthesis_en = (
+                ai_result["summary_en"] or fallback_summary_en
+            )
 
         wa_text = self._build_whatsapp_text(
             masked_text,
@@ -668,8 +811,8 @@ class StrictRAGEngine:
         return {
             "status": "SUCCESS",
             "guard_status": guard_status,
-            "ai_engine": engine_label,
-            "ai_synthesis_status": ai_synthesis_status,
+            "ai_engine": ai_result["ai_engine"],
+            "ai_synthesis_status": ai_result["ai_synthesis_status"],
             "masked_itinerary": masked_text,
             "pii_redacted_count": sum(pii_counts.values()),
             "start_date": start_date,
@@ -677,6 +820,12 @@ class StrictRAGEngine:
             "calendar_conflicts": calendar_check,
             "briefing_items": briefing_items,
             "ai_synthesis": ai_synthesis,
+            "ai_synthesis_en": ai_synthesis_en,
+            "ai_claims": ai_result["claims"],
+            "ai_rejected_claims": ai_result["rejected_claims"],
+            "ai_latency_ms": ai_result["latency_ms"],
+            "ai_model": ai_result["model"],
+            "ai_guard_status": ai_result["guard_status"],
             "whatsapp_text": wa_text,
             "ics_content": ics_calendar,
             "disclaimer": DISCLAIMER,
@@ -694,7 +843,7 @@ class StrictRAGEngine:
         masked_text, pii_counts = mask_pii(post_content)
         framing_markers = self._detect_framing(masked_text)
 
-        scored = self.corpus_mgr.search_regulations_scored(masked_text, top_k=3)
+        scored = self._retrieve_scored(masked_text, top_k=3)
         matched_regs = [item["regulation"] for item in scored]
         scores = [item["score"] for item in scored]
 
@@ -713,12 +862,23 @@ class StrictRAGEngine:
                 "status": "TIDAK_DITEMUKAN",
                 "guard_status": guard_status,
                 "ai_engine": "dual-layer-guard (abstain)",
+                "ai_synthesis_status": "abstain",
                 "confidence": "TIDAK_DITEMUKAN",
                 "confidence_note": CONFIDENCE_NOTE,
                 "verification_scope": "corpus",
                 "masked_post": masked_text,
                 "pii_redacted_count": sum(pii_counts.values()),
                 "neutral_summary": abstain_text,
+                "neutral_summary_en": (
+                    "No regulation or legal norm in the Pramana corpus "
+                    "matches or confirms this claim. Pramana abstains rather "
+                    "than speculate."
+                ),
+                "ai_claims": [],
+                "ai_rejected_claims": 0,
+                "ai_latency_ms": 0,
+                "ai_model": "",
+                "ai_guard_status": "TIDAK_DITEMUKAN",
                 "framing_markers": framing_markers,
                 "citations": [],
                 "copyable_comment": (
@@ -761,12 +921,22 @@ class StrictRAGEngine:
                 "status": "TIDAK_DITEMUKAN",
                 "guard_status": "TIDAK_DITEMUKAN",
                 "ai_engine": "dual-layer-guard (abstain)",
+                "ai_synthesis_status": "abstain",
                 "confidence": "TIDAK_DITEMUKAN",
                 "confidence_note": CONFIDENCE_NOTE,
                 "verification_scope": "corpus",
                 "masked_post": masked_text,
                 "pii_redacted_count": sum(pii_counts.values()),
                 "neutral_summary": abstain_text,
+                "neutral_summary_en": (
+                    "The retrieved quotation did not pass Layer-1 verification "
+                    "against the local corpus. Pramana abstains."
+                ),
+                "ai_claims": [],
+                "ai_rejected_claims": 0,
+                "ai_latency_ms": 0,
+                "ai_model": "",
+                "ai_guard_status": "TIDAK_DITEMUKAN",
                 "framing_markers": framing_markers,
                 "citations": [],
                 "copyable_comment": (
@@ -780,48 +950,109 @@ class StrictRAGEngine:
         top_reg = matched_regs[0]
         top_citation = citations[0]
 
-        corpus_context = "\n".join(
-            f"- {citation['official_doc_title']} ({citation['pasal']}): "
-            f"{citation['quoted_text']}"
-            for citation in citations
+        fallback_summary = (
+            f"Berdasarkan {top_reg['doc_title']} "
+            f"({top_reg.get('pasal', '')}), ketentuan yang relevan adalah: "
+            f"{top_reg.get('text', '')[:240]}"
+            f"{'...' if len(top_reg.get('text', '')) > 240 else ''} "
+            "Catatan ini tidak menyatakan individu bersalah."
         )
-        sys_prompt = (
-            "Anda adalah penyusun Catatan Konteks Hukum Netral Pramana "
-            "(Strict-RAG). Tulis ringkasan konteks hukum yang objektif, netral, "
-            "tanpa menghakimi individu, dan tanpa emoji (maksimal 3 kalimat). "
-            "Wajib merujuk secara akurat pada judul peraturan dan pasal yang "
-            "diberikan. Jangan menambah fakta di luar teks."
+        fallback_summary_en = (
+            f"Based on {top_reg['doc_title']} "
+            f"({top_reg.get('pasal', '')}), the relevant provision is: "
+            f"{top_reg.get('text', '')[:240]}"
+            f"{'...' if len(top_reg.get('text', '')) > 240 else ''} "
+            "This note does not establish individual guilt."
+        )
+        system_prompt = (
+            "You are the Pramana neutral legal-context writer (Strict-RAG). "
+            "Return JSON with summary_id, summary_en, and claims. Use ONLY the "
+            "supplied citations and evidence spans. Each claim must cite one "
+            "citation_id and one or more span_ids. Do not add facts, article "
+            "numbers, or sanctions outside the evidence. The summary must be "
+            "objective, neutral, and must not declare any individual guilty."
         )
         user_prompt = (
             f"Teks Klaim/Postingan (Disamarkan PII): {masked_text}\n"
-            f"Dasar Hukum Terverifikasi:\n{corpus_context}"
+            "Framing markers: "
+            + (", ".join(item["phrase"] for item in framing_markers) or "none")
         )
-        llm_summary, engine_label = self._call_gemini_strict(sys_prompt, user_prompt)
+        ai_result = self.ai_pipeline.answer(
+            citations=citations,
+            system_prompt=system_prompt,
+            user_prompt=user_prompt,
+            fallback_summary=fallback_summary,
+            fallback_summary_en=fallback_summary_en,
+        )
 
-        if llm_summary:
-            neutral_summary = llm_summary
-            ai_synthesis_status = "llm"
-        else:
-            text = top_reg.get("text", "")
-            excerpt = text[:240] + ("..." if len(text) > 240 else "")
-            neutral_summary = (
-                f"Berdasarkan {top_reg['doc_title']} "
-                f"({top_reg.get('pasal', '')}), ketentuan yang relevan adalah: "
-                f"{excerpt} Catatan ini tidak menyatakan individu bersalah."
+        if ai_result["ai_synthesis_status"] == "abstain":
+            abstain_text = (
+                "AI menilai permintaan ini tidak dapat dijawab secara aman "
+                "dari bukti korpus. Pramana memilih abstain daripada "
+                "mengarang atau mengikuti instruksi yang menyimpang."
             )
-            ai_synthesis_status = "deterministic"
+            return {
+                "status": "TIDAK_DITEMUKAN",
+                "guard_status": "TIDAK_DITEMUKAN",
+                "ai_engine": ai_result["ai_engine"],
+                "ai_synthesis_status": "abstain",
+                "confidence": "TIDAK_DITEMUKAN",
+                "confidence_note": CONFIDENCE_NOTE,
+                "verification_scope": "corpus",
+                "masked_post": masked_text,
+                "pii_redacted_count": sum(pii_counts.values()),
+                "neutral_summary": abstain_text,
+                "neutral_summary_en": (
+                    "The AI judged this request unsafe to answer from the "
+                    "corpus evidence. Pramana abstains instead of inventing "
+                    "or following a prompt injection."
+                ),
+                "ai_claims": [],
+                "ai_rejected_claims": 0,
+                "ai_latency_ms": ai_result["latency_ms"],
+                "ai_model": ai_result["model"],
+                "ai_guard_status": ai_result["guard_status"],
+                "framing_markers": framing_markers,
+                "citations": [],
+                "copyable_comment": (
+                    "Catatan Konteks (Pramana): Permintaan ini tidak dijawab "
+                    "karena tidak aman atau tidak didukung bukti korpus."
+                ),
+                "disclaimer": DISCLAIMER,
+            }
+
+        if ai_result["ai_synthesis_status"] == "unavailable":
+            neutral_summary = (
+                "Ringkasan AI tidak tersedia. Sitasi terverifikasi tetap "
+                "ditampilkan di bawah."
+            )
+            neutral_summary_en = (
+                "AI summary is unavailable. The verified citations are still "
+                "shown below."
+            )
+        else:
+            neutral_summary = ai_result["summary_id"] or fallback_summary
+            neutral_summary_en = (
+                ai_result["summary_en"] or fallback_summary_en
+            )
 
         return {
             "status": "TERVERIFIKASI",
             "guard_status": guard_status,
-            "ai_engine": engine_label,
-            "ai_synthesis_status": ai_synthesis_status,
+            "ai_engine": ai_result["ai_engine"],
+            "ai_synthesis_status": ai_result["ai_synthesis_status"],
             "confidence": confidence,
             "confidence_note": CONFIDENCE_NOTE,
             "verification_scope": "corpus",
             "masked_post": masked_text,
             "pii_redacted_count": sum(pii_counts.values()),
             "neutral_summary": neutral_summary,
+            "neutral_summary_en": neutral_summary_en,
+            "ai_claims": ai_result["claims"],
+            "ai_rejected_claims": ai_result["rejected_claims"],
+            "ai_latency_ms": ai_result["latency_ms"],
+            "ai_model": ai_result["model"],
+            "ai_guard_status": ai_result["guard_status"],
             "framing_markers": framing_markers,
             "citations": citations,
             "copyable_comment": (

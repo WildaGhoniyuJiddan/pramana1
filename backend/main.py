@@ -28,10 +28,12 @@ from backend.services.calendar_service import CALENDAR_COVERAGE
 from backend.services.rag_engine import StrictRAGEngine
 from backend.services.corpus_loader import CorpusManager
 from backend.services.zone_registry import ZoneNotFoundError
+from backend.services import ai_metrics
+from backend.services.ai_config import GEMINI_MODEL, ai_enabled, get_ai_mode
 
 logger = logging.getLogger("pramana")
 
-APP_VERSION = "1.3.0"
+APP_VERSION = "1.4.0"
 RATE_LIMIT_PATHS = {"/api/v1/trip-brief", "/api/v1/context-note"}
 RATE_LIMIT_POST_PREFIXES = ("/api/v1/totem/",)
 RATE_LIMIT_WINDOW_SECONDS = int(os.getenv("RATE_LIMIT_WINDOW_SECONDS", "60"))
@@ -184,9 +186,21 @@ def healthcheck():
         ),
         "total_smart_gate_zones": len(rag_engine.zone_registry.get_all()),
         "smart_gate_version": rag_engine.zone_registry.metadata.get("version"),
+        "ai_mode": get_ai_mode(),
+        "ai_enabled": ai_enabled(),
+        "ai_model": GEMINI_MODEL,
         "calendar_coverage": CALENDAR_COVERAGE,
         "verification_scope": "corpus",
     }
+
+
+@app.get("/api/v1/ai/status")
+def ai_status():
+    """Return AI runtime telemetry without prompts, responses, or PII."""
+    data = ai_metrics.snapshot()
+    data["hybrid_retrieval_available"] = rag_engine.hybrid.available
+    data["embedding_vectors_loaded"] = rag_engine.hybrid.vector_count
+    return data
 
 
 @app.get("/api/v1/corpus", response_model=CorpusResponse)

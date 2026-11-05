@@ -1,4 +1,4 @@
-# Audit Korpus dan Provenance — Pramana v1.2.0
+# Audit Korpus dan Provenance — Pramana v1.3.0
 
 Tanggal audit: **5 November 2026**
 
@@ -25,9 +25,10 @@ pasal dan tidak otomatis boleh dikutip.
 5. **Status URL manifest tidak diklaim sebagai verifikasi ulang.** Field
    `manifest_url_status_http` disalin dari manifest. Field `source_check`
    mencatat apa yang benar-benar dilakukan di repo ini (`pdf_downloaded`,
-   `manifest_only`, `existing_corpus_chunk`). Pada 5 November 2026, 22 URL
-   halaman sumber dicek dan semuanya merespons HTTP 200; pemeriksaan tautan ini
-   tidak sama dengan verifikasi isi atau kesegaran dokumen.
+   `manifest_only`, `existing_corpus_chunk`). Pada 5 November 2026, 29 URL
+   halaman sumber dicek; 28 merespons HTTP 200 dan 123dok menolak permintaan
+   otomatis dengan HTTP 403. Pemeriksaan tautan ini tidak sama dengan
+   verifikasi isi atau kesegaran dokumen.
 
 ## 2. Peta Tier
 
@@ -45,24 +46,24 @@ Tier `3` hanya dipakai untuk naskah Awig-awig/Pararem itu sendiri.
 ## 3. Audit 21 Entri Manifest
 
 Kolom “Manifest” adalah status teks yang tercatat di manifest. Kolom “Pramana”
-adalah keputusan korpus v1.2.0.
+adalah keputusan korpus v1.3.0.
 
 | # | ID manifest | Dokumen | Tier manifest → Pramana | Manifest | Pramana | Chunk |
 | :--- | :--- | :--- | :--- | :--- | :--- | :--- |
 | 1 | `uu-15-2023` | UU 15/2023 tentang Provinsi Bali | 1 → 1A | verbatim | `verbatim` | `UU_15_2023_PASAL_8` |
-| 2 | `uu-18-2025` | UU 18/2025 tentang Perubahan Ketiga UU 10/2009 | 1 → 1A | verbatim | `belum-diambil` | — |
+| 2 | `uu-18-2025` | UU 18/2025 tentang Perubahan Ketiga UU 10/2009 | 1 → 1A | verbatim | `verbatim-ocr-dibersihkan` | `UU_18_2025_*` (7 pasal) |
 | 3 | `uu-11-2010` | UU 11/2010 tentang Cagar Budaya | 1 → 1A | verbatim | `belum-diambil` | — |
 | 4 | `uu-22-2009` | UU 22/2009 tentang Lalu Lintas dan Angkutan Jalan | 1 → 1A | verbatim | `belum-diambil` | — |
 | 5 | `uu-6-2011` | UU 6/2011 tentang Keimigrasian | 1 → 1A | verbatim | `verbatim` | `UU_06_2011_PASAL_75` |
 | 6 | `se-gubernur-bali-7-2025` | SE Gubernur Bali 7/2025 | 2 → 2 | non-verbatim | `non-verbatim` | — |
 | 7 | `perda-bali-2-2025` | Perda Bali 2/2025 (perubahan Perda 6/2023) | 2 → 1B | verbatim | `verbatim` | `PERDA_BALI_06_2023_LEVY` |
-| 8 | `perda-bali-6-2023` | Perda Bali 6/2023 tentang Pungutan WNA | 2 → 1B | verbatim | `belum-diambil` | — |
-| 9 | `pergub-bali-2-2024` | Pergub Bali 2/2024 tentang Tata Cara Pembayaran | 2 → 1B | verbatim | `belum-diambil` | — |
+| 8 | `perda-bali-6-2023` | Perda Bali 6/2023 tentang Pungutan WNA | 2 → 1B | verbatim | `verbatim` | `PERDA_BALI_06_2023_PASAL_12`, `_PASAL_14`, `_PENJELASAN_UMUM` |
+| 9 | `pergub-bali-2-2024` | Pergub Bali 2/2024 tentang Tata Cara Pembayaran | 2 → 1B | verbatim | `verbatim` | `PERGUB_BALI_02_2024_PASAL_6`, `_PASAL_7`, `_PASAL_11` |
 | 10 | `pergub-bali-25-2025` | Pergub Bali 25/2025 (perubahan Pergub 2/2024) | 2 → 1B | verbatim | `verbatim` | `PERGUB_BALI_25_2025_PASAL_9_12` |
 | 11 | `pergub-bali-36-2023` | Pergub Bali 36/2023 (dicabut) | 2 → 1B | belum-diambil | `belum-diambil` | — |
-| 12 | `perda-bali-5-2020` | Perda Bali 5/2020 tentang Kepariwisataan Budaya Bali | 2 → 1B | verbatim | `verbatim` | `PERDA_BALI_05_2020_PASAL_15` |
+| 12 | `perda-bali-5-2020` | Perda Bali 5/2020 tentang Kepariwisataan Budaya Bali | 2 → 1B | verbatim | `verbatim` | `PERDA_BALI_05_2020_PASAL_15`, `_PASAL_6`, `_PASAL_7`, `_PASAL_25`, `_PASAL_26` |
 | 13 | `pergub-bali-52-2021` | Pergub Bali 52/2021 (pelaksanaan Perda 5/2020) | 2 → 1B | verbatim | `belum-diambil` | — |
-| 14 | `pergub-bali-25-2020` | Pergub Bali 25/2020 tentang Pelindungan Pura | 2 → 1B | verbatim | `verbatim` | `PERGUB_BALI_25_2020_PASAL_45_46` |
+| 14 | `pergub-bali-25-2020` | Pergub Bali 25/2020 tentang Pelindungan Pura | 2 → 1B | verbatim | `verbatim` | `PERGUB_BALI_25_2020_PASAL_45_46`, `_PASAL_3_4`, `_PASAL_10` |
 | 15 | `perda-bali-2-2023` | Perda Bali 2/2023 tentang RTRW 2023–2043 | 2 → 1B | verbatim | `belum-diambil` | — |
 | 16 | `seruan-bersama-nyepi-2026` | Seruan Bersama Nyepi 2026 | 2 → 2 | verbatim-teks-reproduksi-resmi | `compilation` | `KETENTUAN_HARI_RAYA_NYEPI` |
 | 17 | `kepgub-bali-699-2025` | Kepgub Bali 699/03-L/HK/2025 | 2 → 2 | belum-diambil | `belum-diambil` | — |
@@ -114,6 +115,12 @@ PDF berikut diunduh pada audit ini dan diperiksa dengan `pypdf`:
 | Pergub 25/2020 | 233.292 B | `FD670C346A7ED03DA5B87486DF7A697E429CEE12427EBA9685E450A12E03291D` |
 | Perda 4/2019 | 733.712 B | `5BBFF1012865990AD3AE902A23AD86D349797D2BE8A0D1047107485C51559C34` |
 | Pergub 4/2020 | 684.087 B | `208EEBB67AD6A518936F164CC5495949E76270496FAF95AAB8A5093BFC7DF8B1` |
+| Perda 5/2020 | 365.390 B | `29BA107211524EFD858B6630E35BA59C1AD128982A982572DF3B5DFA59551D5B` |
+| UU 40/2008 | 108.314 B | `81C4DB83E2880C4AD9951140EE426C78BBB2C79695D75F5749238C538D48B232` |
+| UU 1/2024 | 2.178.368 B | `8CDB6721DD5F46E45F13E8A3588C6C1EFC614EA4361CE94EFEBE40E8E4289D5F` |
+| UU 1/2023 | 24.793.845 B | `975FC86CFA63204EE21810CB7A99918C3A16B5FD47E58DADD9562C5FF3F1DFA0` |
+| UU 39/1999 | 190.041 B | `069C6DDAAAFC356CA332779B3BDED58E9BF4C3BF78704DAAEA19241F6604AD6F` |
+| UU 8/1999 | 192.920 B | `DF253C489E78E66D9DA5337C85BEBE1384C68763AF2001335B4880B0F225D816` |
 
 PDF tidak disimpan di repo. Hash dicatat agar unduhan ulang dapat dibandingkan.
 
@@ -175,12 +182,45 @@ Verifikasi ini membuktikan kutipan berasal dari PDF yang diunduh. Verifikasi ini
 **bukan** verifikasi real-time ke JDIH dan tidak menjamin PDF tersebut masih
 versi terbaru pada saat dibaca.
 
-## 8. Batas yang Belum Ditutup
+## 9. Tambahan Phase 2C — Korpus v1.3.0
+
+Korpus v1.3.0 memiliki **29 dokumen registry dan 40 chunk retrieval**. Sebanyak
+30 chunk baru ditambahkan dari 10 dokumen: 5 dokumen baru dan 5 dokumen yang
+sudah ada di registry:
+
+| Dokumen | Chunk baru | Status |
+| :--- | :--- | :--- |
+| UU 18/2025 | 7 pasal | `verbatim-ocr-dibersihkan` |
+| Perda 6/2023 | Pasal 12, 14, Penjelasan Umum | `verbatim` |
+| Pergub 2/2024 | Pasal 6, 7, 11 | `verbatim` |
+| Perda 5/2020 | Pasal 6, 7, 25, 26 | `verbatim` |
+| Pergub 25/2020 | Pasal 3-4, 10 | `verbatim` |
+| UU 40/2008 | 4 chunk | `verbatim` |
+| UU 1/2024 | 2 chunk | `verbatim` |
+| UU 1/2023 | 3 chunk | `verbatim` |
+| UU 39/1999 | 1 chunk | `verbatim` |
+| UU 8/1999 | 1 chunk | `verbatim` |
+
+Tidak dimasukkan:
+
+- **UU 18/2025 Pasal 20** — duplikasi klausul `e. pelayanan` pada teks PDF/OCR.
+- **UU 18/2025 Pasal 24** — klausul `b. norma agama` tidak lengkap pada PDF resmi.
+- **Perda 6/2023 Pasal 1, 4, 5, 6, 7** — diubah Perda 2/2025.
+- **Pergub 2/2024 Pasal 9, 12** — diubah Pergub 25/2025; **Pasal 23** dihapus.
+- **SE 7/2025, SE Kapolri 6/2015, SKB ITE 2021** — non-verbatim/sekunder;
+  SE 7/2025 tetap registry-only.
+
+Status baru `verbatim-ocr-dibersihkan` berarti teks berasal dari PDF resmi,
+tetapi artefak OCR dibersihkan. Ini bukan transkripsi mentah dan tidak boleh
+diklaim sebagai karakter-demi-karakter tanpa verifikasi ulang.
+
+## 10. Batas yang Belum Ditutup
 
 - 13 dari 21 dokumen manifest belum memiliki chunk retrieval.
-- Status HTTP halaman sumber sudah dicek (22/22 merespons 200), tetapi isi
-  halaman/PDF tidak diverifikasi untuk semua dokumen. `source_check` mencatat
-  tingkat verifikasi yang sebenarnya per dokumen.
+- Status HTTP halaman sumber sudah dicek (28/29 merespons 200; 123dok menolak
+  permintaan otomatis dengan 403), tetapi isi halaman/PDF tidak diverifikasi
+  untuk semua dokumen. `source_check` mencatat tingkat verifikasi yang
+  sebenarnya per dokumen.
 - UU 11/2010, UU 22/2009, Pergub 52/2021, Perda 2/2023, dan Kepgub 699/2025
   belum diunduh/diverifikasi di repo ini.
 - Teks lengkap tidak disimpan; hanya kutipan pasal terpilih.

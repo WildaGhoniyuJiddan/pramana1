@@ -3,7 +3,7 @@ Corpus Loader and Legal Document Indexer for Pramana Strict-RAG.
 Reads structured JSON corpus, validates data integrity, and provides fast
 deterministic keyword retrieval with a normalized relevance score.
 
-Corpus v1.2.0 separates two layers:
+Corpus v1.3.0 separates two layers:
 - ``documents``: provenance registry for every audited document. Documents in
   this registry are not automatically citable.
 - ``regulations``: retrieved chunks with verified text. Only these chunks can
@@ -45,12 +45,17 @@ DOCUMENT_REQUIRED_FIELDS = (
 # ``non-verbatim`` documents must never be retrieval-eligible.
 TEXT_STATUS_VALUES = {
     "verbatim",
+    "verbatim-ocr-dibersihkan",
     "verbatim-teks-reproduksi-resmi",
     "compilation",
     "non-verbatim",
     "belum-diambil",
 }
-VERBATIM_TEXT_STATUSES = {"verbatim", "verbatim-teks-reproduksi-resmi"}
+VERBATIM_TEXT_STATUSES = {
+    "verbatim",
+    "verbatim-ocr-dibersihkan",
+    "verbatim-teks-reproduksi-resmi",
+}
 BLOCKED_RETRIEVAL_STATUSES = {"non-verbatim", "belum-diambil"}
 COVERAGE_VALUES = {"full", "excerpt", "secondary", "none"}
 
@@ -66,7 +71,25 @@ STOPWORDS = {
     "tersebut", "merupakan", "dapat", "harus", "wajib", "sangat", "lebih",
     # Title boilerplate that otherwise matches nearly every statute title.
     "atas", "nomor", "tahun", "tentang",
+    # Generic words that do not identify a legal rule on their own.
+    "orang", "tempat", "barang", "uang", "apa", "apakah", "berapa",
+    "menurut", "sedang", "boleh", "masuk", "saya", "lama", "berlaku",
+    "indonesia", "undang", "kuta", "hari", "jam", "bandara", "penerbangan",
+    "delay", "restoran", "bersih", "visa", "turis", "hotel", "harga",
+    "biaya", "papan", "surf", "sewa", "bintang", "mahal", "koper",
+    "aplikasi", "online", "sore", "parah", "kemacetan", "terlalu",
+    "pedagang", "menjual", "taksi", "error", "memesan", "harganya",
+    "tiga",
 }
+
+# Single-token queries made of these words are too weak to ground an answer.
+GENERIC_QUERY_TOKENS = {
+    "harga", "biaya", "hotel", "bandara", "penerbangan", "hari", "aplikasi",
+    "online", "visa", "turis", "bintang", "mahal", "bersih", "koper",
+    "delay", "restoran", "surf", "sewa", "papan", "pajak", "retribusi",
+}
+
+MIN_TOKEN_COVERAGE = 0.34
 
 
 class CorpusManager:
@@ -244,6 +267,18 @@ class CorpusManager:
                     f"'{reg['document_id']}'."
                 )
 
+            if "ocr_cleaned" in reg and not isinstance(reg["ocr_cleaned"], bool):
+                raise ValueError(
+                    f"Regulation '{reg_id}' must have a boolean 'ocr_cleaned'."
+                )
+            if "amendment_status" in reg and reg["amendment_status"] not in {
+                "current", "amended", "deleted",
+            }:
+                raise ValueError(
+                    f"Regulation '{reg_id}' has unknown amendment_status "
+                    f"'{reg['amendment_status']}'."
+                )
+
             aliases = reg.get("aliases", []) or []
             if not isinstance(aliases, list):
                 raise ValueError(f"Regulation '{reg_id}' must have an 'aliases' list.")
@@ -389,7 +424,17 @@ class CorpusManager:
                 continue
 
             coverage = len(weights) / len(tokens)
-            score = max(weights) * (0.6 + 0.4 * coverage)
+            best_weight = max(weights)
+
+            # A single generic word is not enough evidence. Multi-token queries
+            # must cover a meaningful share of their tokens.
+            if len(tokens) == 1:
+                if tokens[0] in GENERIC_QUERY_TOKENS or best_weight < 0.85:
+                    continue
+            elif coverage < MIN_TOKEN_COVERAGE:
+                continue
+
+            score = best_weight * (0.6 + 0.4 * coverage)
 
             if score >= min_score:
                 scored_results.append({

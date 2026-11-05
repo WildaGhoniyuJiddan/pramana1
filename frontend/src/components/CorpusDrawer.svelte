@@ -3,6 +3,7 @@
 
   const TEXT_STATUS_LABELS = {
     verbatim: 'VERBATIM',
+    'verbatim-ocr-dibersihkan': 'VERBATIM (OCR)',
     'verbatim-teks-reproduksi-resmi': 'VERBATIM PORTAL',
     compilation: 'KOMPILASI',
     'non-verbatim': 'NON-VERBATIM',
@@ -15,7 +16,7 @@
   }
 
   function textStatusStyle(status, isVerbatim) {
-    if (status === 'verbatim' || status === 'verbatim-teks-reproduksi-resmi') {
+    if (status === 'verbatim' || status === 'verbatim-ocr-dibersihkan' || status === 'verbatim-teks-reproduksi-resmi') {
       return 'background-color: #e7f0ff; color: #0c249c; border: 1px solid #0c249c;';
     }
     if (status === 'compilation' || status === 'non-verbatim') {

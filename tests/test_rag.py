@@ -12,6 +12,7 @@ from backend.services.rag_engine import StrictRAGEngine
 
 @pytest.fixture
 def engine(monkeypatch):
+    monkeypatch.setenv("AI_MODE", "optional")
     monkeypatch.delenv("GEMINI_API_KEY", raising=False)
     return StrictRAGEngine()
 
@@ -117,7 +118,9 @@ def test_mode2_viral_post_verified(engine):
         assert citation["source_url"].startswith("https://")
         assert citation["is_verbatim"] is True
         assert citation["document_id"]
-        assert citation["text_status"] == "verbatim"
+        assert citation["text_status"] in {
+            "verbatim", "verbatim-ocr-dibersihkan",
+        }
 
     assert result["disclaimer"]
 
@@ -156,3 +159,43 @@ def test_mode2_masks_email(engine):
     assert "alex@travel.com" not in result["masked_post"]
     assert "[EMAIL_DISAMARKAN]" in result["masked_post"]
     assert result["pii_redacted_count"] >= 1
+
+
+def test_mode2_ai_required_without_key_is_explicitly_unavailable(engine, monkeypatch):
+    monkeypatch.setenv("AI_MODE", "required")
+    result = engine.analyze_viral_post(
+        "Bule memanjat pohon suci di Tabanan tanpa pakaian."
+    )
+
+    assert result["status"] == "TERVERIFIKASI"
+    assert result["ai_synthesis_status"] == "unavailable"
+    assert result["ai_guard_status"] == "AI_TIDAK_TERSEDIA"
+    assert result["ai_claims"] == []
+    assert result["neutral_summary"]
+
+
+def test_mode2_ai_abstain_returns_tidak_ditemukan(engine, monkeypatch):
+    monkeypatch.setenv("AI_MODE", "required")
+    monkeypatch.setattr(
+        engine.ai_pipeline,
+        "call_model",
+        lambda *args, **kwargs: (
+            {
+                "abstain": True,
+                "summary_id": "",
+                "summary_en": "",
+                "claims": [],
+            },
+            "mock-gemini",
+            {"latency_ms": 1, "model": "mock"},
+        ),
+    )
+
+    result = engine.analyze_viral_post(
+        "Bule memanjat pohon suci di Tabanan tanpa pakaian."
+    )
+
+    assert result["status"] == "TIDAK_DITEMUKAN"
+    assert result["ai_synthesis_status"] == "abstain"
+    assert result["ai_claims"] == []
+    assert result["citations"] == []

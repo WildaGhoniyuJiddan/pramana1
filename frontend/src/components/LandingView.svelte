@@ -190,7 +190,7 @@
               class="text-xs sm:text-[13.5px] leading-relaxed break-words"
               style="color: rgba(255, 255, 255, 0.88);"
             >
-              Setiap permohonan melewati tiga tahap deterministik: penyaringan data pribadi otomatis (Tahap 01), filter spasio-temporal Gerbang Candi Bentar &amp; Kalender Saka (Tahap 02), serta pencocokan kutipan terhadap 10 chunk terverifikasi dari 22 dokumen registry Pramana (Tahap 03). Registry bukan bukti kutipan, dan korpus tidak diverifikasi ulang secara real-time ke JDIH.
+              Setiap permohonan melewati tiga tahap deterministik: penyaringan data pribadi otomatis (Tahap 01), filter spasio-temporal Gerbang Candi Bentar &amp; Kalender Saka (Tahap 02), serta pencocokan kutipan terhadap 40 chunk terverifikasi dari 29 dokumen registry Pramana (Tahap 03). Registry bukan bukti kutipan, dan korpus tidak diverifikasi ulang secara real-time ke JDIH.
             </p>
 
             <div class="pt-1 flex flex-wrap gap-3">
