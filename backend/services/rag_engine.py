@@ -57,14 +57,21 @@ CONFIDENCE_NOTE = (
     "bukan dari uji entailment semantik atau verifikasi silang real-time ke JDIH."
 )
 TEMPLE_TRIGGERS = (
-    "pura", "temple", "ubud", "besakih", "uluwatu", "batur",
-    "pantai", "beach", "tempat suci", "pratima",
+    "pura", "temple", "besakih", "lempuyang", "tanah lot", "uluwatu",
+    "batur", "tempat suci", "pratima", "kawasan suci", "sembahyang",
 )
 TRAFFIC_TRIGGERS = (
-    "motor", "sepeda", "lalu lintas", "sim", "helm", "kendaraan",
+    "motor", "sepeda", "sepeda motor", "scooter", "motorbike", "motorcycle",
+    "lalu lintas", "sim", "helm", "helmet", "kendaraan", "sewa motor", "rental",
+    "renting", "drive", "driving", "traffic",
 )
-TEMPLE_QUERY = "pura tempat suci pakaian adat larangan memanjat pohon"
-TRAFFIC_QUERY = "kendaraan bermotor sim helm lalu lintas"
+COASTAL_DTW_TRIGGERS = (
+    "pantai", "beach", "surf", "surfing", "selancar", "diving", "snorkeling",
+    "bahari", "daya tarik wisata", "dtw", "laut",
+)
+TEMPLE_QUERY = "pura tempat suci busana sopan adat pelindungan pura larangan memanjat"
+TRAFFIC_QUERY = "kendaraan bermotor helm sim internasional peraturan lalu lintas"
+COASTAL_DTW_QUERY = "daya tarik wisata kelestarian lingkungan kebersihan sampah laut"
 
 ZONE_LANGUAGES = ("id", "en")
 ZONE_DISCLAIMER = {
@@ -658,22 +665,44 @@ class StrictRAGEngine:
 
         calendar_check = check_holiday_conflicts(start_date, effective_end_date)
 
-        # Primary retrieval plus deterministic query expansion for common
-        # travel triggers. Every expansion still has to clear the score guard.
-        scored = self._retrieve_scored(masked_text, top_k=4)
         lowered = masked_text.lower()
+        has_temple = any(trigger in lowered for trigger in TEMPLE_TRIGGERS)
+        has_traffic = any(trigger in lowered for trigger in TRAFFIC_TRIGGERS)
+        has_coastal = any(trigger in lowered for trigger in COASTAL_DTW_TRIGGERS)
 
-        if any(trigger in lowered for trigger in TEMPLE_TRIGGERS):
-            scored = self._merge_scored(
-                scored,
-                self._retrieve_scored(TEMPLE_QUERY, top_k=4),
+        activity_scored: List[Dict[str, Any]] = []
+        if has_temple:
+            activity_scored = self._merge_scored(
+                activity_scored,
+                self._retrieve_scored(TEMPLE_QUERY, top_k=3),
             )
-
-        if any(trigger in lowered for trigger in TRAFFIC_TRIGGERS):
-            scored = self._merge_scored(
-                scored,
+        if has_traffic:
+            activity_scored = self._merge_scored(
+                activity_scored,
                 self._retrieve_scored(TRAFFIC_QUERY, top_k=2),
             )
+        if has_coastal:
+            activity_scored = self._merge_scored(
+                activity_scored,
+                self._retrieve_scored(COASTAL_DTW_QUERY, top_k=2),
+            )
+
+        if activity_scored:
+            scored = self._merge_scored(
+                activity_scored,
+                self._retrieve_scored(masked_text, top_k=2),
+            )
+            # Do not inject temple protection criminal sanctions unless visiting a sacred site
+            if not has_temple:
+                scored = [
+                    item for item in scored
+                    if item["regulation"]["id"] not in {
+                        "PERGUB_BALI_25_2020_PASAL_45_46",
+                        "PERGUB_BALI_25_2020_PASAL_3_4",
+                    }
+                ]
+        else:
+            scored = self._retrieve_scored(masked_text, top_k=4)
 
         matched_regs = [item["regulation"] for item in scored]
         scores = [item["score"] for item in scored]

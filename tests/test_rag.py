@@ -230,3 +230,34 @@ def test_mode2_single_word_abstains(engine):
     assert result['status'] == 'TIDAK_DITEMUKAN'
     assert result['guard_status'] == 'KUERI_TERLALU_PENDEK'
     assert result['citations'] == []
+
+
+def test_mode1_trip_brief_activity_personalization(engine):
+    # 1. Scooter only
+    scooter_res = engine.analyze_trip_itinerary(
+        itinerary_text='Renting a scooter to drive between Canggu and Seminyak cafes',
+        start_date='2026-04-10',
+        traveler_origin='domestic',
+    )
+    scooter_ids = [item['id'] for item in scooter_res['briefing_items']]
+    assert 'SE_GUB_04_2023_DONT' in scooter_ids
+    assert 'PERGUB_BALI_25_2020_PASAL_45_46' not in scooter_ids
+
+    # 2. Temple only
+    temple_res = engine.analyze_trip_itinerary(
+        itinerary_text='Visiting Pura Besakih sacred temple for morning prayers',
+        start_date='2026-04-10',
+        traveler_origin='domestic',
+    )
+    temple_ids = [item['id'] for item in temple_res['briefing_items']]
+    assert 'PERGUB_BALI_25_2020_PASAL_45_46' in temple_ids
+
+    # 3. Surfing / beach only
+    surf_res = engine.analyze_trip_itinerary(
+        itinerary_text='Surfing and beach sunset dining at Canggu beach',
+        start_date='2026-04-10',
+        traveler_origin='domestic',
+    )
+    surf_ids = [item['id'] for item in surf_res['briefing_items']]
+    assert any('PERDA_BALI_05_2020' in reg_id or 'UU_18_2025' in reg_id for reg_id in surf_ids)
+    assert 'PERGUB_BALI_25_2020_PASAL_45_46' not in surf_ids
