@@ -73,6 +73,13 @@ TEMPLE_QUERY = "pura tempat suci busana sopan adat pelindungan pura larangan mem
 TRAFFIC_QUERY = "kendaraan bermotor helm sim internasional peraturan lalu lintas"
 COASTAL_DTW_QUERY = "daya tarik wisata kelestarian lingkungan kebersihan sampah laut"
 
+INJECTION_PATTERNS = [
+    re.compile(r"\babaikan\s+(?:semua\s+)?instruksi\b", re.IGNORECASE),
+    re.compile(r"\bignore\s+(?:all\s+)?(?:previous\s+)?instructions\b", re.IGNORECASE),
+    re.compile(r"\byou\s+are\s+dan\b", re.IGNORECASE),
+    re.compile(r"\breveal\s+(?:your\s+)?(?:system\s+)?prompt\b", re.IGNORECASE),
+]
+
 ZONE_LANGUAGES = ("id", "en")
 ZONE_DISCLAIMER = {
     "id": (
@@ -886,6 +893,39 @@ class StrictRAGEngine:
         """
         masked_text, pii_counts = mask_pii(post_content)
         framing_markers = self._detect_framing(masked_text)
+
+        # Adversarial prompt injection guard
+        if any(p.search(post_content or "") for p in INJECTION_PATTERNS):
+            return {
+                "status": "TIDAK_DITEMUKAN",
+                "guard_status": "INJECTION_BLOCKED",
+                "ai_engine": "dual-layer-guard (abstain)",
+                "ai_synthesis_status": "abstain",
+                "confidence": "TIDAK_DITEMUKAN",
+                "confidence_note": CONFIDENCE_NOTE,
+                "verification_scope": "corpus",
+                "masked_post": masked_text,
+                "pii_redacted_count": sum(pii_counts.values()),
+                "neutral_summary": (
+                    "Permintaan ini diblokir karena terindikasi mengandung instruksi "
+                    "manipulasi sistem (prompt injection). Pramana memilih abstain."
+                ),
+                "neutral_summary_en": (
+                    "This request was blocked due to prompt injection markers. "
+                    "Pramana abstains."
+                ),
+                "ai_claims": [],
+                "ai_rejected_claims": 0,
+                "ai_latency_ms": 0,
+                "ai_model": "",
+                "ai_guard_status": "TIDAK_DITEMUKAN",
+                "framing_markers": framing_markers,
+                "citations": [],
+                "copyable_comment": (
+                    "Catatan Konteks (Pramana): Konten terindikasi rekayasa/manipulasi."
+                ),
+                "disclaimer": DISCLAIMER,
+            }
 
         # Single-token or overly short queries must abstain
         content_tokens = [
