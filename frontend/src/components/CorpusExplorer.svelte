@@ -154,7 +154,7 @@
         return 'PHDI Circular 2026 is an annual decree; corpus must be updated each Saka New Year (next Nyepi).';
       }
       if (gap.includes('UU 6/2011 Pasal 75')) {
-        return 'Immigration Law 6/2011 Art. 75(1) sourced from Directorate General of Immigration official text; amendments via Law 63/2024 and Job Creation Law verified unchanged in delegation substance.';
+        return 'Immigration Law 6/2011 Art. 75(1) sourced from Directorate General of Immigration official text; Art. 75 is not among the articles amended by Law 63/2024 based on the official amendment text.';
       }
     }
     return gap;
