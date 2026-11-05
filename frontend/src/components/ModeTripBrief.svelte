@@ -535,7 +535,9 @@
                       ? 'background-color: #e7f0ff; color: #0c249c; border: 1px solid #0c249c;'
                       : 'background-color: #fff3cd; color: #8a3b00; border: 1px solid #8a3b00;'}
                   >
-                    {activeItem.is_verbatim ? 'Kutipan verbatim korpus' : 'Ringkasan, bukan kutipan verbatim'}
+                    {activeItem.text_status === 'compilation'
+                      ? 'Kompilasi pedoman, bukan kutipan pasal'
+                      : activeItem.is_verbatim ? 'Kutipan verbatim korpus' : 'Ringkasan, bukan kutipan verbatim'}
                   </span>
                 </div>
 

@@ -68,6 +68,7 @@ class DualLayerVerifier:
         citation["tier_label"] = reg.get("tier_label", f"Tingkat {reg['tier']}")
         # Always overwrite legal identifiers with corpus values so a caller
         # cannot attach a fabricated article number to a real quote.
+        citation["reg_id"] = reg["id"]
         citation["pasal"] = reg.get("pasal", "")
         citation["penalties"] = reg.get("penalties", "")
         citation["source_url"] = reg.get("source_url", "")
@@ -79,6 +80,12 @@ class DualLayerVerifier:
         citation["status"] = reg.get("status")
         citation["status_note"] = reg.get("status_note")
         citation["is_verbatim"] = bool(reg.get("is_verbatim", True))
+        citation["document_id"] = reg.get("document_id")
+        citation["text_status"] = reg.get("text_status")
+        citation["source_type"] = reg.get("source_type")
+        citation["source_pdf_url"] = reg.get("source_pdf_url")
+        citation["source_pdf_sha256"] = reg.get("source_pdf_sha256")
+        citation["related_document_ids"] = reg.get("related_document_ids", [])
         citation["superseded_by"] = reg.get("superseded_by")
         citation["superseded_by_url"] = reg.get("superseded_by_url")
 

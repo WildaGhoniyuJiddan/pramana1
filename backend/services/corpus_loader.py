@@ -2,6 +2,12 @@
 Corpus Loader and Legal Document Indexer for Pramana Strict-RAG.
 Reads structured JSON corpus, validates data integrity, and provides fast
 deterministic keyword retrieval with a normalized relevance score.
+
+Corpus v1.2.0 separates two layers:
+- ``documents``: provenance registry for every audited document. Documents in
+  this registry are not automatically citable.
+- ``regulations``: retrieved chunks with verified text. Only these chunks can
+  ground an answer or pass Layer-1 citation verification.
 """
 
 import json
@@ -25,8 +31,28 @@ RELATIVE_SCORE_RATIO = 0.75
 
 REQUIRED_FIELDS = (
     "id", "doc_title", "tier", "category", "bab", "pasal", "text",
-    "source_url", "keywords",
+    "source_url", "keywords", "document_id", "text_status", "source_type",
+    "is_verbatim",
 )
+
+DOCUMENT_REQUIRED_FIELDS = (
+    "id", "title", "doc_type", "tier", "status", "source_url", "source_type",
+    "text_status", "coverage", "retrieval_eligible", "regulation_ids",
+    "in_manifest",
+)
+
+# Statuses used by the corpus and its registry. ``belum-diambil`` and
+# ``non-verbatim`` documents must never be retrieval-eligible.
+TEXT_STATUS_VALUES = {
+    "verbatim",
+    "verbatim-teks-reproduksi-resmi",
+    "compilation",
+    "non-verbatim",
+    "belum-diambil",
+}
+VERBATIM_TEXT_STATUSES = {"verbatim", "verbatim-teks-reproduksi-resmi"}
+BLOCKED_RETRIEVAL_STATUSES = {"non-verbatim", "belum-diambil"}
+COVERAGE_VALUES = {"full", "excerpt", "secondary", "none"}
 
 TOKEN_PATTERN = re.compile(r"[a-z0-9]+")
 
@@ -38,6 +64,8 @@ STOPWORDS = {
     "akan", "oleh", "bagi", "secara", "sudah", "hanya", "serta", "saat",
     "juga", "para", "sebuah", "suatu", "agar", "karena", "tetapi", "namun",
     "tersebut", "merupakan", "dapat", "harus", "wajib", "sangat", "lebih",
+    # Title boilerplate that otherwise matches nearly every statute title.
+    "atas", "nomor", "tahun", "tentang",
 }
 
 
@@ -48,8 +76,11 @@ class CorpusManager:
         self.file_path = file_path
         self.metadata: Dict[str, Any] = {}
         self.tiers: Dict[str, str] = {}
+        self.documents: List[Dict[str, Any]] = []
         self.regulations: List[Dict[str, Any]] = []
+        self._document_index: Dict[str, Dict[str, Any]] = {}
         self._id_index: Dict[str, Dict[str, Any]] = {}
+        self._alias_index: Dict[str, Dict[str, Any]] = {}
         self.load()
 
     @classmethod
@@ -69,8 +100,15 @@ class CorpusManager:
         self._validate(data)
         self.metadata = data.get("metadata", {})
         self.tiers = data.get("tiers", {})
+        self.documents = data.get("documents", [])
         self.regulations = data.get("regulations", [])
+
+        self._document_index = {doc["id"]: doc for doc in self.documents}
         self._id_index = {reg["id"]: reg for reg in self.regulations}
+        self._alias_index = {}
+        for reg in self.regulations:
+            for alias in reg.get("aliases", []) or []:
+                self._alias_index[alias] = reg
 
     def _validate(self, data: Dict[str, Any]) -> None:
         """Fail fast on malformed corpus data instead of serving broken citations."""
@@ -78,18 +116,89 @@ class CorpusManager:
             raise ValueError("Corpus root must be a JSON object.")
 
         regulations = data.get("regulations")
+        documents = data.get("documents")
         tiers = data.get("tiers", {})
         if not isinstance(regulations, list) or not regulations:
             raise ValueError("Corpus must contain a non-empty 'regulations' list.")
+        if not isinstance(documents, list) or not documents:
+            raise ValueError("Corpus must contain a non-empty 'documents' registry.")
         if not isinstance(tiers, dict) or not tiers:
             raise ValueError("Corpus must contain a non-empty 'tiers' object.")
 
+        document_ids = set()
+        for index, doc in enumerate(documents):
+            if not isinstance(doc, dict):
+                raise ValueError(f"Document at index {index} must be a JSON object.")
+
+            missing = [
+                field for field in DOCUMENT_REQUIRED_FIELDS
+                if field not in doc
+            ]
+            if missing:
+                raise ValueError(
+                    f"Document '{doc.get('id', index)}' is missing required "
+                    f"fields: {', '.join(missing)}"
+                )
+
+            doc_id = doc["id"]
+            if not isinstance(doc_id, str) or not doc_id.strip():
+                raise ValueError(f"Document at index {index} has an invalid id.")
+            if doc_id in document_ids:
+                raise ValueError(f"Duplicate document id: {doc_id}")
+            document_ids.add(doc_id)
+
+            if doc["tier"] not in tiers:
+                raise ValueError(
+                    f"Document '{doc_id}' references unknown tier '{doc['tier']}'."
+                )
+            if doc["text_status"] not in TEXT_STATUS_VALUES:
+                raise ValueError(
+                    f"Document '{doc_id}' has unknown text_status "
+                    f"'{doc['text_status']}'."
+                )
+            if doc["coverage"] not in COVERAGE_VALUES:
+                raise ValueError(
+                    f"Document '{doc_id}' has unknown coverage '{doc['coverage']}'."
+                )
+            if not isinstance(doc["retrieval_eligible"], bool):
+                raise ValueError(
+                    f"Document '{doc_id}' must have a boolean 'retrieval_eligible'."
+                )
+            if not isinstance(doc["in_manifest"], bool):
+                raise ValueError(
+                    f"Document '{doc_id}' must have a boolean 'in_manifest'."
+                )
+            if not isinstance(doc["regulation_ids"], list):
+                raise ValueError(
+                    f"Document '{doc_id}' must have a 'regulation_ids' list."
+                )
+            if doc["retrieval_eligible"]:
+                if not doc["regulation_ids"]:
+                    raise ValueError(
+                        f"Document '{doc_id}' is retrieval-eligible but has no "
+                        "regulation chunks."
+                    )
+                if doc["text_status"] in BLOCKED_RETRIEVAL_STATUSES:
+                    raise ValueError(
+                        f"Document '{doc_id}' cannot be retrieval-eligible with "
+                        f"text_status '{doc['text_status']}'."
+                    )
+            elif doc["regulation_ids"]:
+                raise ValueError(
+                    f"Document '{doc_id}' is not retrieval-eligible but lists "
+                    "regulation chunks."
+                )
+
         seen_ids = set()
+        seen_aliases = set()
         for index, reg in enumerate(regulations):
             if not isinstance(reg, dict):
                 raise ValueError(f"Regulation at index {index} must be a JSON object.")
 
-            missing = [field for field in REQUIRED_FIELDS if not reg.get(field)]
+            missing = [
+                field for field in REQUIRED_FIELDS
+                if field not in reg or reg[field] in (None, "")
+            ]
             if missing:
                 raise ValueError(
                     f"Regulation '{reg.get('id', index)}' is missing required fields: "
@@ -99,6 +208,8 @@ class CorpusManager:
             reg_id = reg["id"]
             if reg_id in seen_ids:
                 raise ValueError(f"Duplicate regulation id: {reg_id}")
+            if reg_id in seen_aliases:
+                raise ValueError(f"Regulation id collides with an alias: {reg_id}")
             seen_ids.add(reg_id)
 
             if reg["tier"] not in tiers:
@@ -109,9 +220,111 @@ class CorpusManager:
             if not isinstance(reg["keywords"], list):
                 raise ValueError(f"Regulation '{reg_id}' must have a 'keywords' list.")
 
+            if not isinstance(reg["is_verbatim"], bool):
+                raise ValueError(
+                    f"Regulation '{reg_id}' must have a boolean 'is_verbatim'."
+                )
+            if reg["text_status"] not in TEXT_STATUS_VALUES:
+                raise ValueError(
+                    f"Regulation '{reg_id}' has unknown text_status "
+                    f"'{reg['text_status']}'."
+                )
+            if reg["is_verbatim"] != (
+                reg["text_status"] in VERBATIM_TEXT_STATUSES
+            ):
+                raise ValueError(
+                    f"Regulation '{reg_id}' has is_verbatim="
+                    f"{reg['is_verbatim']} inconsistent with text_status="
+                    f"'{reg['text_status']}'."
+                )
+
+            if reg["document_id"] not in document_ids:
+                raise ValueError(
+                    f"Regulation '{reg_id}' references unknown document_id "
+                    f"'{reg['document_id']}'."
+                )
+
+            aliases = reg.get("aliases", []) or []
+            if not isinstance(aliases, list):
+                raise ValueError(f"Regulation '{reg_id}' must have an 'aliases' list.")
+            for alias in aliases:
+                if not isinstance(alias, str) or not alias.strip():
+                    raise ValueError(
+                        f"Regulation '{reg_id}' has an invalid alias: {alias!r}."
+                    )
+                if alias in seen_ids or alias in document_ids or alias in seen_aliases:
+                    raise ValueError(f"Duplicate or colliding alias: {alias}")
+                seen_aliases.add(alias)
+
+        # Cross-check both directions of the document -> chunk relation.
+        chunk_ids_by_document: Dict[str, set] = {doc_id: set() for doc_id in document_ids}
+        for reg in regulations:
+            chunk_ids_by_document[reg["document_id"]].add(reg["id"])
+
+        for doc in documents:
+            declared = set(doc["regulation_ids"])
+            actual = chunk_ids_by_document[doc["id"]]
+            if declared != actual:
+                raise ValueError(
+                    f"Document '{doc['id']}' regulation_ids do not match its "
+                    f"chunks. Declared: {sorted(declared)}; actual: {sorted(actual)}."
+                )
+            for reg_id in doc["regulation_ids"]:
+                if reg_id not in seen_ids:
+                    raise ValueError(
+                        f"Document '{doc['id']}' references unknown regulation "
+                        f"'{reg_id}'."
+                    )
+
     def get_by_id(self, reg_id: str) -> Optional[Dict[str, Any]]:
-        """Retrieve exact regulation entry by ID."""
-        return self._id_index.get(reg_id)
+        """Retrieve a regulation entry by canonical ID or registered alias."""
+        if not reg_id:
+            return None
+        return self._id_index.get(reg_id) or self._alias_index.get(reg_id)
+
+    def resolve_regulation_id(self, reg_id: str) -> Optional[str]:
+        """Return the canonical regulation ID for an ID or alias."""
+        reg = self.get_by_id(reg_id)
+        return reg["id"] if reg else None
+
+    def get_document(self, document_id: str) -> Optional[Dict[str, Any]]:
+        """Retrieve a document registry entry by ID."""
+        if not document_id:
+            return None
+        return self._document_index.get(document_id)
+
+    def get_documents(self) -> List[Dict[str, Any]]:
+        """Return all document registry entries."""
+        return self.documents
+
+    def get_document_for_regulation(
+        self, reg_id: str
+    ) -> Optional[Dict[str, Any]]:
+        """Return the registry entry that owns a regulation chunk."""
+        reg = self.get_by_id(reg_id)
+        if not reg:
+            return None
+        return self.get_document(reg.get("document_id", ""))
+
+    def get_regulations_for_document(self, document_id: str) -> List[Dict[str, Any]]:
+        """Return the retrieval chunks that belong to a registry document."""
+        return [
+            reg for reg in self.regulations
+            if reg.get("document_id") == document_id
+        ]
+
+    def get_stats(self) -> Dict[str, int]:
+        """Return provenance counts used by health and corpus endpoints."""
+        return {
+            "total_regulations_indexed": len(self.regulations),
+            "total_documents_registered": len(self.documents),
+            "total_manifest_documents": sum(
+                1 for doc in self.documents if doc.get("in_manifest")
+            ),
+            "total_documents_with_chunks": sum(
+                1 for doc in self.documents if doc.get("regulation_ids")
+            ),
+        }
 
     def _tokenize(self, query: str) -> List[str]:
         tokens = TOKEN_PATTERN.findall((query or "").lower())

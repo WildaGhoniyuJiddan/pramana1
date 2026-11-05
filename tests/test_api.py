@@ -22,8 +22,11 @@ def test_healthcheck_endpoint():
     assert response.status_code == 200
     data = response.json()
     assert data["status"] == "healthy"
-    assert data["total_regulations_indexed"] >= 6
-    assert data["corpus_version"] == "1.1.0"
+    assert data["version"] == "1.2.0"
+    assert data["total_regulations_indexed"] == 10
+    assert data["total_documents_registered"] == 22
+    assert data["total_manifest_documents"] == 21
+    assert data["corpus_version"] == "1.2.0"
     assert data["calendar_coverage"] == "2025-2028"
     assert data["verification_scope"] == "corpus"
 
@@ -42,8 +45,20 @@ def test_get_corpus_endpoint():
     data = response.json()
     assert "metadata" in data
     assert "tiers" in data
-    assert data["metadata"]["version"] == "1.1.0"
-    assert len(data["regulations"]) >= 6
+    assert data["metadata"]["version"] == "1.2.0"
+    assert len(data["regulations"]) == 10
+    assert len(data["documents"]) == 22
+
+    documents_by_id = {doc["id"]: doc for doc in data["documents"]}
+    for regulation in data["regulations"]:
+        assert regulation["document_id"] in documents_by_id
+        document = documents_by_id[regulation["document_id"]]
+        assert regulation["id"] in document["regulation_ids"]
+        assert document["retrieval_eligible"] is True
+
+    tourism_law = documents_by_id["uu-18-2025"]
+    assert tourism_law["text_status"] == "belum-diambil"
+    assert tourism_law["retrieval_eligible"] is False
 
 
 def test_trip_brief_endpoint():
@@ -67,6 +82,10 @@ def test_trip_brief_endpoint():
     assert data["verification_scope"] == "corpus"
     assert data["confidence"] in {"SEDANG", "RENDAH"}
     assert data["disclaimer"]
+    for item in data["briefing_items"]:
+        assert item["document_id"]
+        assert item["text_status"] in {"verbatim", "compilation"}
+        assert item["source_type"]
 
 
 def test_context_note_endpoint():
@@ -88,6 +107,8 @@ def test_context_note_endpoint():
     for citation in data["citations"]:
         assert citation["verified_layer1"] is True
         assert len(citation["quote_sha256"]) == 64
+        assert citation["document_id"]
+        assert citation["text_status"] in {"verbatim", "compilation"}
 
 
 def test_context_note_abstain_endpoint():

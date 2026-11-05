@@ -26,7 +26,7 @@ from backend.services.corpus_loader import CorpusManager
 
 logger = logging.getLogger("pramana")
 
-APP_VERSION = "1.1.0"
+APP_VERSION = "1.2.0"
 RATE_LIMIT_PATHS = {"/api/v1/trip-brief", "/api/v1/context-note"}
 RATE_LIMIT_WINDOW_SECONDS = int(os.getenv("RATE_LIMIT_WINDOW_SECONDS", "60"))
 RATE_LIMIT_MAX_REQUESTS = int(os.getenv("RATE_LIMIT_MAX_REQUESTS", "60"))
@@ -158,11 +158,14 @@ async def security_and_rate_limit(request: Request, call_next):
 
 @app.get("/api/v1/health")
 def healthcheck():
+    stats = corpus_manager.get_stats()
     return {
         "status": "healthy",
         "service": "pramana-strict-rag",
         "version": APP_VERSION,
-        "total_regulations_indexed": len(corpus_manager.get_all()),
+        "total_regulations_indexed": stats["total_regulations_indexed"],
+        "total_documents_registered": stats["total_documents_registered"],
+        "total_manifest_documents": stats["total_manifest_documents"],
         "corpus_version": corpus_manager.metadata.get("version"),
         "corpus_last_verified_date": corpus_manager.metadata.get(
             "last_verified_date"
@@ -179,6 +182,7 @@ def get_corpus():
         "metadata": corpus_manager.metadata,
         "tiers": corpus_manager.tiers,
         "regulations": corpus_manager.get_all(),
+        "documents": corpus_manager.get_documents(),
     }
 
 

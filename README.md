@@ -13,12 +13,13 @@ Bali DigiFest 2026 — AI Web Innovation Challenge
 | Bagian | Status | Catatan |
 | :--- | :--- | :--- |
 | Retrieval deterministik + abstain (Layer-2) | ✅ Live | Ambang relevansi normalisasi `0.5` + pemotongan relatif `0.75` dari skor teratas |
+| Registry provenance korpus | ✅ Live | 22 dokumen registry, 10 chunk retrieval, validasi silang `document_id` dan status teks |
 | PII masking (5 kategori) | ✅ Live | Email, telepon, kode booking, kartu, paspor. Bersifat best-effort, bukan DLP penuh |
 | Kalender Nyepi & Pawukon | ✅ Live | Cakupan deterministik 2025–2028, jendela Nyepi 24 jam |
 | Ekspor `.ics` (RFC 5545) | ✅ Live | Escaping teks, line folding, UID stabil, validasi tanggal |
 | Mode 1 — Trip Brief | 🟡 Prototype | Retrieval, kalender, PII, ICS, teks WhatsApp; ringkasan AI opsional |
 | Mode 2 — Context Note | 🟡 Prototype | Sitasi korpus, deteksi framing, abstain; ringkasan AI opsional |
-| Corpus Explorer | 🟡 Prototype | Menampilkan provenance, status entri, dan keterbatasan korpus |
+| Corpus Explorer | 🟡 Prototype | Menampilkan registry dokumen, chunk retrieval, provenance, dan keterbatasan korpus |
 | Sintesis Gemini | 🟡 Prototype | Butuh `GEMINI_API_KEY`; test otomatis memakai fallback deterministik |
 | Verifikasi silang JDIH real-time | ⚪ Planned | Belum diimplementasikan |
 | Benchmark publik | ⚪ Planned | Belum ada angka akurasi/halusinasi yang diukur |
@@ -62,6 +63,8 @@ Pramana sengaja membedakan beberapa tingkat klaim:
 | **Layer-2 guard** | Tidak ada hasil retrieval yang melewati ambang skor, sehingga sistem abstain sebelum memanggil LLM. |
 | **`is_verbatim: true`** | Entri korpus disimpan sebagai kutipan teks, bukan ringkasan. |
 | **`is_verbatim: false`** | Entri adalah ringkasan/kompilasi. UI tidak menampilkannya sebagai bunyi pasal verbatim. |
+| **`text_status`** | Status teks eksplisit: `verbatim`, `compilation`, `non-verbatim`, atau `belum-diambil`. Chunk `compilation` tidak boleh dikutip sebagai bunyi pasal. |
+| **`retrieval_eligible`** | Hanya `true` untuk dokumen yang memiliki chunk teks tersimpan. Dokumen `belum-diambil`/`non-verbatim` tidak menambah hasil retrieval. |
 | **`confidence`** | Dihitung dari skor kecocokan kata kunci. Nilai tertinggi yang diberikan adalah `SEDANG`; sistem tidak mengklaim `TINGGI`. |
 | **`ai_synthesis_status: llm`** | Ringkasan disusun LLM dan **tidak** diverifikasi Layer-1. Hanya kutipan pasal yang diverifikasi terhadap korpus. |
 
@@ -80,25 +83,34 @@ Pemotongan relatif mencegah entri lemah ikut tersitasi hanya karena berbagi satu
 
 ## Korpus dan Kalender
 
-### Korpus regulasi (`corpus/bali_regulations.json` v1.1.0)
+### Korpus regulasi (`corpus/bali_regulations.json` v1.2.0)
 
-Enam entri, diverifikasi terakhir **5 November 2026**:
+Korpus memakai dua lapis yang sengaja dipisahkan:
 
-1. SE Gubernur Bali No. 4 Tahun 2023 — kewajiban wisatawan mancanegara (`is_verbatim: true`).
-2. SE Gubernur Bali No. 4 Tahun 2023 — larangan wisatawan mancanegara (`is_verbatim: true`).
-3. Perda Bali No. 5 Tahun 2020 Pasal 15 — kewajiban pengunjung (`is_verbatim: true`).
-4. Perda Bali No. 6 Tahun 2023 jo. No. 2 Tahun 2025 — pungutan wisatawan asing (`is_verbatim: false`, ringkasan terstruktur).
-5. UU No. 6 Tahun 2011 Pasal 75 — tindakan administratif keimigrasian (`is_verbatim: true`).
-6. Ketentuan Hari Suci Nyepi — kompilasi pedoman tahunan (`is_verbatim: false`).
+- **`documents` — registry provenance (22 dokumen):** 21 entri manifest bantuan yang diaudit pada 5 November 2026, ditambah dokumen legacy SE Gubernur Bali No. 4 Tahun 2023 karena dua chunk Phase 0 merujuk padanya. Registry mencatat status teks, cakupan, sumber PDF, SHA-256, dan keputusan audit. **Registry bukan bukti kutipan dan tidak menambah hasil retrieval.**
+- **`regulations` — chunk retrieval (10 chunk):** hanya chunk yang teksnya tersimpan dan boleh diverifikasi Layer-1.
+
+Sepuluh chunk yang diindeks:
+
+1. SE Gubernur Bali No. 4 Tahun 2023 — kewajiban wisatawan mancanegara (`verbatim`).
+2. SE Gubernur Bali No. 4 Tahun 2023 — larangan wisatawan mancanegara (`verbatim`).
+3. Perda Bali No. 5 Tahun 2020 Pasal 15 — kewajiban pengunjung (`verbatim`).
+4. Perda Bali No. 6 Tahun 2023 jo. No. 2 Tahun 2025 Pasal 4A, 5, dan 16A — pungutan wisatawan asing (`verbatim`; ID lama `PERDA_BALI_06_2023_LEVY` dipertahankan untuk kompatibilitas, alias `PERDA_BALI_02_2025_LEVY` tersedia).
+5. UU No. 6 Tahun 2011 Pasal 75 — tindakan administratif keimigrasian (`verbatim`).
+6. Ketentuan Hari Suci Nyepi — kompilasi pedoman tahunan (`compilation`, non-verbatim).
+7. UU No. 15 Tahun 2023 Pasal 8 ayat (3)–(4) — dasar kewenangan pungutan (`verbatim`).
+8. Pergub Bali No. 25 Tahun 2025 Pasal 9 dan 12 — data serta waktu pembayaran pungutan (`verbatim`).
+9. Pergub Bali No. 25 Tahun 2020 Pasal 45–46 — larangan dan sanksi pelindungan Pura (`verbatim`).
+10. Perda Bali No. 4 Tahun 2019 Pasal 1 — definisi Desa Adat, Awig-awig, dan Pararem (`verbatim`).
 
 Catatan penting:
 
-- **SE Gubernur Bali No. 4 Tahun 2023 telah disempurnakan oleh SE No. 7 Tahun 2025.** Teks lama tetap disimpan sebagai rujukan historis, dengan `status: "Disempurnakan"`, `superseded_by`, dan catatan di UI. Salinan lengkap SE 7/2025 belum dimasukkan sebagai entri terpisah.
-- Entri pungutan adalah **parafrase**, bukan salinan Pasal 4–5 Perda 6/2023. Jangan mengutipnya sebagai bunyi pasal.
-- Entri Nyepi adalah **kompilasi**, bukan satu pasal peraturan.
-- Korpus belum memuat awig-awig/pararem desa adat secara menyeluruh.
-
-Setiap entri mencantumkan `source_url`, `last_verified_date`, `status`, `status_note`, `is_verbatim`, dan bila relevan `superseded_by_url` serta `source_note`. `metadata.known_gaps` merangkum keterbatasan yang diketahui.
+- **SE Gubernur Bali No. 4 Tahun 2023 telah disempurnakan oleh SE No. 7 Tahun 2025.** Teks lama tetap disimpan sebagai rujukan historis dengan `status: "Disempurnakan"`. SE 7/2025 hanya ada di registry (`non-verbatim`, `retrieval_eligible: false`) karena PDF resminya belum diperoleh.
+- Entri pungutan kini berupa **kutipan verbatim** Pasal 4A, 5, dan 16A Perda No. 2 Tahun 2025, bukan parafrase. Teks asli Perda 6/2023 tidak digabung ke dalam kutipan.
+- Perda Bali No. 6 Tahun 2023 dan UU No. 18 Tahun 2025 sudah diunduh PDF resminya, tetapi belum dijadikan chunk karena teks lengkapnya belum lolos verifikasi karakter. Keduanya berstatus `belum-diambil` di registry.
+- Awig-awig Penglipuran dan Tenganan hanya tersedia lewat literatur akademik sekunder; keduanya berstatus `non-verbatim`, Tier 3, dan tidak diindeks.
+- Setiap chunk mencantumkan `document_id`, `text_status`, `source_type`, dan bila relevan `source_pdf_url`, `source_pdf_sha256`, serta `related_document_ids`.
+- Audit lengkap 21 entri manifest, termasuk URL dan keputusan pemetaan tier, ada di [`docs/CORPUS_PROVENANCE.md`](docs/CORPUS_PROVENANCE.md).
 
 ### Kalender deterministik
 
@@ -198,7 +210,7 @@ npm run build
 pytest -q
 ```
 
-Status terakhir dijalankan (5 November 2026): **62 passed**. Build frontend dengan Vite 5.4.21 juga berhasil. Dua peringatan deprecation berasal dari kombinasi Starlette/HTTPX di lingkungan test, bukan kegagalan aplikasi.
+Status terakhir dijalankan (5 November 2026): **70 passed**. Build frontend dengan Vite 5.4.21 juga berhasil. Dua peringatan deprecation berasal dari kombinasi Starlette/HTTPX di lingkungan test, bukan kegagalan aplikasi.
 
 ---
 
@@ -223,8 +235,8 @@ Jangan commit `.env` atau kunci API nyata.
 
 | Metode | Path | Keterangan |
 | :--- | :--- | :--- |
-| `GET` | `/api/v1/health` | Status, versi korpus, cakupan kalender, dan scope verifikasi. |
-| `GET` | `/api/v1/corpus` | Metadata korpus, tier, dan seluruh entri. |
+| `GET` | `/api/v1/health` | Status, versi korpus, jumlah chunk/dokumen, cakupan kalender, dan scope verifikasi. |
+| `GET` | `/api/v1/corpus` | Metadata korpus, tier, chunk retrieval, dan registry dokumen. |
 | `POST` | `/api/v1/trip-brief` | Mode 1. Validasi tanggal ISO, rentang tanggal, dan origin. |
 | `POST` | `/api/v1/context-note` | Mode 2. Validasi teks tidak kosong. |
 
@@ -249,13 +261,13 @@ Kode kesalahan yang relevan: `422` untuk input tidak valid, `413` untuk body ter
 
 ## Keterbatasan yang Diketahui
 
-1. **Korpus kecil dan terkurasi manual**: 6 entri. Belum mencakup seluruh Perda, Pergub, SE, dan awig-awig desa adat.
+1. **Korpus retrieval kecil dan terkurasi manual**: 10 chunk dari 22 dokumen registry. Belum mencakup seluruh Perda, Pergub, SE, dan awig-awig desa adat.
 2. **Retrieval berbasis kata kunci**, bukan embedding atau entailment semantik. Kueri dengan sinonim jauh dapat gagal retrieval dan memicu abstain.
 3. **Tidak ada verifikasi real-time ke JDIH.** Layer-1 hanya mencocokkan kutipan dengan teks yang tersimpan di korpus.
 4. **Ringkasan LLM tidak diverifikasi Layer-1.** UI menandai `ai_synthesis_status` agar pengguna tahu sumber ringkasan.
 5. **Kunci Gemini tidak tersedia di test otomatis**, sehingga jalur LLM belum diuji end-to-end. Fallback deterministik yang diuji.
-6. **Dua entri non-verbatim** (pungutan dan Nyepi). Keduanya ditandai jelas dan tidak boleh dikutip sebagai bunyi pasal.
-7. **SE Gubernur Bali No. 7 Tahun 2025 belum masuk korpus** sebagai entri penuh.
+6. **Satu chunk non-verbatim** (kompilasi Nyepi). Chunk itu ditandai `compilation` dan tidak boleh dikutip sebagai bunyi pasal.
+7. **SE Gubernur Bali No. 7 Tahun 2025 hanya ada di registry**, bukan chunk retrieval, karena PDF resminya belum diperoleh.
 8. **Kalender hanya 2025–2028.** Di luar rentang itu, hasil tidak lengkap dan diberi peringatan.
 9. **Belum ada benchmark publik.** Tidak ada klaim akurasi, presisi, atau “nol halusinasi” yang diukur.
 10. **Belum ada mode bilingual, QR/NFC, atau verifikasi dokumen fisik.** Semua fitur tersebut belum diimplementasikan.
@@ -268,13 +280,22 @@ Naskah peraturan perundang-undangan adalah domain publik berdasarkan **Pasal 42 
 
 Sumber yang dipakai saat verifikasi:
 
-- JDIH BPK: `https://peraturan.bpk.go.id/Details/146819/perda-prov-bali-no-5-tahun-2020`
-- peraturan.go.id: `https://peraturan.go.id/files/perda-provinsi-bali-no-5-tahun-2020.pdf`
+- JDIH BPK (UU 15/2023): `https://peraturan.bpk.go.id/Details/249375`
+- JDIH BPK (UU 18/2025): `https://peraturan.bpk.go.id/Details/334481`
 - JDIH BPK (Perda 2/2025): `https://peraturan.bpk.go.id/Details/323476/perda-prov-bali-no-2-tahun-2025`
+- JDIH BPK (Perda 5/2020): `https://peraturan.bpk.go.id/Details/146819/perda-prov-bali-no-5-tahun-2020`
+- peraturan.go.id (PDF Perda 5/2020): `https://peraturan.go.id/files/perda-provinsi-bali-no-5-tahun-2020.pdf`
+- JDIH BPK (Pergub 25/2025): `https://peraturan.bpk.go.id/Details/345864`
+- JDIH BPK (Pergub 25/2020): `https://peraturan.bpk.go.id/Details/148225`
+- JDIH Bali (PDF Perda 6/2023): `https://jdih-backup.baliprov.go.id/uploads/produk-hukum/peraturan/2023/perda/2023pd0051006.pdf`
+- JDIH Bali (PDF Pergub 4/2020): `https://jdih-backup.baliprov.go.id/uploads/produk-hukum/peraturan/2020/pergub/2020pg0051004.pdf`
+- Pemkab Buleleng (PDF Perda 4/2019): `https://bulelengkab.go.id/informasi/download/peraturan-daerah-provinsi-bali-nomor-4-tahun-2019-tentang-desa-adat-di-bali-29.pdf`
 - PDF SE Gubernur Bali 4/2023 (Pemkab Buleleng): `https://buleleng.bulelengkab.go.id/informasi/download/14_surat-edaran-gubernur-bali-nomor-04-tahun-2023-tentang-tatanan-baru-bagi-wisatawan-mancanegara-selama-berada-di-bali.pdf`
 - Disparda Bali: `https://disparda.baliprov.go.id/peraturan-daerah`
 - Kesbangpol Bali (Nyepi 2026): `https://kesbangpol.baliprov.go.id/seruan-bersama-tentang-pelaksanaan-hari-suci-nyepi-tahun-baru-caka-1948-tahun-2026`
 - UU No. 6 Tahun 2011: `https://peraturan.go.id/id/uu-no-6-tahun-2011`
+
+Rincian audit per dokumen, status teks, dan keputusan pemetaan tier: [`docs/CORPUS_PROVENANCE.md`](docs/CORPUS_PROVENANCE.md).
 
 Pustaka open-source: FastAPI, Pydantic, Uvicorn, HTTPX, Pytest, Svelte 5, Vite, Tailwind CSS. Tipografi: Inter dan JetBrains Mono (Google Fonts, SIL Open Font License).
 

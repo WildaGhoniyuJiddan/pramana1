@@ -215,6 +215,12 @@ class StrictRAGEngine:
                 "status": reg.get("status"),
                 "status_note": reg.get("status_note"),
                 "is_verbatim": bool(reg.get("is_verbatim", True)),
+                "document_id": reg.get("document_id"),
+                "text_status": reg.get("text_status"),
+                "source_type": reg.get("source_type"),
+                "source_pdf_url": reg.get("source_pdf_url"),
+                "source_pdf_sha256": reg.get("source_pdf_sha256"),
+                "related_document_ids": reg.get("related_document_ids", []),
                 "superseded_by": reg.get("superseded_by"),
                 "superseded_by_url": reg.get("superseded_by_url"),
             })
@@ -456,6 +462,13 @@ class StrictRAGEngine:
                 "quoted_text": reg["text"],
                 "penalties": reg.get("penalties", ""),
                 "source_url": reg.get("source_url", ""),
+                "source_note": reg.get("source_note"),
+                "document_id": reg.get("document_id"),
+                "text_status": reg.get("text_status"),
+                "source_type": reg.get("source_type"),
+                "source_pdf_url": reg.get("source_pdf_url"),
+                "source_pdf_sha256": reg.get("source_pdf_sha256"),
+                "related_document_ids": reg.get("related_document_ids", []),
                 "verified_layer1": True,
             })
 

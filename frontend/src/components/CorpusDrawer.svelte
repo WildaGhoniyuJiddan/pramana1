@@ -1,5 +1,33 @@
 <script>
   let { item = null, onClose = () => {} } = $props();
+
+  const TEXT_STATUS_LABELS = {
+    verbatim: 'VERBATIM',
+    'verbatim-teks-reproduksi-resmi': 'VERBATIM PORTAL',
+    compilation: 'KOMPILASI',
+    'non-verbatim': 'NON-VERBATIM',
+    'belum-diambil': 'BELUM DIAMBIL'
+  };
+
+  function textStatusLabel(status, isVerbatim) {
+    if (status && TEXT_STATUS_LABELS[status]) return TEXT_STATUS_LABELS[status];
+    return isVerbatim === false ? 'NON-VERBATIM' : 'VERBATIM';
+  }
+
+  function textStatusStyle(status, isVerbatim) {
+    if (status === 'verbatim' || status === 'verbatim-teks-reproduksi-resmi') {
+      return 'background-color: #e7f0ff; color: #0c249c; border: 1px solid #0c249c;';
+    }
+    if (status === 'compilation' || status === 'non-verbatim') {
+      return 'background-color: #fff3cd; color: #8a3b00; border: 1px solid #8a3b00;';
+    }
+    if (status === 'belum-diambil') {
+      return 'background-color: #ece9e2; color: #5c5952; border: 1px solid #8c877c;';
+    }
+    return isVerbatim === false
+      ? 'background-color: #fff3cd; color: #8a3b00; border: 1px solid #8a3b00;'
+      : 'background-color: #e7f0ff; color: #0c249c; border: 1px solid #0c249c;';
+  }
 </script>
 
 {#if item}
@@ -62,12 +90,15 @@
             {/if}
             <span
               class="font-mono text-[10px] font-bold px-2 py-0.5"
-              style={item.is_verbatim === false
-                ? 'background-color: #fff3cd; color: #8a3b00; border: 1px solid #8a3b00;'
-                : 'background-color: #e7f0ff; color: #0c249c; border: 1px solid #0c249c;'}
+              style={textStatusStyle(item.text_status, item.is_verbatim)}
             >
-              {item.is_verbatim === false ? 'Ringkasan, bukan kutipan verbatim' : 'Kutipan verbatim korpus'}
+              {textStatusLabel(item.text_status, item.is_verbatim)}
             </span>
+            {#if item.document_id}
+              <span class="font-mono text-[10px] font-bold px-2 py-0.5" style="background-color: #ffffff; color: #0c249c; border: 1px solid #0c249c;">
+                DOC: {item.document_id}
+              </span>
+            {/if}
             {#if item.last_verified_date}
               <span class="font-mono text-[10px] font-bold px-2 py-0.5" style="background-color: #ffffff; color: #5c5952; border: 1px solid #cdc9be;">
                 Diverifikasi {item.last_verified_date}
@@ -79,6 +110,11 @@
           {/if}
           {#if item.source_note}
             <p class="text-[11px] leading-snug" style="color: #5c5952;">Catatan sumber: {item.source_note}</p>
+          {/if}
+          {#if item.source_type}
+            <p class="font-mono text-[10px] leading-snug" style="color: #5c5952;">
+              Jenis sumber: {item.source_type}
+            </p>
           {/if}
           {#if item.superseded_by}
             <p class="text-[11px] leading-snug" style="color: #5c5952;">
@@ -127,20 +163,44 @@
           </div>
         {/if}
 
-        <div class="pt-4 border-t" style="border-color: #c8c4ba;">
-          <span class="font-mono text-[10px] uppercase tracking-wider block mb-1.5" style="color: #5c5b57;">
+        <div class="pt-4 border-t space-y-2" style="border-color: #c8c4ba;">
+          <span class="font-mono text-[10px] uppercase tracking-wider block" style="color: #5c5b57;">
             Tautan Sumber Resmi
           </span>
-          <a
-            href={item.source_url}
-            target="_blank"
-            rel="noopener noreferrer"
-            class="inline-flex items-center gap-1.5 text-xs hover:underline font-mono break-all"
-            style="color: #0c249c;"
-          >
-            <span>{item.source_url}</span>
-            <span>↗</span>
-          </a>
+          {#if item.source_url}
+            <a
+              href={item.source_url}
+              target="_blank"
+              rel="noopener noreferrer"
+              class="inline-flex items-center gap-1.5 text-xs hover:underline font-mono break-all"
+              style="color: #0c249c;"
+            >
+              <span>{item.source_url}</span>
+              <span>↗</span>
+            </a>
+          {/if}
+          {#if item.source_pdf_url}
+            <a
+              href={item.source_pdf_url}
+              target="_blank"
+              rel="noopener noreferrer"
+              class="inline-flex items-center gap-1.5 text-xs hover:underline font-mono break-all"
+              style="color: #0c249c;"
+            >
+              <span>PDF resmi: {item.source_pdf_url}</span>
+              <span>↗</span>
+            </a>
+          {/if}
+          {#if item.source_pdf_sha256}
+            <p class="font-mono text-[10px] break-all" style="color: #5c5952;">
+              SHA-256 PDF: {item.source_pdf_sha256}
+            </p>
+          {/if}
+          {#if item.related_document_ids?.length}
+            <p class="font-mono text-[10px]" style="color: #5c5952;">
+              Dokumen terkait: {item.related_document_ids.join(', ')}
+            </p>
+          {/if}
         </div>
       </div>
 

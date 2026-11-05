@@ -10,7 +10,7 @@
     { id: 'perda5', name: 'Perda Bali No. 5/2020', icon: 'dharma' },
     { id: 'segub4', name: 'SE Gubernur 4/2023 & 7/2025', icon: 'scroll' },
     { id: 'phdi', name: 'PHDI & Majelis Desa Adat', icon: 'lotus' },
-    { id: 'lovebali', name: 'Perda Pungutan No. 6/2023', icon: 'diamond' },
+    { id: 'lovebali', name: 'Perda Pungutan 6/2023 jo. 2/2025', icon: 'diamond' },
     { id: 'uu28', name: 'Domain Publik UU 28/2014', icon: 'book' }
   ];
 </script>
@@ -190,7 +190,7 @@
               class="text-xs sm:text-[13.5px] leading-relaxed break-words"
               style="color: rgba(255, 255, 255, 0.88);"
             >
-              Setiap permohonan melewati tiga tahap deterministik: penyaringan data pribadi otomatis (Tahap 01), filter spasio-temporal Gerbang Candi Bentar &amp; Kalender Saka (Tahap 02), serta pencocokan kutipan terhadap korpus regulasi lokal Pramana (Tahap 03). Korpus tidak diverifikasi ulang secara real-time ke JDIH.
+              Setiap permohonan melewati tiga tahap deterministik: penyaringan data pribadi otomatis (Tahap 01), filter spasio-temporal Gerbang Candi Bentar &amp; Kalender Saka (Tahap 02), serta pencocokan kutipan terhadap 10 chunk terverifikasi dari 22 dokumen registry Pramana (Tahap 03). Registry bukan bukti kutipan, dan korpus tidak diverifikasi ulang secara real-time ke JDIH.
             </p>
 
             <div class="pt-1 flex flex-wrap gap-3">

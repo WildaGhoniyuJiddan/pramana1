@@ -101,6 +101,12 @@ class BriefingItem(BaseModel):
     status: Optional[str] = None
     status_note: Optional[str] = None
     is_verbatim: bool = True
+    document_id: Optional[str] = None
+    text_status: Optional[str] = None
+    source_type: Optional[str] = None
+    source_pdf_url: Optional[str] = None
+    source_pdf_sha256: Optional[str] = None
+    related_document_ids: List[str] = Field(default_factory=list)
     superseded_by: Optional[str] = None
     superseded_by_url: Optional[str] = None
 
@@ -165,6 +171,12 @@ class CitationItem(BaseModel):
     status: Optional[str] = None
     status_note: Optional[str] = None
     is_verbatim: bool = True
+    document_id: Optional[str] = None
+    text_status: Optional[str] = None
+    source_type: Optional[str] = None
+    source_pdf_url: Optional[str] = None
+    source_pdf_sha256: Optional[str] = None
+    related_document_ids: List[str] = Field(default_factory=list)
     superseded_by: Optional[str] = None
     superseded_by_url: Optional[str] = None
 
@@ -190,3 +202,4 @@ class CorpusResponse(BaseModel):
     metadata: Dict[str, Any]
     tiers: Dict[str, str]
     regulations: List[Dict[str, Any]]
+    documents: List[Dict[str, Any]] = Field(default_factory=list)

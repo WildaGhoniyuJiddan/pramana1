@@ -53,6 +53,15 @@ def test_mode1_international_adds_levy(engine):
     ids = [item["id"] for item in result["briefing_items"]]
     assert "PERDA_BALI_06_2023_LEVY" in ids
 
+    levy = next(
+        item for item in result["briefing_items"]
+        if item["id"] == "PERDA_BALI_06_2023_LEVY"
+    )
+    assert levy["text_status"] == "verbatim"
+    assert levy["document_id"] == "perda-bali-2-2025"
+    assert "Pasal 4A" in levy["full_text"]
+    assert "Pasal 16A" in levy["full_text"]
+
 
 def test_mode1_domestic_does_not_add_levy(engine):
     result = engine.analyze_trip_itinerary(
@@ -107,6 +116,8 @@ def test_mode2_viral_post_verified(engine):
         assert len(citation["quote_sha256"]) == 64
         assert citation["source_url"].startswith("https://")
         assert citation["is_verbatim"] is True
+        assert citation["document_id"]
+        assert citation["text_status"] == "verbatim"
 
     assert result["disclaimer"]
 
@@ -122,6 +133,8 @@ def test_mode2_cites_non_verbatim_compilation_honestly(engine):
         if citation["reg_id"] == "KETENTUAN_HARI_RAYA_NYEPI"
     )
     assert nyepi["is_verbatim"] is False
+    assert nyepi["text_status"] == "compilation"
+    assert nyepi["document_id"] == "seruan-bersama-nyepi-2026"
 
 
 def test_mode2_viral_post_abstain_out_of_domain(engine):

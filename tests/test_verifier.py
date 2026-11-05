@@ -59,6 +59,21 @@ def test_verify_and_filter_citations_propagates_provenance():
     assert citation["last_verified_date"] == "2026-11-05"
     assert citation["is_verbatim"] is True
     assert citation["status"] == "Disempurnakan"
+    assert citation["document_id"] == "se-gubernur-bali-4-2023"
+    assert citation["text_status"] == "verbatim"
+    assert citation["source_type"] == "official_pdf"
+
+
+def test_verify_and_filter_resolves_legacy_alias_to_canonical_id():
+    verifier = _verifier()
+    citations = [{"reg_id": "PERDA_BALI_02_2025_LEVY"}]
+
+    verified = verifier.verify_and_filter_citations(citations)
+    assert len(verified) == 1
+    assert verified[0]["reg_id"] == "PERDA_BALI_06_2023_LEVY"
+    assert verified[0]["document_id"] == "perda-bali-2-2025"
+    assert verified[0]["text_status"] == "verbatim"
+    assert "Pasal 16A" in verified[0]["quoted_text"]
 
 
 def test_verify_and_filter_overwrites_fabricated_legal_identifiers():
