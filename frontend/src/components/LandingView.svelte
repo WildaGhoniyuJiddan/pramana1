@@ -7,15 +7,15 @@
   let landing = $derived(DICT[i18n.lang].landing);
 
   // Distinct institutional & statutory wordmarks for the single-row Hero Ribbon
-  const HERO_INSTITUTIONS = [
-    { id: 'jdih', name: 'JDIH BPK & Sumber Resmi', icon: 'gate' },
-    { id: 'imigrasi', name: 'UU Imigrasi Pasal 75', icon: 'compass' },
-    { id: 'perda5', name: 'Perda Bali No. 5/2020', icon: 'dharma' },
-    { id: 'segub4', name: 'SE Gubernur 4/2023 & 7/2025', icon: 'scroll' },
-    { id: 'phdi', name: 'PHDI & Majelis Desa Adat', icon: 'lotus' },
-    { id: 'lovebali', name: 'Perda Pungutan 6/2023 jo. 2/2025', icon: 'diamond' },
-    { id: 'uu28', name: 'Domain Publik UU 28/2014', icon: 'book' }
-  ];
+  let heroInstitutions = $derived([
+    { id: 'jdih', name: i18n.lang === 'en' ? 'BPK JDIH & Official Sources' : 'JDIH BPK & Sumber Resmi', icon: 'gate' },
+    { id: 'imigrasi', name: i18n.lang === 'en' ? 'Immigration Law Art. 75' : 'UU Imigrasi Pasal 75', icon: 'compass' },
+    { id: 'perda5', name: i18n.lang === 'en' ? 'Bali Regional Reg 5/2020' : 'Perda Bali No. 5/2020', icon: 'dharma' },
+    { id: 'segub4', name: i18n.lang === 'en' ? 'Governor Circular 4/2023 & 7/2025' : 'SE Gubernur 4/2023 & 7/2025', icon: 'scroll' },
+    { id: 'phdi', name: i18n.lang === 'en' ? 'PHDI & Customary Village Council' : 'PHDI & Majelis Desa Adat', icon: 'lotus' },
+    { id: 'lovebali', name: i18n.lang === 'en' ? 'Levy Bylaw 6/2023 jo. 2/2025' : 'Perda Pungutan 6/2023 jo. 2/2025', icon: 'diamond' },
+    { id: 'uu28', name: i18n.lang === 'en' ? 'Public Domain Law 28/2014' : 'Domain Publik UU 28/2014', icon: 'book' }
+  ]);
 </script>
 
 <div class="w-full" style="background-color: #e6e4de; color: #0a0a0a; width: 100%; max-width: 100vw; overflow-x: hidden;">
@@ -46,7 +46,7 @@
           style="width: 100%; max-width: 100%; overflow: hidden;"
         >
           <div class="opero-marquee-track gap-3.5">
-            {#each [...HERO_INSTITUTIONS, ...HERO_INSTITUTIONS] as item}
+            {#each [...heroInstitutions, ...heroInstitutions] as item}
               <button
                 type="button"
                 onclick={() => navigate('/corpus')}

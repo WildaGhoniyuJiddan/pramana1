@@ -88,7 +88,7 @@
           <div class="flex flex-wrap gap-1.5">
             {#if item.status}
               <span class="font-mono text-[10px] font-bold px-2 py-0.5" style="background-color: #f2f0ea; color: #0a0a0a; border: 1px solid #c8c4ba;">
-                Status: {item.status}
+                {i18n.lang === 'en' ? 'Status' : 'Status'}: {i18n.lang === 'en' ? (item.status === 'Berlaku' ? 'Active' : item.status === 'Disempurnakan' ? 'Superseded' : item.status === 'Berlaku Tahunan' ? 'Annual Observance' : item.status) : item.status}
               </span>
             {/if}
             <span
@@ -147,12 +147,14 @@
           </div>
           {#if item.is_verbatim === false}
             <p class="mt-2 text-[11px] leading-snug" style="color: #8a3b00;">
-              Entri ini adalah ringkasan/kompilasi, bukan salinan pasal. Jangan dikutip sebagai bunyi pasal verbatim.
+              {i18n.lang === 'en'
+                ? 'This entry is a summary/compilation, not an official statutory transcript. Do not cite as verbatim text.'
+                : 'Entri ini adalah ringkasan/kompilasi, bukan salinan pasal. Jangan dikutip sebagai bunyi pasal verbatim.'}
             </p>
           {/if}
           {#if item.quote_sha256}
             <p class="mt-2 font-mono text-[10px] break-all" style="color: #5c5952;">
-              SHA-256 kutipan: {item.quote_sha256}
+              {i18n.lang === 'en' ? 'Quote SHA-256:' : 'SHA-256 kutipan:'} {item.quote_sha256}
             </p>
           {/if}
         </div>
@@ -160,7 +162,7 @@
         {#if item.penalties}
           <div class="pt-4 border-t" style="border-color: #c8c4ba;">
             <span class="font-mono text-[10px] uppercase tracking-wider block mb-1.5" style="color: #5c5b57;">
-              Ketentuan Sanksi & Penegakan
+              {i18n.lang === 'en' ? 'Sanctions & Enforcement Provisions' : 'Ketentuan Sanksi & Penegakan'}
             </span>
             <p class="text-xs leading-relaxed" style="color: #2b2b29;">
               {item.penalties}
@@ -170,7 +172,7 @@
 
         <div class="pt-4 border-t space-y-2" style="border-color: #c8c4ba;">
           <span class="font-mono text-[10px] uppercase tracking-wider block" style="color: #5c5b57;">
-            Tautan Sumber Resmi
+            {i18n.lang === 'en' ? 'Official Source Links' : 'Tautan Sumber Resmi'}
           </span>
           {#if item.source_url}
             <a
@@ -192,7 +194,7 @@
               class="inline-flex items-center gap-1.5 text-xs hover:underline font-mono break-all"
               style="color: #0c249c;"
             >
-              <span>PDF resmi: {item.source_pdf_url}</span>
+              <span>{i18n.lang === 'en' ? 'Official PDF:' : 'PDF resmi:'} {item.source_pdf_url}</span>
               <span>↗</span>
             </a>
           {/if}
@@ -203,7 +205,7 @@
           {/if}
           {#if item.related_document_ids?.length}
             <p class="font-mono text-[10px]" style="color: #5c5952;">
-              Dokumen terkait: {item.related_document_ids.join(', ')}
+              {i18n.lang === 'en' ? 'Related documents:' : 'Dokumen terkait:'} {item.related_document_ids.join(', ')}
             </p>
           {/if}
         </div>
@@ -214,7 +216,9 @@
         class="px-6 py-3.5 border-t font-mono text-[10px]"
         style="background-color: #f2f0ea; border-color: #c8c4ba; color: #5c5b57;"
       >
-        Naskah peraturan perundang-undangan merupakan domain publik berdasarkan Pasal 42 huruf b UU No. 28 Tahun 2014. Tampilan ini bukan nasihat hukum.
+        {i18n.lang === 'en'
+          ? 'Statutory regulatory texts are in the public domain pursuant to Art. 42(b) of Law No. 28/2014. This display does not constitute official legal advice.'
+          : 'Naskah peraturan perundang-undangan merupakan domain publik berdasarkan Pasal 42 huruf b UU No. 28 Tahun 2014. Tampilan ini bukan nasihat hukum.'}
       </div>
     </div>
   </div>

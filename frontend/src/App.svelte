@@ -1,5 +1,6 @@
 <script>
   import { onMount } from 'svelte';
+  import { i18n } from './lib/i18n.svelte.js';
   import Header from './components/Header.svelte';
   import LandingView from './components/LandingView.svelte';
   import ModeTripBrief from './components/ModeTripBrief.svelte';
@@ -132,7 +133,9 @@
       class="px-6 sm:px-10 pb-6 text-[11px] leading-relaxed"
       style="background-color: #e6e4de; color: #5c5b57;"
     >
-      <strong>Catatan:</strong> Pramana adalah sistem asistensi konteks aturan pariwisata berbasis korpus lokal. Keluaran sistem bukan nasihat hukum resmi dan tidak menggantikan teks peraturan pada JDIH atau instansi berwenang. Kutipan diverifikasi terhadap korpus Pramana, bukan verifikasi langsung real-time ke server JDIH.
+      <strong>{i18n.lang === 'en' ? 'Note:' : 'Catatan:'}</strong> {i18n.lang === 'en'
+        ? 'Pramana is an AI legal context assistance system based on a verified local corpus. System outputs do not constitute official legal advice and do not supersede statutory texts published on JDIH or official authorities. Citations are verified against the Pramana corpus, not re-verified real-time against JDIH servers.'
+        : 'Pramana adalah sistem asistensi konteks aturan pariwisata berbasis korpus lokal. Keluaran sistem bukan nasihat hukum resmi dan tidak menggantikan teks peraturan pada JDIH atau instansi berwenang. Kutipan diverifikasi terhadap korpus Pramana, bukan verifikasi langsung real-time ke server JDIH.'}
     </div>
   </footer>
 
