@@ -4,7 +4,7 @@ Pydantic schemas for Pramana API endpoints.
 
 import re
 from datetime import date as Date
-from typing import List, Dict, Any, Optional
+from typing import List, Dict, Any, Optional, Literal
 
 from pydantic import BaseModel, Field, field_validator, model_validator
 
@@ -195,6 +195,65 @@ class ContextNoteResponse(BaseModel):
     citations: List[CitationItem]
     copyable_comment: Optional[str] = None
     disclaimer: str
+
+
+# Mode 3: Smart Gate / Zone cards
+class ZoneSummary(BaseModel):
+    id: str
+    name: Dict[str, str]
+    category: str
+    location_note: Dict[str, str]
+    regulation_ids: List[str]
+    historical_regulation_ids: List[str] = Field(default_factory=list)
+    rules_version: str
+    last_verified_date: str
+
+
+class ZoneListResponse(BaseModel):
+    metadata: Dict[str, Any]
+    zones: List[ZoneSummary]
+
+
+class ZoneCard(BaseModel):
+    id: str
+    name: str
+    category: str
+    location_note: str
+    scope_note: str
+    practical_checks: List[str]
+    regulation_ids: List[str]
+    historical_regulation_ids: List[str] = Field(default_factory=list)
+    rules_version: str
+    last_verified_date: str
+    available_languages: List[str] = Field(
+        default_factory=lambda: ["id", "en"]
+    )
+
+
+class ZoneCardResponse(BaseModel):
+    zone: ZoneCard
+    language: str
+    citations: List[CitationItem]
+    historical_citations: List[CitationItem] = Field(default_factory=list)
+    tts_text: str
+    disclaimer: str
+    verification_scope: str = "corpus"
+
+
+class ZoneBriefRequest(BaseModel):
+    lang: Literal["id", "en"] = "id"
+
+
+class ZoneBriefResponse(BaseModel):
+    zone_id: str
+    language: str
+    brief: str
+    ai_engine: str
+    ai_synthesis_status: str
+    guard_status: str
+    citation_ids: List[str] = Field(default_factory=list)
+    disclaimer: str
+    verification_scope: str = "corpus"
 
 
 # Corpus listing

@@ -41,3 +41,36 @@ export async function requestContextNote(payload) {
   }
   return res.json();
 }
+
+export async function fetchZones() {
+  const res = await fetch(`${API_BASE}/zones`);
+  if (!res.ok) throw new Error('Failed to load Smart Gate zones');
+  return res.json();
+}
+
+export async function fetchTotem(zoneId, lang = 'id') {
+  const res = await fetch(
+    `${API_BASE}/totem/${encodeURIComponent(zoneId)}?lang=${encodeURIComponent(lang)}`
+  );
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({}));
+    throw new Error(err.detail || 'Failed to load Smart Gate card');
+  }
+  return res.json();
+}
+
+export async function requestTotemBrief(zoneId, lang = 'id') {
+  const res = await fetch(
+    `${API_BASE}/totem/${encodeURIComponent(zoneId)}/brief`,
+    {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ lang })
+    }
+  );
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({}));
+    throw new Error(err.detail || 'Failed to generate Smart Gate brief');
+  }
+  return res.json();
+}

@@ -22,10 +22,12 @@ def test_healthcheck_endpoint():
     assert response.status_code == 200
     data = response.json()
     assert data["status"] == "healthy"
-    assert data["version"] == "1.2.0"
+    assert data["version"] == "1.3.0"
     assert data["total_regulations_indexed"] == 10
     assert data["total_documents_registered"] == 22
     assert data["total_manifest_documents"] == 21
+    assert data["total_smart_gate_zones"] == 3
+    assert data["smart_gate_version"] == "1.0.0"
     assert data["corpus_version"] == "1.2.0"
     assert data["calendar_coverage"] == "2025-2028"
     assert data["verification_scope"] == "corpus"
@@ -59,6 +61,96 @@ def test_get_corpus_endpoint():
     tourism_law = documents_by_id["uu-18-2025"]
     assert tourism_law["text_status"] == "belum-diambil"
     assert tourism_law["retrieval_eligible"] is False
+
+
+def test_zone_list_endpoint():
+    response = client.get("/api/v1/zones")
+    assert response.status_code == 200
+    data = response.json()
+    assert data["metadata"]["version"] == "1.0.0"
+    assert len(data["zones"]) == 3
+    assert {zone["id"] for zone in data["zones"]} == {
+        "bandara-ngurah-rai",
+        "pura-besakih",
+        "pantai-melasti",
+    }
+    for zone in data["zones"]:
+        assert zone["name"]["id"]
+        assert zone["name"]["en"]
+
+
+def test_totem_card_endpoint():
+    response = client.get("/api/v1/totem/bandara-ngurah-rai?lang=en")
+    assert response.status_code == 200
+    data = response.json()
+
+    assert data["zone"]["id"] == "bandara-ngurah-rai"
+    assert data["zone"]["name"] == "I Gusti Ngurah Rai Airport"
+    assert data["language"] == "en"
+    assert len(data["citations"]) == 3
+    assert data["historical_citations"] == []
+    assert data["tts_text"]
+    for citation in data["citations"]:
+        assert citation["verified_layer1"] is True
+        assert citation["text_status"] == "verbatim"
+
+
+def test_totem_card_keeps_historical_references_separate():
+    response = client.get("/api/v1/totem/pura-besakih?lang=id")
+    assert response.status_code == 200
+    data = response.json()
+
+    assert len(data["citations"]) == 2
+    assert len(data["historical_citations"]) == 2
+    assert all(
+        citation["status"] == "Disempurnakan"
+        for citation in data["historical_citations"]
+    )
+
+
+def test_totem_unknown_zone_returns_404():
+    response = client.get("/api/v1/totem/gerbang-tidak-ada")
+    assert response.status_code == 404
+
+
+def test_totem_invalid_language_returns_422():
+    response = client.get("/api/v1/totem/bandara-ngurah-rai?lang=fr")
+    assert response.status_code == 422
+
+
+def test_totem_brief_endpoint_uses_deterministic_fallback():
+    response = client.post(
+        "/api/v1/totem/bandara-ngurah-rai/brief",
+        json={"lang": "en"},
+    )
+    assert response.status_code == 200
+    data = response.json()
+
+    assert data["zone_id"] == "bandara-ngurah-rai"
+    assert data["language"] == "en"
+    assert data["ai_synthesis_status"] == "deterministic"
+    assert data["guard_status"] == "FALLBACK_DETERMINISTIK"
+    assert data["brief"]
+    assert len(data["citation_ids"]) == 3
+
+
+def test_totem_brief_is_rate_limited(monkeypatch):
+    monkeypatch.setattr(main_module, "RATE_LIMIT_MAX_REQUESTS", 1)
+    monkeypatch.setattr(main_module, "RATE_LIMIT_WINDOW_SECONDS", 60)
+    main_module._rate_buckets.clear()
+
+    first = client.post(
+        "/api/v1/totem/bandara-ngurah-rai/brief",
+        json={"lang": "id"},
+    )
+    second = client.post(
+        "/api/v1/totem/bandara-ngurah-rai/brief",
+        json={"lang": "id"},
+    )
+
+    assert first.status_code == 200
+    assert second.status_code == 429
+    main_module._rate_buckets.clear()
 
 
 def test_trip_brief_endpoint():

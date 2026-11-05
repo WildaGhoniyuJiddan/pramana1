@@ -10,6 +10,7 @@ relevance threshold, it abstains instead of generating an unsupported answer.
 """
 
 import os
+import re
 from typing import Dict, Any, List, Optional, Tuple
 
 import httpx
@@ -25,6 +26,7 @@ from backend.services.calendar_service import (
     check_holiday_conflicts,
     generate_ics_calendar,
 )
+from backend.services.zone_registry import ZoneRegistry
 
 load_dotenv()
 
@@ -54,11 +56,31 @@ TRAFFIC_TRIGGERS = (
 TEMPLE_QUERY = "pura tempat suci pakaian adat larangan memanjat pohon"
 TRAFFIC_QUERY = "kendaraan bermotor sim helm lalu lintas"
 
+ZONE_LANGUAGES = ("id", "en")
+ZONE_DISCLAIMER = {
+    "id": (
+        "Kartu gerbang ini adalah panduan edukasi berbasis korpus lokal "
+        "Pramana. Bukan nasihat hukum, bukan bukti pembayaran, dan bukan "
+        "verifikasi real-time ke JDIH. Teks asli Bahasa Indonesia tetap "
+        "menjadi rujukan."
+    ),
+    "en": (
+        "This gate card is educational guidance based on the local Pramana "
+        "corpus. It is not legal advice, not proof of payment, and not a "
+        "real-time JDIH verification. The original Indonesian legal text "
+        "remains authoritative."
+    ),
+}
+ARTICLE_PATTERN = re.compile(r"\bPasal\s+(\d+[A-Za-z]?)\b", re.IGNORECASE)
+RUPIAH_PATTERN = re.compile(r"Rp\s?([\d.,]+)", re.IGNORECASE)
+
 
 class StrictRAGEngine:
     def __init__(self):
         self.corpus_mgr = CorpusManager.get_instance()
         self.verifier = DualLayerVerifier(self.corpus_mgr)
+        self.zone_registry = ZoneRegistry.get_instance()
+        self._zone_brief_cache: Dict[Tuple[str, str, str], Dict[str, Any]] = {}
 
     def _call_gemini_strict(
         self,
@@ -225,6 +247,262 @@ class StrictRAGEngine:
                 "superseded_by_url": reg.get("superseded_by_url"),
             })
         return briefing_items
+
+    @staticmethod
+    def _validate_zone_language(lang: str) -> str:
+        normalized = (lang or "").strip().lower()
+        if normalized not in ZONE_LANGUAGES:
+            raise ValueError("lang harus 'id' atau 'en'")
+        return normalized
+
+    def _build_zone_citations(
+        self,
+        zone: Dict[str, Any],
+        historical: bool = False,
+    ) -> List[Dict[str, Any]]:
+        """Build Layer-1 verified citations for one zone."""
+        field = "historical_regulation_ids" if historical else "regulation_ids"
+        regulation_ids = zone.get(field, [])
+        raw_citations = []
+        for reg_id in regulation_ids:
+            reg = self.corpus_mgr.get_by_id(reg_id)
+            if not reg:
+                raise ValueError(f"Chunk zona tidak ditemukan: {reg_id}")
+            raw_citations.append({
+                "reg_id": reg["id"],
+                "quoted_text": reg["text"],
+            })
+
+        verified = self.verifier.verify_and_filter_citations(raw_citations)
+        if len(verified) != len(regulation_ids):
+            raise ValueError(
+                "Kartu zona gagal verifikasi Layer-1 untuk chunk: "
+                f"{', '.join(regulation_ids)}"
+            )
+        return verified
+
+    def list_zones(self) -> Dict[str, Any]:
+        """Return the zone directory used by the Smart Gate landing page."""
+        zones = []
+        for zone in self.zone_registry.get_all():
+            zones.append({
+                "id": zone["id"],
+                "name": zone["name"],
+                "category": zone["category"],
+                "location_note": zone["location_note"],
+                "regulation_ids": zone["regulation_ids"],
+                "historical_regulation_ids": zone.get(
+                    "historical_regulation_ids", []
+                ),
+                "rules_version": zone["rules_version"],
+                "last_verified_date": zone["last_verified_date"],
+            })
+        return {
+            "metadata": self.zone_registry.metadata,
+            "zones": zones,
+        }
+
+    def get_zone_card(self, zone_id: str, lang: str = "id") -> Dict[str, Any]:
+        """Return a deterministic zone card with Layer-1 verified citations."""
+        lang = self._validate_zone_language(lang)
+        zone = self.zone_registry.get_zone_or_raise(zone_id)
+
+        citations = self._build_zone_citations(zone, historical=False)
+        historical_citations = self._build_zone_citations(
+            zone, historical=True
+        )
+
+        name = zone["name"][lang]
+        location_note = zone["location_note"][lang]
+        scope_note = zone["scope_note"][lang]
+        practical_checks = [item[lang] for item in zone["practical_checks"]]
+        citation_refs = "; ".join(
+            f"{citation['official_doc_title']} ({citation['pasal']})"
+            for citation in citations
+        )
+        tts_text = (
+            f"{name}. {location_note} {scope_note} "
+            f"Panduan utama: {' '.join(practical_checks)} "
+            f"Rujukan resmi: {citation_refs}. "
+            f"{ZONE_DISCLAIMER[lang]}"
+        )
+
+        return {
+            "zone": {
+                "id": zone["id"],
+                "name": name,
+                "category": zone["category"],
+                "location_note": location_note,
+                "scope_note": scope_note,
+                "practical_checks": practical_checks,
+                "regulation_ids": zone["regulation_ids"],
+                "historical_regulation_ids": zone.get(
+                    "historical_regulation_ids", []
+                ),
+                "rules_version": zone["rules_version"],
+                "last_verified_date": zone["last_verified_date"],
+                "available_languages": list(ZONE_LANGUAGES),
+            },
+            "language": lang,
+            "citations": citations,
+            "historical_citations": historical_citations,
+            "tts_text": tts_text,
+            "disclaimer": ZONE_DISCLAIMER[lang],
+            "verification_scope": "corpus",
+        }
+
+    @staticmethod
+    def _deterministic_zone_brief(
+        zone: Dict[str, Any],
+        citations: List[Dict[str, Any]],
+        lang: str,
+    ) -> str:
+        checks = zone["practical_checks"][:3]
+        titles = "; ".join(
+            citation["official_doc_title"] for citation in citations
+        )
+        if lang == "en":
+            return (
+                f"At {zone['name']}, follow {len(zone['practical_checks'])} "
+                f"key checks. {' '.join(checks)} "
+                f"The verified legal basis is: {titles}. "
+                "This is a deterministic template; the original Indonesian "
+                "legal text remains authoritative."
+            )
+        return (
+            f"Di {zone['name']}, ada {len(zone['practical_checks'])} panduan "
+            f"utama. {' '.join(checks)} "
+            f"Dasar hukum terverifikasi: {titles}. "
+            "Ringkasan ini adalah template deterministik; teks asli Bahasa "
+            "Indonesia tetap menjadi rujukan."
+        )
+
+    @staticmethod
+    def _zone_brief_is_safe(
+        text: str,
+        citations: List[Dict[str, Any]],
+    ) -> bool:
+        """Reject LLM output that introduces article numbers or rupiah amounts
+        outside the verified citation set."""
+        if not text or len(text.strip()) < 20 or len(text) > 900:
+            return False
+
+        allowed_articles = set()
+        allowed_rupiah = set()
+        for citation in citations:
+            for match in ARTICLE_PATTERN.finditer(citation.get("pasal", "")):
+                allowed_articles.add(match.group(1).lower())
+            for match in RUPIAH_PATTERN.finditer(
+                citation.get("quoted_text", "")
+            ):
+                allowed_rupiah.add(re.sub(r"\D", "", match.group(1)))
+
+        mentioned_articles = {
+            match.group(1).lower()
+            for match in ARTICLE_PATTERN.finditer(text)
+        }
+        if mentioned_articles - allowed_articles:
+            return False
+
+        for match in RUPIAH_PATTERN.finditer(text):
+            digits = re.sub(r"\D", "", match.group(1))
+            if digits and not any(
+                digits in allowed for allowed in allowed_rupiah
+            ):
+                return False
+
+        return True
+
+    def analyze_zone_brief(
+        self,
+        zone_id: str,
+        lang: str = "id",
+    ) -> Dict[str, Any]:
+        """Generate a grounded, bilingual Smart Gate brief.
+
+        Gemini only rewrites the verified citations into practical guidance.
+        It never creates citations. If the LLM is unavailable or its output
+        mentions unsupported article numbers/amounts, a deterministic template
+        is returned instead.
+        """
+        lang = self._validate_zone_language(lang)
+        card = self.get_zone_card(zone_id, lang)
+        zone = card["zone"]
+        citations = card["citations"]
+
+        cache_key = (zone_id, lang, zone["rules_version"])
+        cached = self._zone_brief_cache.get(cache_key)
+        if cached:
+            return cached
+
+        deterministic_brief = self._deterministic_zone_brief(
+            zone, citations, lang
+        )
+        context = "\n".join(
+            f"- [{citation['official_doc_title']}] "
+            f"({citation['pasal']}) status: {citation['text_status']} | "
+            f"{citation['quoted_text']}"
+            for citation in citations
+        )
+        language_name = "Bahasa Indonesia" if lang == "id" else "English"
+        system_prompt = (
+            "You are the Pramana Smart Gate compliance guide at a Bali "
+            "tourist site. Use ONLY the verified legal excerpts supplied by "
+            "the user. Do not invent rules, article numbers, sanctions, or "
+            "fees. Write 2-3 sentences of practical guidance in "
+            f"{language_name}. Do not quote long passages; summarize. Mention "
+            "that the original Indonesian legal text is authoritative. If the "
+            "excerpts do not cover a topic, say the card does not cover it."
+        )
+        user_prompt = (
+            f"Zone: {zone['name']} ({zone['category']})\n"
+            f"Location: {zone['location_note']}\n"
+            f"Scope note: {zone['scope_note']}\n"
+            "Practical checklist:\n- "
+            + "\n- ".join(zone["practical_checks"])
+            + f"\nVerified excerpts:\n{context}"
+        )
+
+        llm_summary, engine_label = self._call_gemini_strict(
+            system_prompt, user_prompt
+        )
+
+        if llm_summary and self._zone_brief_is_safe(llm_summary, citations):
+            result = {
+                "zone_id": zone_id,
+                "language": lang,
+                "brief": llm_summary.strip(),
+                "ai_engine": engine_label,
+                "ai_synthesis_status": "llm",
+                "guard_status": "LLM_GROUNDED",
+                "citation_ids": [
+                    citation["reg_id"] for citation in citations
+                ],
+                "disclaimer": ZONE_DISCLAIMER[lang],
+                "verification_scope": "corpus",
+            }
+            self._zone_brief_cache[cache_key] = result
+            return result
+
+        return {
+            "zone_id": zone_id,
+            "language": lang,
+            "brief": deterministic_brief,
+            "ai_engine": (
+                "deterministic-zone-template"
+                if not llm_summary
+                else f"{engine_label} (rejected by citation guard)"
+            ),
+            "ai_synthesis_status": "deterministic",
+            "guard_status": (
+                "FALLBACK_DETERMINISTIK"
+                if not llm_summary
+                else "FALLBACK_GUARD"
+            ),
+            "citation_ids": [citation["reg_id"] for citation in citations],
+            "disclaimer": ZONE_DISCLAIMER[lang],
+            "verification_scope": "corpus",
+        }
 
     def analyze_trip_itinerary(
         self,

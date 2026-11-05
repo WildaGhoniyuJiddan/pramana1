@@ -1,0 +1,151 @@
+{
+  "metadata": {
+    "version": "1.0.0",
+    "last_updated": "2026-11-05",
+    "last_verified_date": "2026-11-05",
+    "description": "Registry gerbang Smart Gate Pramana. Zona hanya mereferensikan chunk korpus yang sudah terverifikasi; registry ini bukan sumber hukum baru.",
+    "scope_policy": "Kartu zona adalah panduan praktis untuk pengunjung. Teks pasal asli pada regulations tetap menjadi rujukan hukum. Rujukan historis tidak boleh diperlakukan sebagai aturan aktif.",
+    "supported_languages": [
+      "id",
+      "en"
+    ]
+  },
+  "zones": [
+    {
+      "id": "bandara-ngurah-rai",
+      "name": {
+        "id": "Bandara I Gusti Ngurah Rai",
+        "en": "I Gusti Ngurah Rai Airport"
+      },
+      "category": "entry_point",
+      "location_note": {
+        "id": "Pintu kedatangan udara utama Bali.",
+        "en": "Bali's main air arrival gateway."
+      },
+      "scope_note": {
+        "id": "Kartu ini merangkum ketentuan pungutan yang tersimpan di korpus. Kartu ini bukan konfirmasi status pembayaran pribadi.",
+        "en": "This card summarizes the levy provisions stored in the corpus. It is not a confirmation of your personal payment status."
+      },
+      "regulation_ids": [
+        "PERDA_BALI_06_2023_LEVY",
+        "PERGUB_BALI_25_2025_PASAL_9_12",
+        "UU_15_2023_PASAL_8"
+      ],
+      "historical_regulation_ids": [],
+      "practical_checks": [
+        {
+          "id": "Wisatawan asing wajib membayar pungutan Rp150.000,00 secara nontunai melalui Sistem Love Bali atau sistem lain yang terintegrasi.",
+          "en": "Foreign tourists must pay the IDR 150,000 levy cashless through the Love Bali system or another integrated system."
+        },
+        {
+          "id": "Pembayaran dapat dilakukan sebelum atau selama berwisata di Bali. Jika belum, pembayaran dapat dilakukan saat kedatangan, selama berada di Bali, atau saat keberangkatan.",
+          "en": "Payment can be made before or during your stay in Bali. If not yet paid, it can be made on arrival, while in Bali, or on departure."
+        },
+        {
+          "id": "Siapkan nama, nomor paspor, kewarganegaraan, email, dan tanggal kedatangan saat melakukan pembayaran.",
+          "en": "Prepare your name, passport number, nationality, email, and arrival date when making the payment."
+        },
+        {
+          "id": "Pengecualian berlaku bagi kru alat angkut, pemegang KITAS atau KITAP, pemegang visa diplomatik dan visa dinas, visa penyatuan keluarga, visa pelajar, golden visa, dan jenis visa lainnya.",
+          "en": "Exemptions apply to transport crew, KITAS or KITAP holders, diplomatic and official visa holders, family reunification visa holders, student visa holders, golden visa holders, and other visa types."
+        },
+        {
+          "id": "Simpan bukti pembayaran elektronik. Pelanggaran dapat dikenai sanksi administratif berupa teguran lisan, teguran tertulis, dan/atau tidak mendapatkan pelayanan di Daya Tarik Wisata.",
+          "en": "Keep the electronic proof of payment. Violations may lead to administrative sanctions: verbal warning, written warning, and/or denial of services at a tourist attraction."
+        }
+      ],
+      "rules_version": "2026-11-05",
+      "last_verified_date": "2026-11-05"
+    },
+    {
+      "id": "pura-besakih",
+      "name": {
+        "id": "Pura Besakih",
+        "en": "Besakih Temple"
+      },
+      "category": "temple",
+      "location_note": {
+        "id": "Kawasan suci Pura Besakih, Kabupaten Karangasem.",
+        "en": "Besakih Temple sacred area, Karangasem Regency."
+      },
+      "scope_note": {
+        "id": "Aturan busana adat terbaru tidak tersedia di korpus ini. SE Gubernur Bali No. 4 Tahun 2023 telah disempurnakan oleh SE No. 7 Tahun 2025; rujukan SE 4/2023 ditampilkan sebagai historis, bukan aturan aktif.",
+        "en": "The latest dress-code rule is not available in this corpus. Bali Governor Circular No. 4/2023 has been superseded by No. 7/2025; the 4/2023 reference is shown as historical, not current."
+      },
+      "regulation_ids": [
+        "PERGUB_BALI_25_2020_PASAL_45_46",
+        "PERDA_BALI_05_2020_PASAL_15"
+      ],
+      "historical_regulation_ids": [
+        "SE_GUB_04_2023_DO",
+        "SE_GUB_04_2023_DONT"
+      ],
+      "practical_checks": [
+        {
+          "id": "Jangan memasuki Pura jika berada dalam keadaan Cuntaka atau Sebel.",
+          "en": "Do not enter the temple if you are in a state of Cuntaka or Sebel."
+        },
+        {
+          "id": "Akses Pura dibatasi untuk persembahyangan, piodalan, dan/atau kegiatan pelindungan Pura. Ikuti arahan pemangku, pecalang, atau pengempon Pura di lokasi.",
+          "en": "Temple access is limited to worship, piodalan ceremonies, and/or temple protection activities. Follow the instructions of the local pemangku, pecalang, or temple custodians."
+        },
+        {
+          "id": "Jangan merusak, menodai, atau mencuri Pura, Pratima, dan Simbol Keagamaan.",
+          "en": "Do not damage, desecrate, or steal temple property, Pratima, or religious symbols."
+        },
+        {
+          "id": "Hormati nilai agama, adat istiadat, tradisi, seni, budaya, dan kearifan lokal masyarakat Bali.",
+          "en": "Respect Balinese religious values, customs, traditions, arts, culture, and local wisdom."
+        },
+        {
+          "id": "Pelanggaran dapat dikenai sanksi adat dan/atau sanksi sesuai ketentuan peraturan perundang-undangan.",
+          "en": "Violations may lead to customary sanctions and/or sanctions under applicable laws and regulations."
+        }
+      ],
+      "rules_version": "2026-11-05",
+      "last_verified_date": "2026-11-05"
+    },
+    {
+      "id": "pantai-melasti",
+      "name": {
+        "id": "Pantai Melasti",
+        "en": "Melasti Beach"
+      },
+      "category": "public_area",
+      "location_note": {
+        "id": "Kawasan pantai di Kabupaten Badung.",
+        "en": "Coastal area in Badung Regency."
+      },
+      "scope_note": {
+        "id": "Tidak ada aturan spesifik Pantai Melasti di korpus. Kartu ini menampilkan kewajiban umum wisatawan dan rujukan historis tentang larangan mengotori lingkungan.",
+        "en": "There is no Melasti-specific rule in the corpus. This card shows general tourist obligations and a historical reference on littering."
+      },
+      "regulation_ids": [
+        "PERDA_BALI_05_2020_PASAL_15"
+      ],
+      "historical_regulation_ids": [
+        "SE_GUB_04_2023_DONT"
+      ],
+      "practical_checks": [
+        {
+          "id": "Hormati nilai agama, adat istiadat, tradisi, seni, budaya, dan kearifan lokal masyarakat Bali.",
+          "en": "Respect Balinese religious values, customs, traditions, arts, culture, and local wisdom."
+        },
+        {
+          "id": "Jaga dan pelihara kelestarian lingkungan alam dan budaya setempat.",
+          "en": "Protect and preserve the local natural and cultural environment."
+        },
+        {
+          "id": "Jangan membuang sampah sembarangan atau mengotori pantai, laut, dan tempat umum.",
+          "en": "Do not litter or pollute the beach, sea, or public spaces."
+        },
+        {
+          "id": "Hindari perbuatan yang bertentangan dengan norma agama, kesusilaan, ketertiban umum, dan peraturan perundang-undangan.",
+          "en": "Avoid conduct that conflicts with religious norms, decency, public order, and applicable laws and regulations."
+        }
+      ],
+      "rules_version": "2026-11-05",
+      "last_verified_date": "2026-11-05"
+    }
+  ]
+}

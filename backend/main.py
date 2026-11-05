@@ -7,7 +7,7 @@ import logging
 import os
 import threading
 import time
-from typing import Dict, List
+from typing import Dict, List, Literal
 
 from fastapi import FastAPI, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
@@ -19,15 +19,21 @@ from backend.models.schemas import (
     ContextNoteRequest,
     ContextNoteResponse,
     CorpusResponse,
+    ZoneListResponse,
+    ZoneCardResponse,
+    ZoneBriefRequest,
+    ZoneBriefResponse,
 )
 from backend.services.calendar_service import CALENDAR_COVERAGE
 from backend.services.rag_engine import StrictRAGEngine
 from backend.services.corpus_loader import CorpusManager
+from backend.services.zone_registry import ZoneNotFoundError
 
 logger = logging.getLogger("pramana")
 
-APP_VERSION = "1.2.0"
+APP_VERSION = "1.3.0"
 RATE_LIMIT_PATHS = {"/api/v1/trip-brief", "/api/v1/context-note"}
+RATE_LIMIT_POST_PREFIXES = ("/api/v1/totem/",)
 RATE_LIMIT_WINDOW_SECONDS = int(os.getenv("RATE_LIMIT_WINDOW_SECONDS", "60"))
 RATE_LIMIT_MAX_REQUESTS = int(os.getenv("RATE_LIMIT_MAX_REQUESTS", "60"))
 MAX_REQUEST_BODY_BYTES = int(os.getenv("MAX_REQUEST_BODY_BYTES", "65536"))
@@ -58,7 +64,7 @@ def _client_key(request: Request) -> str:
 
 
 def _allow_request(client_key: str) -> bool:
-    """Small in-memory sliding-window limiter for the two expensive endpoints."""
+    """Small in-memory sliding-window limiter for expensive POST endpoints."""
     now = time.monotonic()
     with _rate_lock:
         bucket = [
@@ -125,7 +131,13 @@ async def security_and_rate_limit(request: Request, call_next):
                 content={"detail": "Header Content-Length tidak valid."},
             )
 
-    if request.method == "POST" and request.url.path in RATE_LIMIT_PATHS:
+    if request.method == "POST" and (
+        request.url.path in RATE_LIMIT_PATHS
+        or (
+            request.url.path.startswith(RATE_LIMIT_POST_PREFIXES)
+            and request.url.path.endswith("/brief")
+        )
+    ):
         if not _allow_request(_client_key(request)):
             return JSONResponse(
                 status_code=429,
@@ -170,6 +182,8 @@ def healthcheck():
         "corpus_last_verified_date": corpus_manager.metadata.get(
             "last_verified_date"
         ),
+        "total_smart_gate_zones": len(rag_engine.zone_registry.get_all()),
+        "smart_gate_version": rag_engine.zone_registry.metadata.get("version"),
         "calendar_coverage": CALENDAR_COVERAGE,
         "verification_scope": "corpus",
     }
@@ -184,6 +198,55 @@ def get_corpus():
         "regulations": corpus_manager.get_all(),
         "documents": corpus_manager.get_documents(),
     }
+
+
+@app.get("/api/v1/zones", response_model=ZoneListResponse)
+def get_zones():
+    """Return the Smart Gate zone directory."""
+    return rag_engine.list_zones()
+
+
+@app.get("/api/v1/totem/{zone_id}", response_model=ZoneCardResponse)
+def get_totem_card(
+    zone_id: str,
+    lang: Literal["id", "en"] = "id",
+):
+    """Return one deterministic Smart Gate card with verified citations."""
+    try:
+        return rag_engine.get_zone_card(zone_id, lang)
+    except ZoneNotFoundError as exc:
+        raise HTTPException(status_code=404, detail=str(exc)) from exc
+    except ValueError as exc:
+        raise HTTPException(status_code=422, detail=str(exc)) from exc
+    except Exception:
+        logger.exception("totem card processing failed")
+        raise HTTPException(
+            status_code=500,
+            detail=(
+                "Terjadi kesalahan internal saat memuat kartu gerbang. "
+                "Silakan coba lagi."
+            ),
+        )
+
+
+@app.post("/api/v1/totem/{zone_id}/brief", response_model=ZoneBriefResponse)
+def generate_totem_brief(zone_id: str, req: ZoneBriefRequest):
+    """Generate a grounded AI brief for one Smart Gate zone."""
+    try:
+        return rag_engine.analyze_zone_brief(zone_id, req.lang)
+    except ZoneNotFoundError as exc:
+        raise HTTPException(status_code=404, detail=str(exc)) from exc
+    except ValueError as exc:
+        raise HTTPException(status_code=422, detail=str(exc)) from exc
+    except Exception:
+        logger.exception("totem brief processing failed")
+        raise HTTPException(
+            status_code=500,
+            detail=(
+                "Terjadi kesalahan internal saat menyusun panduan gerbang. "
+                "Kartu deterministik tetap dapat digunakan."
+            ),
+        )
 
 
 @app.post("/api/v1/trip-brief", response_model=TripBriefResponse)

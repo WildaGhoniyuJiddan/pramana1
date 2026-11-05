@@ -19,11 +19,12 @@ Bali DigiFest 2026 — AI Web Innovation Challenge
 | Ekspor `.ics` (RFC 5545) | ✅ Live | Escaping teks, line folding, UID stabil, validasi tanggal |
 | Mode 1 — Trip Brief | 🟡 Prototype | Retrieval, kalender, PII, ICS, teks WhatsApp; ringkasan AI opsional |
 | Mode 2 — Context Note | 🟡 Prototype | Sitasi korpus, deteksi framing, abstain; ringkasan AI opsional |
+| Mode 3 — Smart Gate (NFC/QR) | 🟡 Prototype | 3 zona, kartu deterministik, AI brief grounded, TTS, QR; offline belum |
 | Corpus Explorer | 🟡 Prototype | Menampilkan registry dokumen, chunk retrieval, provenance, dan keterbatasan korpus |
 | Sintesis Gemini | 🟡 Prototype | Butuh `GEMINI_API_KEY`; test otomatis memakai fallback deterministik |
 | Verifikasi silang JDIH real-time | ⚪ Planned | Belum diimplementasikan |
 | Benchmark publik | ⚪ Planned | Belum ada angka akurasi/halusinasi yang diukur |
-| Antarmuka bilingual ID/EN | ⚪ Planned | Belum diimplementasikan |
+| Antarmuka bilingual ID/EN | 🟡 Prototype | Smart Gate sudah ID/EN; Mode 1 dan 2 masih Bahasa Indonesia |
 
 ---
 
@@ -50,6 +51,19 @@ Aplikasi ini tidak menjawab pertanyaan hukum bebas. Ia mengambil kecocokan dari 
 - Mendeteksi frasa framing sensasional (generalisasi, tuduhan tanpa dasar, dan sejenisnya).
 - Mengambil entri korpus yang relevan, lalu memverifikasi kutipan terhadap teks korpus (Layer-1).
 - Menghasilkan catatan konteks netral dan komentar yang dapat disalin, atau abstain.
+
+### Mode 3 — Smart Gate (NFC/QR)
+
+- `/totem` menampilkan direktori gerbang; `/totem/{zone_id}` adalah halaman tujuan URL NFC/QR.
+- Tiga zona awal: Bandara I Gusti Ngurah Rai, Pura Besakih, dan Pantai Melasti.
+- Kartu zona bersifat **deterministik**: checklist praktis + sitasi yang sudah lolos Layer-1.
+- AI brief 2–3 kalimat dibuat dari sitasi terverifikasi; jika Gemini tidak tersedia atau menyebut pasal/angka di luar bukti, sistem memakai template deterministik.
+- Teks pasal asli tetap Bahasa Indonesia; terjemahan hanya untuk panduan praktis.
+- Audio memakai Web Speech API bawaan browser, bukan API TTS eksternal.
+- QR dibuat lokal di browser. NFC memakai URL record pada tag NTAG213; tidak memakai Web NFC API.
+- Tombol “Tandai Sudah Dibaca” hanya menyimpan status di `localStorage` perangkat, bukan check-in server dan bukan bukti hukum.
+- Rujukan yang sudah disempurnakan (SE Gubernur Bali No. 4 Tahun 2023) ditampilkan terpisah sebagai **rujukan historis**, bukan aturan aktif.
+- Mode ini belum memiliki cache offline/PWA.
 
 ---
 
@@ -124,9 +138,9 @@ Catatan penting:
 
 ## Tech Stack
 
-- **Frontend:** Svelte 5 (runes), Vite 5.4.x, Tailwind CSS 3.
+- **Frontend:** Svelte 5 (runes), Vite 5.4.x, Tailwind CSS 3, Web Speech API, `qrcode`.
 - **Backend:** Python 3.11+ (diuji pada 3.12.10), FastAPI, Pydantic v2, Uvicorn, HTTPX.
-- **Penyimpanan:** JSON korpus terstruktur di memori; tidak ada database.
+- **Penyimpanan:** JSON korpus terstruktur dan zone registry di memori; tidak ada database.
 - **AI opsional:** Google Gemini API (`gemini-2.5-flash`, `temperature=0.1`). Tanpa API key, sistem memakai ringkasan deterministik.
 - **Testing:** Pytest + FastAPI TestClient.
 
@@ -135,32 +149,34 @@ Catatan penting:
 ## Arsitektur
 
 ```text
-Input (itinerary / klaim viral)
+Input (itinerary / klaim viral / zone_id)
         │
         ▼
-[1] PII masking (regex, 5 kategori)
+[1] PII masking (regex, 5 kategori) — hanya Mode 1/2
         │
         ├──► [2a] Kalender Bali: Nyepi 24 jam, Pengerupukan, Pawukon
         │
-        ▼
-[2b] Retrieval kata kunci berbobot + skor normalisasi
+        ├──► [2b] Zone registry: Smart Gate /totem/{zone_id}
         │
         ▼
-[3] Layer-2 guard: skor ≥ 0.5 dan ≥ 0.75 × skor teratas?
+[3] Retrieval kata kunci berbobot + skor normalisasi
+        │
+        ▼
+[4] Layer-2 guard: skor ≥ 0.5 dan ≥ 0.75 × skor teratas?
         │
         ├── TIDAK ──► Abstain deterministik (tanpa LLM) + ICS tetap dibuat
         │
         ▼ YA
-[4] Gemini opsional (jika ada API key) ──► fallback deterministik bila gagal
+[5] Gemini opsional (jika ada API key) ──► fallback deterministik bila gagal
         │
         ▼
-[5] Layer-1: cek kutipan terhadap teks korpus + SHA-256 + provenance
+[6] Layer-1: cek kutipan terhadap teks korpus + SHA-256 + provenance
         │
         ▼
-JSON terstruktur ──► UI, teks WhatsApp, ekspor .ics
+JSON terstruktur ──► UI, Smart Gate card, teks WhatsApp, ekspor .ics
 ```
 
-Catatan: ringkasan LLM tidak melewati Layer-1. Yang diverifikasi adalah kutipan pasal yang diambil dari korpus, bukan kebenaran parafrase LLM.
+Catatan: ringkasan LLM tidak melewati Layer-1. Yang diverifikasi adalah kutipan pasal yang diambil dari korpus, bukan kebenaran parafrase LLM. Pada Smart Gate, AI brief juga ditolak jika menyebut nomor pasal atau nominal rupiah di luar sitasi.
 
 ---
 
@@ -210,7 +226,7 @@ npm run build
 pytest -q
 ```
 
-Status terakhir dijalankan (5 November 2026): **70 passed**. Build frontend dengan Vite 5.4.21 juga berhasil. Dua peringatan deprecation berasal dari kombinasi Starlette/HTTPX di lingkungan test, bukan kegagalan aplikasi.
+Status terakhir dijalankan (5 November 2026): **89 passed**. Build frontend dengan Vite 5.4.21 juga berhasil. Dua peringatan deprecation berasal dari kombinasi Starlette/HTTPX di lingkungan test, bukan kegagalan aplikasi.
 
 ---
 
@@ -237,10 +253,13 @@ Jangan commit `.env` atau kunci API nyata.
 | :--- | :--- | :--- |
 | `GET` | `/api/v1/health` | Status, versi korpus, jumlah chunk/dokumen, cakupan kalender, dan scope verifikasi. |
 | `GET` | `/api/v1/corpus` | Metadata korpus, tier, chunk retrieval, dan registry dokumen. |
+| `GET` | `/api/v1/zones` | Direktori zona Smart Gate. |
+| `GET` | `/api/v1/totem/{zone_id}?lang=id\|en` | Kartu zona deterministik + sitasi Layer-1. |
+| `POST` | `/api/v1/totem/{zone_id}/brief` | AI brief grounded; fallback deterministik; rate-limited. |
 | `POST` | `/api/v1/trip-brief` | Mode 1. Validasi tanggal ISO, rentang tanggal, dan origin. |
 | `POST` | `/api/v1/context-note` | Mode 2. Validasi teks tidak kosong. |
 
-Kode kesalahan yang relevan: `422` untuk input tidak valid, `413` untuk body terlalu besar, `429` untuk rate limit, `500` untuk kegagalan internal dengan pesan generik.
+Kode kesalahan yang relevan: `404` untuk zona tidak dikenal, `422` untuk input/language tidak valid, `413` untuk body terlalu besar, `429` untuk rate limit, `500` untuk kegagalan internal dengan pesan generik.
 
 `trip-brief` mengembalikan field `ics_content` (bukan `ics_calendar`). UI dan test memakai nama tersebut.
 
@@ -267,10 +286,14 @@ Kode kesalahan yang relevan: `422` untuk input tidak valid, `413` untuk body ter
 4. **Ringkasan LLM tidak diverifikasi Layer-1.** UI menandai `ai_synthesis_status` agar pengguna tahu sumber ringkasan.
 5. **Kunci Gemini tidak tersedia di test otomatis**, sehingga jalur LLM belum diuji end-to-end. Fallback deterministik yang diuji.
 6. **Satu chunk non-verbatim** (kompilasi Nyepi). Chunk itu ditandai `compilation` dan tidak boleh dikutip sebagai bunyi pasal.
-7. **SE Gubernur Bali No. 7 Tahun 2025 hanya ada di registry**, bukan chunk retrieval, karena PDF resminya belum diperoleh.
-8. **Kalender hanya 2025–2028.** Di luar rentang itu, hasil tidak lengkap dan diberi peringatan.
-9. **Belum ada benchmark publik.** Tidak ada klaim akurasi, presisi, atau “nol halusinasi” yang diukur.
-10. **Belum ada mode bilingual, QR/NFC, atau verifikasi dokumen fisik.** Semua fitur tersebut belum diimplementasikan.
+7. **Smart Gate baru mencakup 3 zona.** Pura Besakih dan Pantai Melasti memakai aturan umum serta rujukan historis; aturan busana terbaru (SE 7/2025) belum tersedia di korpus.
+8. **TTS bergantung pada browser/perangkat.** Tidak semua browser memiliki suara ID/EN; teks panduan tetap tersedia.
+9. **Belum ada mode offline/PWA.** Smart Gate membutuhkan koneksi ke backend; offline ditunda.
+10. **Kunci Gemini di deployment harus diset agar AI brief aktif.** Tanpa kunci, Smart Gate tetap berfungsi dengan template deterministik.
+11. **SE Gubernur Bali No. 7 Tahun 2025 hanya ada di registry**, bukan chunk retrieval, karena PDF resminya belum diperoleh.
+12. **Kalender hanya 2025–2028.** Di luar rentang itu, hasil tidak lengkap dan diberi peringatan.
+13. **Belum ada benchmark publik.** Tidak ada klaim akurasi, presisi, atau “nol halusinasi” yang diukur.
+14. **Belum ada QR/NFC verifikasi dokumen fisik.** QR/NFC hanya membuka URL; tidak memverifikasi identitas atau pembayaran.
 
 ---
 
@@ -297,7 +320,7 @@ Sumber yang dipakai saat verifikasi:
 
 Rincian audit per dokumen, status teks, dan keputusan pemetaan tier: [`docs/CORPUS_PROVENANCE.md`](docs/CORPUS_PROVENANCE.md).
 
-Pustaka open-source: FastAPI, Pydantic, Uvicorn, HTTPX, Pytest, Svelte 5, Vite, Tailwind CSS. Tipografi: Inter dan JetBrains Mono (Google Fonts, SIL Open Font License).
+Pustaka open-source: FastAPI, Pydantic, Uvicorn, HTTPX, Pytest, Svelte 5, Vite, Tailwind CSS, `qrcode` (MIT), Lucide (ISC). Tipografi: Plus Jakarta Sans, Newsreader, dan JetBrains Mono (Google Fonts, SIL Open Font License).
 
 ---
 
@@ -308,12 +331,13 @@ Pustaka open-source: FastAPI, Pydantic, Uvicorn, HTTPX, Pytest, Svelte 5, Vite, 
 | **Nama Produk** | Pramana |
 | **Framework / Frontend** | Svelte 5, Vite 5.4.x, Tailwind CSS 3 |
 | **Backend / Runtime** | Python 3.11+, FastAPI, Uvicorn |
-| **Database / Storage** | JSON korpus di memori (`corpus/bali_regulations.json`) |
+| **Database / Storage** | JSON korpus dan zone registry di memori (`corpus/bali_regulations.json`, `corpus/zones.json`); tidak ada database |
 | **Hosting / Deployment** | Belum ada deployment publik yang diverifikasi; jalankan secara lokal atau self-hosted |
-| **AI Model / API** | Gemini API opsional (`gemini-2.5-flash`) + retrieval deterministik + Layer-1/Layer-2 guard |
-| **Peran AI** | Menyusun ringkasan eksekutif (Mode 1) dan catatan konteks netral (Mode 2) dari entri korpus yang sudah lolos guard. Tanpa API key, ringkasan dibuat deterministik. |
+| **AI Model / API** | Gemini API opsional (`gemini-2.5-flash`) + retrieval deterministik + Layer-1/Layer-2 guard + template fallback |
+| **Peran AI** | Menyusun ringkasan eksekutif (Mode 1), catatan konteks netral (Mode 2), dan AI brief Smart Gate (Mode 3) dari entri korpus yang sudah lolos guard. Tanpa API key, ringkasan dibuat deterministik. |
+| **Phygital Interface** | URL record NFC NTAG213 / QR, Web Speech API (TTS). Tidak memakai Web NFC API dan tidak memverifikasi identitas. |
 | **Dataset** | Korpus kurasi manual dari sumber resmi; lihat bagian Sumber Data |
-| **Open-source Libraries** | `fastapi`, `pydantic`, `uvicorn`, `httpx`, `python-dotenv`, `pytest`, `svelte`, `vite`, `tailwindcss` |
+| **Open-source Libraries** | `fastapi`, `pydantic`, `uvicorn`, `httpx`, `python-dotenv`, `pytest`, `svelte`, `vite`, `tailwindcss`, `qrcode`, `lucide-svelte` |
 | **Template / Boilerplate** | Dibangun khusus, tanpa template komersial pihak ketiga |
 | **AI Coding Assistant** | Digunakan sebagai alat bantu pengembangan dan pengujian; arsitektur dan keputusan verifikasi tetap ditinjau manusia |
 | **Pre-existing Components** | Tidak ada komponen komersial pihak ketiga |
