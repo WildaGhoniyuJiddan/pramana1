@@ -558,10 +558,11 @@ class StrictRAGEngine:
             "You are the Pramana Smart Gate compliance guide at a Bali "
             "tourist site. Use ONLY the verified citations and evidence spans "
             "supplied by the user. Do not invent rules, article numbers, "
-            "sanctions, or fees. Return JSON with summary_id, summary_en, and "
-            "claims. Each claim must cite one citation_id and one or more "
-            "span_ids from that citation. Keep each summary to 2-3 sentences. "
-            "State that the original Indonesian legal text is authoritative."
+            "sanctions, or fees. Return JSON with summary_indonesian, "
+            "summary_english, and claims. Each claim must cite one citation_id "
+            "and one or more span_ids from that citation. Keep each summary to "
+            "2-3 sentences. State that the original Indonesian legal text is "
+            "authoritative."
         )
         user_prompt = (
             f"Zone ID: {raw_zone['id']}\n"
@@ -587,14 +588,33 @@ class StrictRAGEngine:
         selected_summary = (
             result["summary_id"] if lang == "id" else result["summary_en"]
         )
-        if result["ai_synthesis_status"] == "unavailable":
-            brief = (
-                "Ringkasan AI tidak tersedia. Gunakan checklist dan sitasi "
-                "terverifikasi di bawah."
-                if lang == "id"
-                else "AI summary is unavailable. Use the verified checklist "
-                "and citations below."
-            )
+        if result["ai_synthesis_status"] in {
+            "unavailable", "rejected", "abstain"
+        }:
+            if result["ai_synthesis_status"] == "rejected":
+                brief = (
+                    "Output AI ditolak oleh guard sitasi/span. Gunakan "
+                    "checklist dan sitasi terverifikasi di bawah."
+                    if lang == "id"
+                    else "The AI output was rejected by the citation/span "
+                    "guard. Use the verified checklist and citations below."
+                )
+            elif result["ai_synthesis_status"] == "abstain":
+                brief = (
+                    "AI memilih abstain karena permintaan tidak dapat dijawab "
+                    "aman dari bukti korpus."
+                    if lang == "id"
+                    else "AI abstained because the request cannot be safely "
+                    "answered from the corpus evidence."
+                )
+            else:
+                brief = (
+                    "Ringkasan AI tidak tersedia. Gunakan checklist dan sitasi "
+                    "terverifikasi di bawah."
+                    if lang == "id"
+                    else "AI summary is unavailable. Use the verified checklist "
+                    "and citations below."
+                )
         else:
             brief = selected_summary or (
                 fallback_id if lang == "id" else fallback_en
@@ -604,8 +624,16 @@ class StrictRAGEngine:
             "zone_id": zone_id,
             "language": lang,
             "brief": brief,
-            "brief_id": result["summary_id"] or fallback_id,
-            "brief_en": result["summary_en"] or fallback_en,
+            "brief_id": (
+                None if result["ai_synthesis_status"] in {
+                    "unavailable", "rejected", "abstain"
+                } else (result["summary_id"] or fallback_id)
+            ),
+            "brief_en": (
+                None if result["ai_synthesis_status"] in {
+                    "unavailable", "rejected", "abstain"
+                } else (result["summary_en"] or fallback_en)
+            ),
             "ai_engine": result["ai_engine"],
             "ai_synthesis_status": result["ai_synthesis_status"],
             "guard_status": result["guard_status"],
@@ -752,7 +780,8 @@ class StrictRAGEngine:
         )
         system_prompt = (
             "You are the Pramana Strict-RAG trip compliance engine. Return "
-            "JSON with summary_id, summary_en, and claims. Use ONLY the "
+            "JSON with summary_indonesian, summary_english, and claims. Use "
+            "ONLY the "
             "supplied citations and evidence spans. Each claim must cite one "
             "citation_id and one or more span_ids. Do not invent articles, "
             "sanctions, or fees. Mention the calendar status only when it is "
@@ -773,15 +802,36 @@ class StrictRAGEngine:
             fallback_summary_en=fallback_summary_en,
         )
 
-        if ai_result["ai_synthesis_status"] == "unavailable":
-            ai_synthesis = (
-                "Ringkasan AI tidak tersedia. Sitasi terverifikasi tetap "
-                "ditampilkan di bawah."
-            )
-            ai_synthesis_en = (
-                "AI summary is unavailable. The verified citations are still "
-                "shown below."
-            )
+        if ai_result["ai_synthesis_status"] in {
+            "unavailable", "rejected", "abstain"
+        }:
+            if ai_result["ai_synthesis_status"] == "rejected":
+                ai_synthesis = (
+                    "Output AI ditolak oleh guard sitasi/span. Sitasi "
+                    "terverifikasi tetap ditampilkan di bawah."
+                )
+                ai_synthesis_en = (
+                    "The AI output was rejected by the citation/span guard. "
+                    "The verified citations are still shown below."
+                )
+            elif ai_result["ai_synthesis_status"] == "abstain":
+                ai_synthesis = (
+                    "AI memilih abstain karena permintaan tidak dapat dijawab "
+                    "aman dari bukti korpus."
+                )
+                ai_synthesis_en = (
+                    "AI abstained because the request cannot be safely "
+                    "answered from the corpus evidence."
+                )
+            else:
+                ai_synthesis = (
+                    "Ringkasan AI tidak tersedia. Sitasi terverifikasi tetap "
+                    "ditampilkan di bawah."
+                )
+                ai_synthesis_en = (
+                    "AI summary is unavailable. The verified citations are "
+                    "still shown below."
+                )
         else:
             ai_synthesis = ai_result["summary_id"] or fallback_summary
             ai_synthesis_en = (
@@ -966,7 +1016,8 @@ class StrictRAGEngine:
         )
         system_prompt = (
             "You are the Pramana neutral legal-context writer (Strict-RAG). "
-            "Return JSON with summary_id, summary_en, and claims. Use ONLY the "
+            "Return JSON with summary_indonesian, summary_english, and "
+            "claims. Use ONLY the "
             "supplied citations and evidence spans. Each claim must cite one "
             "citation_id and one or more span_ids. Do not add facts, article "
             "numbers, or sanctions outside the evidence. The summary must be "
@@ -1017,6 +1068,40 @@ class StrictRAGEngine:
                 "copyable_comment": (
                     "Catatan Konteks (Pramana): Permintaan ini tidak dijawab "
                     "karena tidak aman atau tidak didukung bukti korpus."
+                ),
+                "disclaimer": DISCLAIMER,
+            }
+
+        if ai_result["ai_synthesis_status"] == "rejected":
+            rejected_text = (
+                "Output AI ditolak oleh guard sitasi/span. Pramana tidak "
+                "menampilkan klaim yang tidak didukung bukti korpus."
+            )
+            return {
+                "status": "TIDAK_DITEMUKAN",
+                "guard_status": "TIDAK_DITEMUKAN",
+                "ai_engine": ai_result["ai_engine"],
+                "ai_synthesis_status": "rejected",
+                "confidence": "TIDAK_DITEMUKAN",
+                "confidence_note": CONFIDENCE_NOTE,
+                "verification_scope": "corpus",
+                "masked_post": masked_text,
+                "pii_redacted_count": sum(pii_counts.values()),
+                "neutral_summary": rejected_text,
+                "neutral_summary_en": (
+                    "The AI output was rejected by the citation/span guard. "
+                    "Pramana will not display unsupported claims."
+                ),
+                "ai_claims": [],
+                "ai_rejected_claims": 0,
+                "ai_latency_ms": ai_result["latency_ms"],
+                "ai_model": ai_result["model"],
+                "ai_guard_status": ai_result["guard_status"],
+                "framing_markers": framing_markers,
+                "citations": [],
+                "copyable_comment": (
+                    "Catatan Konteks (Pramana): Output AI ditolak karena "
+                    "tidak didukung bukti korpus."
                 ),
                 "disclaimer": DISCLAIMER,
             }

@@ -49,6 +49,7 @@ def embed_text(text: str, task_type: str = "RETRIEVAL_QUERY") -> List[float]:
         "model": f"models/{GEMINI_EMBEDDING_MODEL}",
         "content": {"parts": [{"text": text}]},
         "taskType": task_type,
+        "outputDimensionality": 768,
     }
     with httpx.Client(timeout=15.0) as client:
         response = client.post(

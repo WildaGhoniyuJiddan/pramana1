@@ -125,6 +125,35 @@ def test_pipeline_rejects_hallucinated_article(citations, monkeypatch):
     assert "Pasal 999" not in (result["summary_id"] or "")
 
 
+def test_pipeline_rejects_unsupported_foreign_currency(citations, monkeypatch):
+    monkeypatch.setenv("AI_MODE", "optional")
+    span_index = build_span_index(citations)
+    span_id = next(iter(span_index))
+
+    parsed = {
+        "abstain": False,
+        "summary_id": "Turis wajib membayar 1000 dolar.",
+        "summary_en": "Tourists must pay 1000 dolar.",
+        "claims": [{
+            "claim_text_id": "Turis wajib membayar 1000 dolar.",
+            "claim_text_en": "Tourists must pay 1000 dolar.",
+            "citation_id": "PERDA_BALI_06_2023_LEVY",
+            "span_ids": [span_id],
+        }],
+    }
+
+    result = _pipeline(parsed).answer(
+        citations=citations,
+        system_prompt="test",
+        user_prompt="test",
+        fallback_summary="fallback",
+    )
+
+    assert result["ai_synthesis_status"] == "deterministic"
+    assert result["guard_status"] == "FALLBACK_GUARD"
+    assert "1000 dolar" not in (result["summary_id"] or "")
+
+
 def test_pipeline_supports_abstain(citations, monkeypatch):
     monkeypatch.setenv("AI_MODE", "required")
     parsed = {

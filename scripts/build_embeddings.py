@@ -38,9 +38,10 @@ def main() -> int:
         text = reg.get("text", "")
         if not text:
             continue
-        vectors[reg["id"]] = embed_text(
-            text, task_type="RETRIEVAL_DOCUMENT"
-        )
+        vectors[reg["id"]] = [
+            round(value, 6)
+            for value in embed_text(text, task_type="RETRIEVAL_DOCUMENT")
+        ]
         print(f"[{index}/{len(corpus.get_all())}] {reg['id']}")
         time.sleep(0.2)
 
