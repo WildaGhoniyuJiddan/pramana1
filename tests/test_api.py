@@ -311,3 +311,51 @@ def test_client_key_ignores_forwarded_header_by_default(monkeypatch):
 def test_client_key_uses_forwarded_header_when_trusted(monkeypatch):
     monkeypatch.setattr(main_module, "TRUST_PROXY_HEADERS", True)
     assert main_module._client_key(_request_with_forwarded_header()) == "198.51.100.7"
+
+
+def test_cors_preflight_accepts_vercel_origin():
+    response = client.options(
+        "/api/v1/trip-brief",
+        headers={
+            "Origin": "https://pramana1.vercel.app",
+            "Access-Control-Request-Method": "POST",
+            "Access-Control-Request-Headers": "content-type",
+        },
+    )
+    assert response.status_code == 200
+    assert response.headers.get("access-control-allow-origin") in {
+        "https://pramana1.vercel.app",
+        "*",
+    }
+
+
+def test_two_different_ips_have_independent_quotas(monkeypatch):
+    monkeypatch.setattr(main_module, "RATE_LIMIT_MAX_REQUESTS", 1)
+    monkeypatch.setattr(main_module, "RATE_LIMIT_WINDOW_SECONDS", 60)
+
+    ip1 = "192.0.2.1"
+    ip2 = "192.0.2.2"
+
+    assert main_module._allow_request(ip1) is True
+    assert main_module._allow_request(ip1) is False  # ip1 exhausted
+
+    # ip2 is unaffected
+    assert main_module._allow_request(ip2) is True
+    assert main_module._allow_request(ip2) is False
+
+
+def test_client_key_prefers_session_id_header():
+    req = Request(
+        {
+            "type": "http",
+            "method": "POST",
+            "path": "/api/v1/trip-brief",
+            "headers": [
+                (b"x-session-id", b"session-abc-123"),
+                (b"x-forwarded-for", b"198.51.100.7"),
+            ],
+            "client": ("203.0.113.5", 12345),
+        }
+    )
+    assert main_module._client_key(req) == "session:session-abc-123"
+

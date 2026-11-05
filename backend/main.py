@@ -39,7 +39,7 @@ RATE_LIMIT_POST_PREFIXES = ("/api/v1/totem/",)
 RATE_LIMIT_WINDOW_SECONDS = int(os.getenv("RATE_LIMIT_WINDOW_SECONDS", "60"))
 RATE_LIMIT_MAX_REQUESTS = int(os.getenv("RATE_LIMIT_MAX_REQUESTS", "60"))
 MAX_REQUEST_BODY_BYTES = int(os.getenv("MAX_REQUEST_BODY_BYTES", "65536"))
-TRUST_PROXY_HEADERS = os.getenv("TRUST_PROXY_HEADERS", "false").strip().lower() in {
+TRUST_PROXY_HEADERS = os.getenv("TRUST_PROXY_HEADERS", "true").strip().lower() in {
     "1", "true", "yes", "on",
 }
 
@@ -50,14 +50,17 @@ _rate_buckets: Dict[str, List[float]] = {}
 def _allowed_origins() -> List[str]:
     raw = os.getenv(
         "CORS_ALLOW_ORIGINS",
-        "http://localhost:5173,http://127.0.0.1:5173",
+        "http://localhost:5173,http://127.0.0.1:5173,https://pramana1.vercel.app",
     )
     return [origin.strip() for origin in raw.split(",") if origin.strip()]
 
 
 def _client_key(request: Request) -> str:
-    # Only trust proxy headers when the deployment explicitly enables it.
-    # Otherwise a client can spoof X-Forwarded-For to bypass the rate limit.
+    # 1. Client-provided session id header takes priority if present
+    session_id = request.headers.get("x-session-id", "").strip()
+    if session_id:
+        return f"session:{session_id}"
+    # 2. X-Forwarded-For when proxy headers trusted
     if TRUST_PROXY_HEADERS:
         forwarded = request.headers.get("x-forwarded-for", "")
         if forwarded:
