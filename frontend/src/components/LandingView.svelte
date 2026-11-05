@@ -249,9 +249,6 @@
               </span>
               <span class="font-mono text-xs font-bold" style="color: #0c249c;">/trip-brief</span>
             </div>
-            <span class="inline-block font-mono text-[9.5px] font-bold px-1.5 py-0.5" style="background-color: #fff3cd; color: #8a3b00; border: 1px solid #8a3b00;">
-              🟡 Prototype
-            </span>
             <h3 class="text-lg font-medium tracking-tight pt-1" style="color: #0a0a0a;">
               Rencana Perjalanan &amp; Kalender .ICS
             </h3>
@@ -288,9 +285,6 @@
               </span>
               <span class="font-mono text-xs font-bold" style="color: #0c249c;">/context-note</span>
             </div>
-            <span class="inline-block font-mono text-[9.5px] font-bold px-1.5 py-0.5" style="background-color: #fff3cd; color: #8a3b00; border: 1px solid #8a3b00;">
-              🟡 Prototype
-            </span>
             <h3 class="text-lg font-medium tracking-tight pt-1" style="color: #0a0a0a;">
               Verifikasi Klaim Insiden Viral
             </h3>
@@ -327,9 +321,6 @@
               </span>
               <span class="font-mono text-xs font-bold" style="color: #0a0a0a;">2026</span>
             </div>
-            <span class="inline-block font-mono text-[9.5px] font-bold px-1.5 py-0.5" style="background-color: #fff3cd; color: #8a3b00; border: 1px solid #8a3b00;">
-              🟡 Prototype
-            </span>
             <h3 class="text-lg font-medium tracking-tight pt-1" style="color: #0a0a0a;">
               Jadwal Deterministik Bali 2026
             </h3>

@@ -132,7 +132,7 @@
       class="px-6 sm:px-10 pb-6 text-[11px] leading-relaxed"
       style="background-color: #e6e4de; color: #5c5b57;"
     >
-      <strong>🟡 Prototype.</strong> Pramana adalah alat edukasi konteks aturan pariwisata berbasis korpus lokal. Keluaran sistem bukan nasihat hukum resmi dan tidak menggantikan teks peraturan pada JDIH atau instansi berwenang. Kutipan diverifikasi terhadap korpus Pramana, bukan diverifikasi ulang secara real-time ke JDIH.
+      <strong>Catatan:</strong> Pramana adalah sistem asistensi konteks aturan pariwisata berbasis korpus lokal. Keluaran sistem bukan nasihat hukum resmi dan tidak menggantikan teks peraturan pada JDIH atau instansi berwenang. Kutipan diverifikasi terhadap korpus Pramana, bukan verifikasi langsung real-time ke server JDIH.
     </div>
   </footer>
 
