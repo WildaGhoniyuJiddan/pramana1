@@ -1,6 +1,6 @@
 # Pramana Evaluation Results
 
-Generated: 2026-11-05T20:18:31.653284+00:00
+Generated: 2026-11-05T20:20:37.370543+00:00
 
 | Metric | Value |
 | :--- | :--- |
@@ -20,7 +20,7 @@ Generated: 2026-11-05T20:18:31.653284+00:00
 | citations_verified | 92 |
 | citation_validity | 1.0 |
 | latency_p50_ms | 0 |
-| latency_p95_ms | 1 |
+| latency_p95_ms | 2 |
 | ai_status_counts | {'deterministic': 39, 'abstain': 26} |
 | ai_mode | disabled |
 | ai_key_present | True |

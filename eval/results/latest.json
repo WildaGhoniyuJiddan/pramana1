@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-11-05T20:18:31.651645+00:00",
+  "generated_at": "2026-11-05T20:20:37.369560+00:00",
   "metrics": {
     "total_cases": 65,
     "passed": 65,
@@ -17,7 +17,7 @@
     "citations_verified": 92,
     "citation_validity": 1.0,
     "latency_p50_ms": 0,
-    "latency_p95_ms": 1,
+    "latency_p95_ms": 2,
     "ai_status_counts": {
       "deterministic": 39,
       "abstain": 26
@@ -61,7 +61,7 @@
       ],
       "forbidden_hits": [],
       "leaked_pii": [],
-      "latency_ms": 1
+      "latency_ms": 0
     },
     {
       "id": "tourism-03",
@@ -97,7 +97,7 @@
       ],
       "forbidden_hits": [],
       "leaked_pii": [],
-      "latency_ms": 1
+      "latency_ms": 0
     },
     {
       "id": "tourism-05",
@@ -115,7 +115,7 @@
       ],
       "forbidden_hits": [],
       "leaked_pii": [],
-      "latency_ms": 1
+      "latency_ms": 0
     },
     {
       "id": "tourism-06",
@@ -131,7 +131,7 @@
       ],
       "forbidden_hits": [],
       "leaked_pii": [],
-      "latency_ms": 1
+      "latency_ms": 0
     },
     {
       "id": "tourism-07",
@@ -185,7 +185,7 @@
       ],
       "forbidden_hits": [],
       "leaked_pii": [],
-      "latency_ms": 0
+      "latency_ms": 1
     },
     {
       "id": "tourism-10",
@@ -258,7 +258,7 @@
       ],
       "forbidden_hits": [],
       "leaked_pii": [],
-      "latency_ms": 2
+      "latency_ms": 1
     },
     {
       "id": "discourse-02",
@@ -276,7 +276,7 @@
       ],
       "forbidden_hits": [],
       "leaked_pii": [],
-      "latency_ms": 1
+      "latency_ms": 0
     },
     {
       "id": "discourse-03",
@@ -348,7 +348,7 @@
       ],
       "forbidden_hits": [],
       "leaked_pii": [],
-      "latency_ms": 1
+      "latency_ms": 0
     },
     {
       "id": "discourse-07",
@@ -569,7 +569,7 @@
       "expected_citation_ids": [],
       "forbidden_hits": [],
       "leaked_pii": [],
-      "latency_ms": 1
+      "latency_ms": 0
     },
     {
       "id": "pii-01",
@@ -651,7 +651,7 @@
       ],
       "forbidden_hits": [],
       "leaked_pii": [],
-      "latency_ms": 1
+      "latency_ms": 2
     },
     {
       "id": "en-scope-02",
@@ -669,7 +669,7 @@
       ],
       "forbidden_hits": [],
       "leaked_pii": [],
-      "latency_ms": 1
+      "latency_ms": 2
     },
     {
       "id": "en-scope-03",
@@ -738,7 +738,7 @@
       ],
       "forbidden_hits": [],
       "leaked_pii": [],
-      "latency_ms": 1
+      "latency_ms": 2
     },
     {
       "id": "en-scope-07",
@@ -755,7 +755,7 @@
       ],
       "forbidden_hits": [],
       "leaked_pii": [],
-      "latency_ms": 1
+      "latency_ms": 2
     },
     {
       "id": "en-scope-08",
@@ -773,7 +773,7 @@
       ],
       "forbidden_hits": [],
       "leaked_pii": [],
-      "latency_ms": 1
+      "latency_ms": 2
     },
     {
       "id": "en-scope-09",
@@ -809,7 +809,7 @@
       ],
       "forbidden_hits": [],
       "leaked_pii": [],
-      "latency_ms": 2
+      "latency_ms": 1
     },
     {
       "id": "en-scope-11",
@@ -828,7 +828,7 @@
       ],
       "forbidden_hits": [],
       "leaked_pii": [],
-      "latency_ms": 1
+      "latency_ms": 2
     },
     {
       "id": "en-scope-12",
@@ -845,7 +845,7 @@
       ],
       "forbidden_hits": [],
       "leaked_pii": [],
-      "latency_ms": 1
+      "latency_ms": 2
     },
     {
       "id": "en-scope-13",
@@ -899,7 +899,7 @@
       ],
       "forbidden_hits": [],
       "leaked_pii": [],
-      "latency_ms": 2
+      "latency_ms": 1
     },
     {
       "id": "en-out-01",
@@ -935,7 +935,7 @@
       "expected_citation_ids": [],
       "forbidden_hits": [],
       "leaked_pii": [],
-      "latency_ms": 0
+      "latency_ms": 1
     },
     {
       "id": "en-out-04",
