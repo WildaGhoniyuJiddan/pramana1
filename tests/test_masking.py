@@ -50,3 +50,20 @@ def test_clean_text_no_masking():
     masked, counts = mask_pii(text)
     assert masked == text
     assert sum(counts.values()) == 0
+
+
+def test_handle_masking():
+    text = 'Laporkan ke pihak berwajib akun @baliviral_news dan @tourist_guide.'
+    masked, counts = mask_pii(text)
+    assert '[HANDLE_DISAMARKAN]' in masked
+    assert '@baliviral_news' not in masked
+    assert counts['handle'] == 2
+
+
+def test_name_pattern_masking():
+    text = 'Halo nama saya Budi Santoso dan rekan saya My name is Sarah Connor.'
+    masked, counts = mask_pii(text)
+    assert '[NAMA_DISAMARKAN]' in masked
+    assert 'Budi Santoso' not in masked
+    assert 'Sarah Connor' not in masked
+    assert counts['name'] == 2
