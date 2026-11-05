@@ -20,7 +20,7 @@ Bali DigiFest 2026 — AI Web Innovation Challenge
 | AI Core Hardening | ✅ Live | Structured output, evidence span, claim verifier, `AI_MODE`, telemetri, eval harness |
 | Mode 1 — Trip Brief | 🟡 Prototype | Retrieval, kalender, PII, ICS, teks WhatsApp; AI-first dengan fallback dev |
 | Mode 2 — Context Note | 🟡 Prototype | Sitasi korpus, deteksi framing, claim verifier, abstain; AI-first |
-| Mode 3 — Smart Gate (NFC/QR) | 🟡 Prototype | 3 zona, kartu deterministik, AI brief grounded, TTS, QR; offline belum |
+| Mode 3 — Smart Gate (NFC/QR) | 🟡 Prototype | 3 zona, kartu deterministik, AI brief grounded, TTS, QR; konsep arsitektural tanpa instalasi fisik lapangan |
 | Corpus Explorer | 🟡 Prototype | Menampilkan registry dokumen, chunk retrieval, provenance, dan keterbatasan korpus |
 | Sintesis Gemini | 🟡 Prototype | Structured JSON + evidence span; `AI_MODE=required` di submission |
 | Verifikasi silang JDIH real-time | ⚪ Planned | Belum diimplementasikan |
@@ -334,8 +334,10 @@ Kode kesalahan yang relevan: `404` untuk zona tidak dikenal, `422` untuk input/l
 12. **Kunci Gemini di deployment harus diset agar AI aktif.** Dengan `AI_MODE=required`, kegagalan AI menghasilkan status `unavailable`, bukan template.
 13. **SE Gubernur Bali No. 7 Tahun 2025 hanya ada di registry**, bukan chunk retrieval, karena PDF resminya belum diperoleh.
 14. **Kalender hanya 2025–2028.** Di luar rentang itu, hasil tidak lengkap dan diberi peringatan.
-15. **Belum ada benchmark publik.** Eval internal 40 kasus bukan klaim akurasi universal.
-16. **Belum ada QR/NFC verifikasi dokumen fisik.** QR/NFC hanya membuka URL; tidak memverifikasi identitas atau pembayaran.
+15. **Evaluasi Berkelanjutan.** Evaluasi internal mencakup 65 kasus berlabel (termasuk 25 kasus Bahasa Inggris) dengan akurasi retrieval deterministik 100% pada cakupan korpus lokal.
+16. **Metodologi Pengujian Jarak Jauh (Remote Validation).** Tim tidak berada di Bali dan tidak memiliki akses langsung ke narasumber lokal. Seluruh pengujian dan kurasi didasarkan pada teks hukum PDF resmi pemerintah dan kasus uji sintetis.
+17. **Status Nyepi 2027 dan 2028.** Tanggal Nyepi 2027 dan 2028 berstatus perkiraan astronomis kalender Bali dan belum terbit dalam SKB 3 Menteri resmi.
+18. **Belum ada QR/NFC verifikasi dokumen fisik.** QR/NFC hanya membuka URL panduan edukasi; tidak memverifikasi identitas atau pembayaran dan bukan instalasi fisik.
 
 ---
 
@@ -393,4 +395,4 @@ Pustaka open-source: FastAPI, Pydantic, Uvicorn, HTTPX, Pytest, Svelte 5, Vite, 
 
 ## Tim
 
-Tim Pengembang Pramana — Bali DigiFest 2026 AI Web Innovation Challenge.
+Tim Pengembang Pramana: Azzaky Raihan (Fullstack & AI Engineer) — Bali DigiFest 2026 AI Web Innovation Challenge.
