@@ -6,6 +6,9 @@
   let { onOpenDoc = () => {} } = $props();
 
   let t = $derived(DICT[i18n.lang].trip);
+  let common = $derived(DICT[i18n.lang].common);
+  let presets = $derived(t.presets);
+
   let itineraryText = $state('');
   let startDate = $state('');
   let endDate = $state('');
@@ -19,96 +22,99 @@
   let activeRuleIdx = $state(0);
   let summaryLang = $derived(i18n.lang);
 
-  const PRESETS = [
-    {
-      label: '01 // Nyepi (18-21 Mar)',
-      start: '2026-03-18',
-      end: '2026-03-21',
-      origin: 'international',
-      text: 'Tiba di Bandara Ngurah Rai, menginap di Ubud tanggal 18 Maret 2026 sampai 21 Maret 2026. Berencana jalan-jalan ke Pura Saraswati dan sewa motor di jalan raya. Kode booking: GA4521 email: alex@travel.com.'
-    },
-    {
-      label: '02 // Kawasan Suci Pura',
-      start: '2026-06-10',
-      end: '2026-06-15',
-      origin: 'international',
-      text: 'Rencana tur spiritual mengunjungi Pura Besakih dan Pura Lempuyang, mendaki Gunung Agung, dan mengambil foto komersial menggunakan drone di area pelataran utama pura.'
-    },
-    {
-      label: '03 // Sewa Motor & Remote',
-      start: '2026-07-01',
-      end: '2026-07-20',
-      origin: 'international',
-      text: 'Tinggal di Canggu selama 3 minggu, menyewa motor bulanan dari perorangan tanpa plat nomor resmi, dan bekerja lepas sebagai web designer untuk klien luar negeri dari kafe lokal.'
-    }
+  const PRESET_DATES = [
+    { start: '2026-03-18', end: '2026-03-21', origin: 'international' },
+    { start: '2026-06-10', end: '2026-06-15', origin: 'international' },
+    { start: '2026-07-01', end: '2026-07-20', origin: 'international' }
   ];
 
+  $effect(() => {
+    const curr = presets[activePresetIdx];
+    if (curr && (!itineraryText || presets.some(p => p.text === itineraryText))) {
+      itineraryText = curr.text;
+    }
+  });
+
   function getShortTabLabel(item, idx) {
+    const isEn = i18n.lang === 'en';
     const cat = (item.category || '').toLowerCase();
     const num = `0${idx + 1}`;
-    if (cat.includes('pungutan') || cat.includes('levy')) return `${num} · Retribusi Wisman`;
-    if (cat.includes('kewajiban') || cat.includes("do's")) return `${num} · Etika Kawasan Suci`;
-    if (cat.includes('larangan') || cat.includes("don'ts")) return `${num} · Larangan Wisatawan`;
-    if (cat.includes('keimigrasian')) return `${num} · Izin Keimigrasian`;
-    if (cat.includes('nyepi')) return `${num} · Catur Brata Nyepi`;
-    if (cat.includes('lalu lintas') || cat.includes('angkutan')) return `${num} · Lalu Lintas & Motor`;
+    if (cat.includes('pungutan') || cat.includes('levy')) return `${num} · ${isEn ? 'Tourist Levy' : 'Retribusi Wisman'}`;
+    if (cat.includes('kewajiban') || cat.includes("do's")) return `${num} · ${isEn ? 'Sacred Area Etiquette' : 'Etika Kawasan Suci'}`;
+    if (cat.includes('larangan') || cat.includes("don'ts")) return `${num} · ${isEn ? 'Tourist Restrictions' : 'Larangan Wisatawan'}`;
+    if (cat.includes('keimigrasian')) return `${num} · ${isEn ? 'Immigration Rules' : 'Izin Keimigrasian'}`;
+    if (cat.includes('nyepi')) return `${num} · ${isEn ? 'Nyepi Observance' : 'Catur Brata Nyepi'}`;
+    if (cat.includes('lalu lintas') || cat.includes('angkutan')) return `${num} · ${isEn ? 'Traffic & Scooter' : 'Lalu Lintas & Motor'}`;
     return `${num} · ${item.category.split(' ')[0]}`;
   }
 
   function getHumanTitle(item) {
+    const isEn = i18n.lang === 'en';
     const cat = (item.category || '').toLowerCase();
     if (cat.includes('pungutan') || cat.includes('levy')) {
-      return 'Kewajiban Retribusi Wisatawan Asing Rp150.000 (Love Bali)';
+      return isEn
+        ? 'Foreign Tourist Levy Rp150,000 (Love Bali Mandatory)'
+        : 'Kewajiban Retribusi Wisatawan Asing Rp150.000 (Love Bali)';
     }
     if (cat.includes('kewajiban') || cat.includes("do's") || cat.includes('dos')) {
-      return 'Kewajiban Berbusana Adat/Sopan & Menghormati Kesucian Pura';
+      return isEn
+        ? 'Modest Dress & Sacred Temple Etiquette'
+        : 'Kewajiban Berbusana Adat/Sopan & Menghormati Kesucian Pura';
     }
     if (cat.includes('larangan') || cat.includes("don'ts") || cat.includes('donts')) {
-      return 'Larangan Memanjat Pohon Suci & Perilaku Menodai Kawasan Pura';
+      return isEn
+        ? 'Prohibition on Climbing Sacred Trees & Desecrating Temples'
+        : 'Larangan Memanjat Pohon Suci & Perilaku Menodai Kawasan Pura';
     }
     if (cat.includes('keimigrasian')) {
-      return 'Larangan Bekerja atau Berbisnis Ilegal dengan Visa Kunjungan';
+      return isEn
+        ? 'Prohibition on Illegal Employment on Tourist Visas'
+        : 'Larangan Bekerja atau Berbisnis Ilegal dengan Visa Kunjungan';
     }
     if (cat.includes('nyepi')) {
-      return 'Kepatuhan Catur Brata Penyepian (Penghentian Aktivitas 24 Jam)';
+      return isEn
+        ? 'Catur Brata Nyepi 24-Hour Islandwide Lockdown'
+        : 'Kepatuhan Catur Brata Penyepian (Penghentian Aktivitas 24 Jam)';
     }
     return item.title;
   }
 
   function getCompactnyepiRule(ruleName) {
+    const isEn = i18n.lang === 'en';
     const r = (ruleName || '').toLowerCase();
-    if (r.includes('geni')) return 'Tanpa api & cahaya luar';
-    if (r.includes('karya')) return 'Toko & kantor tutup total';
-    if (r.includes('lelungan')) return 'Wajib di dalam penginapan';
-    if (r.includes('lelanguan')) return 'Hening & tanpa hiburan';
+    if (r.includes('geni')) return isEn ? 'No fire or outdoor light' : 'Tanpa api & cahaya luar';
+    if (r.includes('karya')) return isEn ? 'All work and shops closed' : 'Toko & kantor tutup total';
+    if (r.includes('lelungan')) return isEn ? 'Remain inside lodgings' : 'Wajib di dalam penginapan';
+    if (r.includes('lelanguan')) return isEn ? 'Silence & no entertainment' : 'Hening & tanpa hiburan';
     return ruleName;
   }
 
   onMount(() => {
-    applyPreset(PRESETS[0], 0, true);
+    applyPreset(presets[0], 0, true);
   });
 
   function applyPreset(p, idx, autoRun = false) {
     activePresetIdx = idx;
     itineraryText = p.text;
-    startDate = p.start;
-    endDate = p.end;
-    travelerOrigin = p.origin;
+    const meta = PRESET_DATES[idx] || PRESET_DATES[0];
+    startDate = meta.start;
+    endDate = meta.end;
+    travelerOrigin = meta.origin;
     if (autoRun) handleSubmit();
   }
 
   async function handleSubmit(e) {
     if (e) e.preventDefault();
     if (!itineraryText.trim()) {
-      errorMsg = 'Masukkan rencana perjalanan Anda terlebih dahulu.';
+      errorMsg = i18n.lang === 'en' ? 'Please enter your travel plans.' : 'Masukkan rencana perjalanan Anda terlebih dahulu.';
       return;
     }
     if (!startDate) {
-      errorMsg = 'Tentukan tanggal tiba terlebih dahulu.';
+      errorMsg = i18n.lang === 'en' ? 'Please select an arrival date.' : 'Tentukan tanggal tiba terlebih dahulu.';
       return;
     }
     if (endDate && endDate < startDate) {
-      errorMsg = 'Tanggal pulang tidak boleh lebih awal dari tanggal tiba.';
+      errorMsg = i18n.lang === 'en' ? 'Departure date cannot be earlier than arrival date.' : 'Tanggal pulang tidak boleh lebih awal dari tanggal tiba.';
       return;
     }
     loading = true;
@@ -123,7 +129,7 @@
       });
       activeRuleIdx = 0;
     } catch (err) {
-      errorMsg = err.message || 'Gagal menyusun panduan perjalanan.';
+      errorMsg = err.message || (i18n.lang === 'en' ? 'Failed to generate trip brief.' : 'Gagal menyusun panduan perjalanan.');
     } finally {
       loading = false;
     }
@@ -201,7 +207,7 @@
 
       <!-- Preset Selector Buttons -->
       <div class="flex flex-wrap items-center gap-2">
-        {#each PRESETS as preset, idx}
+        {#each presets as preset, idx}
           <button
             type="button"
             onclick={() => applyPreset(preset, idx, true)}
@@ -226,7 +232,7 @@
         <div class="brutal-card p-5 sm:p-6 space-y-5" style="background-color: #f3f1eb;">
           <div class="flex items-center justify-between pb-3" style="border-bottom: 1px solid #cdc9be;">
             <span class="font-mono text-[10px] font-bold px-2 py-0.5" style="background-color: #dfd6c3; color: #0a0a0a; border: 1px solid #0a0a0a;">
-              PARAMETER RUTE
+              {t.inputSection}
             </span>
             <span class="font-mono text-[11px]" style="color: #5c5952;">PII Auto-Masking</span>
           </div>
@@ -356,25 +362,25 @@
 
             {#if result.ai_synthesis_status === 'llm'}
               <p class="text-[11px] font-mono" style="color: #8a3b00;">
-                Ringkasan AI tidak diverifikasi Layer-1. Hanya kutipan pasal yang diverifikasi terhadap korpus.
+                {common.llmNotice}
               </p>
             {:else if result.ai_synthesis_status === 'unavailable'}
               <p class="text-[11px] font-mono" style="color: #8a3b00;">
-                AI tidak tersedia. Sistem tidak menampilkan ringkasan template sebagai jawaban AI; sitasi terverifikasi tetap ditampilkan.
+                {common.unavailableNotice}
               </p>
             {:else if result.ai_synthesis_status === 'abstain'}
               <p class="text-[11px] font-mono" style="color: #8a3b00;">
-                AI memilih abstain karena permintaan tidak dapat dijawab aman dari bukti korpus.
+                {common.abstainNotice}
               </p>
             {:else}
               <p class="text-[11px] font-mono" style="color: #5c5952;">
-                Template deterministik dipakai karena AI_MODE=optional atau API key tidak tersedia.
+                {common.templateNotice}
               </p>
             {/if}
 
             {#if result.ai_claims?.length}
               <p class="font-mono text-[10px]" style="color: #0c249c;">
-                {result.ai_claims.length} klaim AI terverifikasi terhadap evidence span.
+                {result.ai_claims.length} claims verified against evidence span.
               </p>
             {/if}
 
@@ -393,12 +399,12 @@
 
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 text-[11px]">
               <div class="p-3" style="background-color: #ffffff; border: 1px solid #0a0a0a;">
-                <span class="font-mono font-bold block mb-1">TEKS TERSAMARKAN</span>
+                <span class="font-mono font-bold block mb-1">{common.maskedText.toUpperCase()}</span>
                 <span style="color: #3a3935;">{result.masked_itinerary}</span>
               </div>
               <div class="p-3" style="background-color: #ffffff; border: 1px solid #0a0a0a;">
-                <span class="font-mono font-bold block mb-1">PII DISAMARKAN</span>
-                <span style="color: #3a3935;">{result.pii_redacted_count} entitas</span>
+                <span class="font-mono font-bold block mb-1">{common.piiRedacted.toUpperCase()}</span>
+                <span style="color: #3a3935;">{result.pii_redacted_count} {common.entities}</span>
               </div>
             </div>
 
@@ -438,7 +444,7 @@
                   class="font-mono text-[10px] font-bold px-2 py-0.5"
                   style="background-color: #dfd6c3; color: #0a0a0a; border: 1px solid #0a0a0a;"
                 >
-                  PRIORITAS 01 // PERINGATAN KALENDER {sakaYearLabel().toUpperCase()}
+                  {t.priorityCalendar} {sakaYearLabel().toUpperCase()}
                 </span>
                 <span class="font-mono text-[11px] font-bold" style="color: #dfd6c3;">
                   {nyepi.date} · 06.00 WITA – 06.00 WITA
@@ -447,7 +453,7 @@
 
               <div class="space-y-1.5">
                 <h2 class="opero-h1 text-xl sm:text-2xl" style="color: #ffffff;">
-                  Jadwal Melewati <span class="opero-serif" style="color: #dfd6c3;">{nyepi.event_name}</span>
+                  {i18n.lang === 'en' ? 'Itinerary overlaps' : 'Jadwal Melewati'} <span class="opero-serif" style="color: #dfd6c3;">{nyepi.event_name}</span>
                 </h2>
                 <p class="text-xs leading-relaxed" style="color: rgba(255, 255, 255, 0.88);">
                   {nyepi.overlap_note}
@@ -475,23 +481,23 @@
             <div class="brutal-card p-5 flex items-center justify-between" style="background-color: #dfd6c3;">
               <div class="space-y-1">
                 <span class="font-mono text-[10px] font-bold px-2 py-0.5" style="background-color: #0c249c; color: #ffffff; border: 1px solid #0a0a0a;">
-                  STATUS KALENDER SAKA
+                  {i18n.lang === 'en' ? 'SAKA CALENDAR STATUS' : 'STATUS KALENDER SAKA'}
                 </span>
                 {#if result.calendar_conflicts?.events?.length}
                   <h2 class="text-base font-medium pt-1" style="color: #0a0a0a;">
-                    Ada {result.calendar_conflicts.events.length} peringatan budaya pada rentang ini
+                    {i18n.lang === 'en' ? `${result.calendar_conflicts.events.length} cultural advisories in this period` : `Ada ${result.calendar_conflicts.events.length} peringatan budaya pada rentang ini`}
                   </h2>
                   <p class="text-[11px] leading-snug" style="color: #3a3935;">
                     {result.calendar_conflicts.events.map((e) => e.name).join(' · ')}
                   </p>
                 {:else}
                   <h2 class="text-base font-medium pt-1" style="color: #0a0a0a;">
-                    Jadwal Perjalanan Normal ({formatDate(result.start_date)} s/d {formatDate(result.end_date)})
+                    {i18n.lang === 'en' ? `Normal Travel Schedule (${formatDate(result.start_date)} to ${formatDate(result.end_date)})` : `Jadwal Perjalanan Normal (${formatDate(result.start_date)} s/d ${formatDate(result.end_date)})`}
                   </h2>
                 {/if}
               </div>
               <span class="font-mono text-xs font-bold shrink-0" style="color: #0c249c;">
-                {result.calendar_conflicts?.events?.length ? 'CEK UPACARA' : 'TANPA PENUTUPAN'}
+                {result.calendar_conflicts?.events?.length ? (i18n.lang === 'en' ? 'CHECK CEREMONY' : 'CEK UPACARA') : (i18n.lang === 'en' ? 'NO CLOSURE' : 'TANPA PENUTUPAN')}
               </span>
             </div>
           {/if}
@@ -503,7 +509,7 @@
             <div class="flex flex-wrap items-center justify-between gap-3 pb-3.5" style="border-bottom: 1px solid #cdc9be;">
               <div>
                 <span class="font-mono text-[10px] font-bold px-2 py-0.5" style="background-color: #dfd6c3; color: #0a0a0a; border: 1px solid #0a0a0a;">
-                  02 // KETENTUAN HUKUM ({result.briefing_items.length} PASAL)
+                  {t.priorityLegal} ({result.briefing_items.length} {t.articlesLabel})
                 </span>
               </div>
 
@@ -518,7 +524,7 @@
                     <rect x="5.5" y="5.5" width="9" height="9" stroke="#0a0a0a" stroke-width="1.5" />
                     <path d="M12.5 5.5V3.5h-9v9h2" stroke="#0a0a0a" stroke-width="1.5" />
                   </svg>
-                  <span>{copySuccess ? 'Tersalin' : 'Salin Ringkasan'}</span>
+                  <span>{copySuccess ? common.copied : common.copySummary}</span>
                 </button>
               </div>
             </div>
@@ -563,7 +569,7 @@
                     class="font-mono text-[10px] font-bold px-2 py-0.5"
                     style="background-color: #ffffff; color: #0a0a0a; border: 1px solid #0a0a0a;"
                   >
-                    Status: {activeItem.status || 'Tidak dicatat'}
+                    Status: {activeItem.status || '-'}
                   </span>
                   <span
                     class="font-mono text-[10px] font-bold px-2 py-0.5"
@@ -572,8 +578,8 @@
                       : 'background-color: #fff3cd; color: #8a3b00; border: 1px solid #8a3b00;'}
                   >
                     {activeItem.text_status === 'compilation'
-                      ? 'Kompilasi pedoman, bukan kutipan pasal'
-                      : activeItem.is_verbatim ? 'Kutipan verbatim korpus' : 'Ringkasan, bukan kutipan verbatim'}
+                      ? common.compilationNotice
+                      : activeItem.is_verbatim ? common.verbatimNotice : common.summaryNotice}
                   </span>
                 </div>
 
@@ -591,12 +597,12 @@
                   {/if}
                   {#if activeItem.source_note}
                     <p class="text-[11px] leading-snug" style="color: #5c5952;">
-                      Catatan sumber: {activeItem.source_note}
+                      {activeItem.source_note}
                     </p>
                   {/if}
                   {#if activeItem.superseded_by}
                     <p class="text-[11px] leading-snug" style="color: #5c5952;">
-                      Disempurnakan oleh:
+                      {common.supersededBy}
                       {#if activeItem.superseded_by_url}
                         <a href={activeItem.superseded_by_url} target="_blank" rel="noopener noreferrer" class="underline" style="color: #0c249c;">
                           {activeItem.superseded_by}
@@ -614,7 +620,7 @@
                     style="background-color: #dfd6c3; border: 1px solid #0a0a0a; color: #0a0a0a;"
                   >
                     <span class="font-mono text-[10px] font-bold uppercase block">
-                      Ketentuan Sanksi &amp; Penegakan
+                      {common.penaltiesTitle}
                     </span>
                     <p class="leading-snug">{activeItem.penalties}</p>
                   </div>
@@ -622,7 +628,7 @@
 
                 <div class="pt-1 flex flex-wrap items-center justify-between gap-2">
                   <span class="font-mono text-[10px] truncate max-w-md" style="color: #5c5952;">
-                    Sumber: {activeItem.title}{#if activeItem.last_verified_date} · diverifikasi {formatDate(activeItem.last_verified_date)}{/if}
+                    Sumber: {activeItem.title}{#if activeItem.last_verified_date} · {formatDate(activeItem.last_verified_date)}{/if}
                   </span>
 
                   <button
@@ -632,7 +638,7 @@
                     class="brutal-press inline-flex items-center gap-2 text-xs font-medium cursor-pointer"
                   >
                     <span class="px-2.5 py-1 font-mono text-[11px]">
-                      {activeItem.is_verbatim ? 'Buka Naskah Verbatim' : 'Buka Ringkasan Sumber'}
+                      {activeItem.is_verbatim ? common.openOriginal : common.openSummary}
                     </span>
                     <span
                       style="background-color: #dfd6c3; color: #0a0a0a;"
@@ -667,7 +673,7 @@
                 <div>GUARD: <strong>{result.guard_status}</strong></div>
                 <div>CONFIDENCE: <strong>{result.confidence}</strong></div>
                 <div>SCOPE: <strong>{result.verification_scope || 'corpus'}</strong></div>
-                <div>PII MASKED: <strong>{result.pii_redacted_count} entitas</strong></div>
+                <div>PII MASKED: <strong>{result.pii_redacted_count} {common.entities}</strong></div>
               </div>
             {/if}
           </div>
@@ -676,7 +682,7 @@
             <div class="brutal-card p-6 sm:p-8 space-y-4" style="background-color: #dfd6c3;">
               <div class="flex flex-wrap items-center justify-between gap-2">
                 <span class="font-mono text-[10px] font-bold px-2 py-0.5" style="background-color: #0a0a0a; color: #ffffff;">
-                  LAYER-2 ABSTAIN // TIDAK_DITEMUKAN
+                  LAYER-2 ABSTAIN
                 </span>
                 <span class="font-mono text-xs font-bold" style="color: #8a3b00;">
                   {result.guard_status}
@@ -684,7 +690,7 @@
               </div>
 
               <h2 class="opero-h1 text-2xl sm:text-3xl">
-                Tidak Ada Aturan Spesifik di <span class="opero-serif">Korpus Pramana</span>
+                {t.abstainTitle}
               </h2>
 
               <p class="text-xs sm:text-sm leading-relaxed" style="color: #3a3935;">
@@ -692,7 +698,7 @@
               </p>
 
               <div class="p-3 bg-white font-mono text-[11px] leading-relaxed" style="border: 1.5px solid #0a0a0a;">
-                Pemeriksaan kalender tetap dijalankan. Peringatan Nyepi atau upacara budaya, jika ada, ditampilkan di atas. Tidak ada kutipan pasal yang dipaksakan.
+                {t.abstainDesc}
               </div>
             </div>
           {/if}
@@ -702,7 +708,7 @@
               class="p-3 text-[11px] leading-relaxed"
               style="background-color: #ffffff; border: 1px solid #0a0a0a; color: #3a3935;"
             >
-              <strong>Disclaimer:</strong> {result.disclaimer}
+              <strong>{common.disclaimer}</strong> {result.disclaimer}
             </div>
           {/if}
         {/if}

@@ -1,6 +1,9 @@
 <script>
   import { onMount } from 'svelte';
   import { fetchCorpus } from '../lib/api.js';
+  import { i18n, DICT } from '../lib/i18n.svelte.js';
+
+  let t = $derived(DICT[i18n.lang].corpus);
 
   let corpusData = $state(null);
   let loading = $state(true);
@@ -11,13 +14,13 @@
   let activeDoc = $state(null);
   let viewMode = $state('chunks');
 
-  const TIER_OPTIONS = [
-    { id: 'ALL', label: 'SEMUA' },
+  let tierOptions = $derived([
+    { id: 'ALL', label: i18n.lang === 'en' ? 'ALL' : 'SEMUA' },
     { id: '1A', label: 'T.1A // UU NASIONAL' },
     { id: '1B', label: 'T.1B // PERDA & PERGUB' },
     { id: '2', label: 'T.2 // SE & PEDOMAN' },
     { id: '3', label: 'T.3 // NORMA ADAT' }
-  ];
+  ]);
 
   const TEXT_STATUS_LABELS = {
     verbatim: 'VERBATIM',
@@ -134,12 +137,15 @@
           >
             03
           </span>
-          <span class="px-3 py-0.5 text-[11px] font-semibold">Statutory Corpus Index</span>
+          <span class="px-3 py-0.5 text-[11px] font-semibold">{t.badge}</span>
         </div>
 
         <h1 class="opero-h1 text-[30px] sm:text-[42px]">
-          Indeks <span class="opero-serif">Korpus Hukum</span> Pramana
+          {t.title}
         </h1>
+        <p class="text-xs sm:text-[13px] mt-1 max-w-xl" style="color: #4a4740;">
+          {t.subtitle}
+        </p>
       </div>
 
       <!-- Search & Tier Filter -->
@@ -147,12 +153,12 @@
         <input
           type="search"
           bind:value={searchQuery}
-          placeholder="Cari pasal, kata kunci..."
+          placeholder={t.searchPlaceholder}
           style="background-color: #ffffff; color: #0a0a0a; border: 1.5px solid #0a0a0a;"
           class="px-3 py-1.5 text-xs font-mono focus:outline-none w-56"
         />
 
-        {#each TIER_OPTIONS as opt}
+        {#each tierOptions as opt}
           <button
             type="button"
             onclick={() => (selectedTier = opt.id)}
@@ -172,7 +178,7 @@
   <section class="px-5 sm:px-10 py-6 sm:py-8">
     {#if loading}
       <div class="p-12 text-center font-mono text-xs" style="color: #5c5952;">
-        Memuat indeks korpus regulasi...
+        {t.loading}
       </div>
     {:else if errorMsg}
       <div class="brutal-card p-6 space-y-3" style="background-color: #ffffff; border-color: #c92a2a;">

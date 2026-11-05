@@ -1,4 +1,6 @@
 <script>
+  import { i18n } from '../lib/i18n.svelte.js';
+
   let { item = null, onClose = () => {} } = $props();
 
   const TEXT_STATUS_LABELS = {
@@ -57,20 +59,20 @@
             class="font-mono text-[10px] uppercase px-2 py-0.5 font-medium"
             style="background-color: #0c249c; color: #ffffff;"
           >
-            Tingkat {item.tier || '1B'} · {item.tier_label || 'Regulasi'}
+            {i18n.lang === 'en' ? 'Tier' : 'Tingkat'} {item.tier || '1B'} · {item.tier_label || (i18n.lang === 'en' ? 'Statute' : 'Regulasi')}
           </span>
           <h3 class="text-base font-medium mt-1.5" style="color: #0a0a0a;">
-            {item.pasal || 'Naskah Regulasi'}
+            {item.pasal || (i18n.lang === 'en' ? 'Statutory Text' : 'Naskah Regulasi')}
           </h3>
         </div>
 
         <button
           type="button"
           onclick={onClose}
-          class="px-3 py-1 border font-mono text-xs transition-colors"
+          class="px-3 py-1 border font-mono text-xs transition-colors cursor-pointer"
           style="background-color: #ffffff; border-color: #c8c4ba; color: #0a0a0a;"
         >
-          TUTUP [ESC]
+          {i18n.lang === 'en' ? 'CLOSE [ESC]' : 'TUTUP [ESC]'}
         </button>
       </div>
 
@@ -78,7 +80,7 @@
       <div class="p-6 overflow-y-auto flex-1 space-y-6" style="background-color: #ffffff;">
         <div class="pb-4 border-b space-y-2" style="border-color: #c8c4ba;">
           <span class="font-mono text-[10px] uppercase tracking-wider block" style="color: #5c5b57;">
-            Nomenklatur Peraturan Resmi
+            {i18n.lang === 'en' ? 'Official Statute Title' : 'Nomenklatur Peraturan Resmi'}
           </span>
           <p class="text-sm font-medium leading-snug" style="color: #0a0a0a;">
             {item.title || item.official_doc_title}
@@ -102,7 +104,7 @@
             {/if}
             {#if item.last_verified_date}
               <span class="font-mono text-[10px] font-bold px-2 py-0.5" style="background-color: #ffffff; color: #5c5952; border: 1px solid #cdc9be;">
-                Diverifikasi {item.last_verified_date}
+                {i18n.lang === 'en' ? 'Verified' : 'Diverifikasi'} {item.last_verified_date}
               </span>
             {/if}
           </div>
@@ -110,16 +112,16 @@
             <p class="text-[11px] leading-snug" style="color: #8a3b00;">{item.status_note}</p>
           {/if}
           {#if item.source_note}
-            <p class="text-[11px] leading-snug" style="color: #5c5952;">Catatan sumber: {item.source_note}</p>
+            <p class="text-[11px] leading-snug" style="color: #5c5952;">{i18n.lang === 'en' ? 'Source note:' : 'Catatan sumber:'} {item.source_note}</p>
           {/if}
           {#if item.source_type}
             <p class="font-mono text-[10px] leading-snug" style="color: #5c5952;">
-              Jenis sumber: {item.source_type}
+              {i18n.lang === 'en' ? 'Source type:' : 'Jenis sumber:'} {item.source_type}
             </p>
           {/if}
           {#if item.superseded_by}
             <p class="text-[11px] leading-snug" style="color: #5c5952;">
-              Disempurnakan oleh:
+              {i18n.lang === 'en' ? 'Superseded by:' : 'Disempurnakan oleh:'}
               {#if item.superseded_by_url}
                 <a href={item.superseded_by_url} target="_blank" rel="noopener noreferrer" class="underline" style="color: #0c249c;">
                   {item.superseded_by}
@@ -133,7 +135,9 @@
 
         <div>
           <span class="font-mono text-[10px] uppercase tracking-wider block mb-2" style="color: #5c5b57;">
-            {item.is_verbatim === false ? 'Ringkasan Tersimpan (Bukan Kutipan Verbatim)' : 'Teks Tersimpan (Rujukan Layer-1 Korpus)'}
+            {item.is_verbatim === false 
+              ? (i18n.lang === 'en' ? 'Stored Summary (Non-Verbatim Guidance)' : 'Ringkasan Tersimpan (Bukan Kutipan Verbatim)') 
+              : (i18n.lang === 'en' ? 'Verified Stored Text (Layer-1 Corpus Reference)' : 'Teks Tersimpan (Rujukan Layer-1 Korpus)')}
           </span>
           <div
             class="p-5 border text-xs sm:text-sm leading-relaxed font-mono whitespace-pre-line"
