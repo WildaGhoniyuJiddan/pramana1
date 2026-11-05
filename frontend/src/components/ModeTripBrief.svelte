@@ -1,9 +1,11 @@
 <script>
   import { onMount } from 'svelte';
   import { requestTripBrief } from '../lib/api.js';
+  import { i18n, DICT } from '../lib/i18n.svelte.js';
 
   let { onOpenDoc = () => {} } = $props();
 
+  let t = $derived(DICT[i18n.lang].trip);
   let itineraryText = $state('');
   let startDate = $state('');
   let endDate = $state('');
@@ -15,7 +17,7 @@
   let showTechAudit = $state(false);
   let activePresetIdx = $state(0);
   let activeRuleIdx = $state(0);
-  let summaryLang = $state('id');
+  let summaryLang = $derived(i18n.lang);
 
   const PRESETS = [
     {
@@ -189,11 +191,11 @@
           >
             01
           </span>
-          <span class="px-3 py-0.5 text-[11px] font-semibold">Preventive Trip Brief</span>
+          <span class="px-3 py-0.5 text-[11px] font-semibold">{t.badge}</span>
         </div>
 
         <h1 class="opero-h1 text-[30px] sm:text-[42px]">
-          Panduan <span class="opero-serif">Kepatuhan Rute</span> &amp; Kalender Bali
+          {t.title}
         </h1>
       </div>
 
@@ -232,13 +234,13 @@
           <form onsubmit={handleSubmit} class="space-y-4">
             <div>
               <label for="itinerary" class="block text-xs font-semibold mb-1.5" style="color: #0a0a0a;">
-                Rencana Aktivitas &amp; Tujuan Kunjungan
+                {t.inputLabel}
               </label>
               <textarea
                 id="itinerary"
                 bind:value={itineraryText}
                 rows="4"
-                placeholder="Tulis rencana perjalanan, destinasi pura, sewa kendaraan, atau jadwal tiba..."
+                placeholder={t.placeholder}
                 style="background-color: #ffffff; color: #0a0a0a; border: 1.5px solid #0a0a0a;"
                 class="w-full p-3 text-xs sm:text-[13px] focus:outline-none leading-relaxed"
               ></textarea>
@@ -247,7 +249,7 @@
             <div class="grid grid-cols-2 gap-3">
               <div>
                 <label for="start-date" class="block text-xs font-semibold mb-1" style="color: #0a0a0a;">
-                  Tanggal Tiba
+                  {t.startDate}
                 </label>
                 <input
                   id="start-date"
@@ -260,7 +262,7 @@
 
               <div>
                 <label for="end-date" class="block text-xs font-semibold mb-1" style="color: #0a0a0a;">
-                  Tanggal Pulang
+                  {t.endDate}
                 </label>
                 <input
                   id="end-date"
@@ -274,7 +276,7 @@
 
             <div>
               <label for="traveler-origin" class="block text-xs font-semibold mb-1" style="color: #0a0a0a;">
-                Kategori Wisatawan
+                {t.travelerType}
               </label>
               <select
                 id="traveler-origin"
@@ -282,8 +284,8 @@
                 style="background-color: #ffffff; color: #0a0a0a; border: 1.5px solid #0a0a0a;"
                 class="w-full px-3 py-2 text-xs font-medium"
               >
-                <option value="international">Wisatawan Mancanegara / WNA (Wajib Love Bali Rp150.000)</option>
-                <option value="domestic">Wisatawan Nusantara / WNI (Bebas Pungutan Wisman)</option>
+                <option value="international">{t.typeInt}</option>
+                <option value="domestic">{t.typeDom}</option>
               </select>
             </div>
 
@@ -300,7 +302,7 @@
               class="opero-split-btn brutal-press w-full inline-flex items-center justify-between text-xs font-medium cursor-pointer disabled:opacity-50"
             >
               <span class="px-4 py-2 font-semibold">
-                {loading ? 'Memeriksa Korpus Pramana...' : 'Susun Panduan Kepatuhan'}
+                {loading ? t.loadingBtn : t.submitBtn}
               </span>
               <span
                 style="background-color: #dfd8c8; color: #0a0a0a;"
@@ -318,7 +320,7 @@
               <path d="M6 8V5.5a3 3 0 0 1 6 0V8" stroke="#0a0a0a" stroke-width="1.5" />
             </svg>
             <span class="leading-snug">
-              Data reservasi (email, nomor paspor, kode booking) disamarkan otomatis sebelum analisis.
+              {t.privacyNote}
             </span>
           </div>
         </div>
@@ -344,36 +346,12 @@
               </span>
             </div>
 
-            <div class="flex flex-wrap items-start justify-between gap-2">
-              <p class="text-xs sm:text-[13px] leading-relaxed flex-1" style="color: #0a0a0a;">
+            <div>
+              <p class="text-xs sm:text-[13px] leading-relaxed" style="color: #0a0a0a;">
                 {summaryLang === 'en' && result.ai_synthesis_en
                   ? result.ai_synthesis_en
                   : result.ai_synthesis}
               </p>
-              {#if result.ai_synthesis_en}
-                <div class="flex gap-1 shrink-0">
-                  <button
-                    type="button"
-                    onclick={() => (summaryLang = 'id')}
-                    class="brutal-press px-2 py-0.5 font-mono text-[9px] font-bold cursor-pointer"
-                    style={summaryLang === 'id'
-                      ? 'background-color: #0c249c; color: #ffffff; border: 1px solid #0a0a0a;'
-                      : 'background-color: #ffffff; color: #0a0a0a; border: 1px solid #0a0a0a;'}
-                  >
-                    ID
-                  </button>
-                  <button
-                    type="button"
-                    onclick={() => (summaryLang = 'en')}
-                    class="brutal-press px-2 py-0.5 font-mono text-[9px] font-bold cursor-pointer"
-                    style={summaryLang === 'en'
-                      ? 'background-color: #0c249c; color: #ffffff; border: 1px solid #0a0a0a;'
-                      : 'background-color: #ffffff; color: #0a0a0a; border: 1px solid #0a0a0a;'}
-                  >
-                    EN
-                  </button>
-                </div>
-              {/if}
             </div>
 
             {#if result.ai_synthesis_status === 'llm'}
@@ -435,7 +413,7 @@
                   <rect x="2.5" y="3.5" width="13" height="11" stroke="#ffffff" stroke-width="1.5" />
                   <path d="M2.5 7.5h13M6 2v3M12 2v3" stroke="#ffffff" stroke-width="1.5" />
                 </svg>
-                <span>Unduh Kalender .ICS</span>
+                <span>{t.downloadIcs}</span>
               </button>
               {#if travelerOrigin === 'international'}
                 <a
@@ -445,7 +423,7 @@
                   style="background-color: #dfd6c3; color: #0a0a0a; border: 1.5px solid #0a0a0a; box-shadow: 2px 2px 0px #0a0a0a;"
                   class="brutal-press px-3 py-1.5 font-mono text-[11px] font-bold inline-flex items-center gap-1.5 cursor-pointer"
                 >
-                  <span>Portal Resmi Love Bali (Rp150k) ↗</span>
+                  <span>{t.loveBaliLink}</span>
                 </a>
               {/if}
             </div>

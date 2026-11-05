@@ -1,9 +1,11 @@
 <script>
   import { onMount } from 'svelte';
   import { requestContextNote } from '../lib/api.js';
+  import { i18n, DICT } from '../lib/i18n.svelte.js';
 
   let { onOpenDoc = () => {} } = $props();
 
+  let t = $derived(DICT[i18n.lang].context);
   let postContent = $state('');
   let loading = $state(false);
   let errorMsg = $state('');
@@ -12,7 +14,7 @@
   let activePresetIdx = $state(0);
   let activeCiteIdx = $state(0);
   let showTechAudit = $state(false);
-  let summaryLang = $state('id');
+  let summaryLang = $derived(i18n.lang);
 
   const PRESETS = [
     {
@@ -99,11 +101,11 @@
           >
             02
           </span>
-          <span class="px-3 py-0.5 text-[11px] font-semibold">Public Context Verifier</span>
+          <span class="px-3 py-0.5 text-[11px] font-semibold">{t.badge}</span>
         </div>
 
         <h1 class="opero-h1 text-[30px] sm:text-[42px]">
-          Verifikasi <span class="opero-serif">Klaim Insiden</span> &amp; Rujukan Pasal
+          {t.title}
         </h1>
       </div>
 
@@ -142,13 +144,13 @@
           <form onsubmit={handleSubmit} class="space-y-4">
             <div>
               <label for="post-content" class="block text-xs font-semibold mb-1.5" style="color: #0a0a0a;">
-                Teks Unggahan atau Klaim Pelanggaran
+                {t.inputLabel}
               </label>
               <textarea
                 id="post-content"
                 bind:value={postContent}
                 rows="5"
-                placeholder="Tempel teks unggahan media sosial, keluhan warga, atau klaim pelanggaran aturan di sini..."
+                placeholder={t.placeholder}
                 style="background-color: #ffffff; color: #0a0a0a; border: 1.5px solid #0a0a0a;"
                 class="w-full p-3 text-xs sm:text-[13px] focus:outline-none leading-relaxed"
               ></textarea>
@@ -167,7 +169,7 @@
               class="opero-split-btn brutal-press w-full inline-flex items-center justify-between text-xs font-medium cursor-pointer disabled:opacity-50"
             >
               <span class="px-4 py-2 font-semibold">
-                {loading ? 'Mencocokkan Korpus Pramana...' : 'Uji Klaim & Susun Konteks'}
+                {loading ? t.loadingBtn : t.submitBtn}
               </span>
               <span
                 style="background-color: #dfd8c8; color: #0a0a0a;"
@@ -270,36 +272,12 @@
                 {/if}
               </div>
 
-              <div class="flex flex-wrap items-start justify-between gap-2">
-                <p class="text-sm sm:text-base leading-relaxed font-normal flex-1" style="color: #ffffff;">
+              <div>
+                <p class="text-sm sm:text-base leading-relaxed font-normal" style="color: #ffffff;">
                   {summaryLang === 'en' && result.neutral_summary_en
                     ? result.neutral_summary_en
                     : result.neutral_summary}
                 </p>
-                {#if result.neutral_summary_en}
-                  <div class="flex gap-1 shrink-0">
-                    <button
-                      type="button"
-                      onclick={() => (summaryLang = 'id')}
-                      class="brutal-press px-2 py-0.5 font-mono text-[9px] font-bold cursor-pointer"
-                      style={summaryLang === 'id'
-                        ? 'background-color: #dfd6c3; color: #0a0a0a; border: 1px solid #0a0a0a;'
-                        : 'background-color: #ffffff; color: #0a0a0a; border: 1px solid #0a0a0a;'}
-                    >
-                      ID
-                    </button>
-                    <button
-                      type="button"
-                      onclick={() => (summaryLang = 'en')}
-                      class="brutal-press px-2 py-0.5 font-mono text-[9px] font-bold cursor-pointer"
-                      style={summaryLang === 'en'
-                        ? 'background-color: #dfd6c3; color: #0a0a0a; border: 1px solid #0a0a0a;'
-                        : 'background-color: #ffffff; color: #0a0a0a; border: 1px solid #0a0a0a;'}
-                    >
-                      EN
-                    </button>
-                  </div>
-                {/if}
               </div>
 
               {#if result.ai_synthesis_status === 'llm'}

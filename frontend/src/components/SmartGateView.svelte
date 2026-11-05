@@ -1,6 +1,7 @@
 <script>
   import { onMount, onDestroy } from 'svelte';
   import { fetchZones, fetchTotem, requestTotemBrief } from '../lib/api.js';
+  import { i18n } from '../lib/i18n.svelte.js';
   import QrCode from './QrCode.svelte';
   import GateScannerModal from './GateScannerModal.svelte';
 
@@ -137,7 +138,7 @@
     public_area: { id: 'Ruang Publik', en: 'Public Space' }
   };
 
-  let lang = $state(detectLanguage());
+  let lang = $derived(i18n.lang);
   let zones = $state([]);
   let card = $state(null);
   let loading = $state(true);
@@ -153,12 +154,6 @@
   let briefSeq = 0;
 
   let t = $derived(UI_TEXT[lang]);
-
-  function detectLanguage() {
-    if (typeof navigator === 'undefined') return 'id';
-    const code = (navigator.language || 'id').toLowerCase();
-    return code.startsWith('id') ? 'id' : 'en';
-  }
 
   function categoryLabel(category) {
     return CATEGORY_LABELS[category]?.[lang] || category;
@@ -299,13 +294,6 @@
     }
   }
 
-  function changeLanguage(next) {
-    if (next === lang) return;
-    lang = next;
-    stopSpeaking();
-    if (zoneId) loadCard();
-  }
-
   function openZone(id) {
     navigate(`/totem/${id}`);
   }
@@ -345,8 +333,10 @@
     speaking = false;
   }
 
-  onMount(() => {
-    if (zoneId) {
+  $effect(() => {
+    const _lang = i18n.lang;
+    const _zone = zoneId;
+    if (_zone) {
       loadCard();
     } else {
       loadZoneList();
@@ -390,26 +380,6 @@
       </div>
 
       <div class="flex flex-wrap items-center gap-2">
-        <button
-          type="button"
-          onclick={() => changeLanguage('id')}
-          style={lang === 'id'
-            ? 'background-color: #0c249c; color: #ffffff; border: 1.5px solid #0a0a0a; box-shadow: 2px 2px 0px #0a0a0a;'
-            : 'background-color: #ffffff; color: #0a0a0a; border: 1.5px solid #0a0a0a;'}
-          class="brutal-press px-3 py-1.5 font-mono text-[11px] font-bold cursor-pointer"
-        >
-          ID
-        </button>
-        <button
-          type="button"
-          onclick={() => changeLanguage('en')}
-          style={lang === 'en'
-            ? 'background-color: #0c249c; color: #ffffff; border: 1.5px solid #0a0a0a; box-shadow: 2px 2px 0px #0a0a0a;'
-            : 'background-color: #ffffff; color: #0a0a0a; border: 1.5px solid #0a0a0a;'}
-          class="brutal-press px-3 py-1.5 font-mono text-[11px] font-bold cursor-pointer"
-        >
-          EN
-        </button>
         <button
           type="button"
           onclick={() => showScanner = true}

@@ -1,23 +1,26 @@
 <script>
+  import { i18n, DICT } from '../lib/i18n.svelte.js';
+
   let { currentPath = '/', navigate = (p) => {}, overlay = false } = $props();
 
   let scrollY = $state(0);
   let isScrolled = $derived(scrollY > 15);
 
-  const NAV_ITEMS = [
-    { path: '/', label: 'Home' },
-    { path: '/trip-brief', label: 'Trip Brief' },
-    { path: '/context-note', label: 'Context Note' },
-    { path: '/totem', label: 'Gate' },
-    { path: '/corpus', label: 'Korpus' },
-    { path: '/settings', label: 'Pengaturan' }
-  ];
+  let nav = $derived(DICT[i18n.lang].nav);
 
-  function isActive(item) {
-    if (item.path === '/totem') {
+  let navItems = $derived([
+    { path: '/', label: nav.home },
+    { path: '/trip-brief', label: nav.tripBrief },
+    { path: '/context-note', label: nav.contextNote },
+    { path: '/totem', label: nav.gate },
+    { path: '/corpus', label: nav.corpus }
+  ]);
+
+  function isActive(path) {
+    if (path === '/totem') {
       return currentPath === '/totem' || currentPath.startsWith('/totem/');
     }
-    return currentPath === item.path;
+    return currentPath === path;
   }
 </script>
 
@@ -60,16 +63,30 @@
     </a>
 
     <div class="flex items-center gap-3 sm:gap-5 text-[11px] sm:text-[12px] font-medium">
-      {#each NAV_ITEMS as item}
+      {#each navItems as item}
         <a
           href={item.path}
           onclick={(e) => { e.preventDefault(); navigate(item.path); }}
-          style={isActive(item) ? 'color: #0c249c; font-weight: 600;' : 'color: #3a3935;'}
+          style={isActive(item.path) ? 'color: #0c249c; font-weight: 600;' : 'color: #3a3935;'}
           class="hover:opacity-70 transition-opacity whitespace-nowrap"
         >
           {item.label}
         </a>
       {/each}
+
+      <a
+        href="/settings"
+        onclick={(e) => { e.preventDefault(); navigate('/settings'); }}
+        style={currentPath === '/settings' ? 'color: #0c249c;' : 'color: #5c5952;'}
+        class="hover:opacity-70 transition-opacity p-1 flex items-center justify-center cursor-pointer"
+        title={nav.settings}
+        aria-label="Settings"
+      >
+        <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="3"></circle>
+          <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+        </svg>
+      </a>
     </div>
 
     <button
