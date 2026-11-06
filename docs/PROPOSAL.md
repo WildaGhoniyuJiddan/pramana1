@@ -38,14 +38,14 @@ Sebagai destinasi pariwisata utama dunia, Bali menghadapi tantangan krusial pada
 
 ## 4. AI Implementation
 
-- **Metode & Model AI:** Arsitektur hibrida yang menggabungkan **Google Gemini API (`gemini-2.5-flash`, `temperature=0.1`)**, **Deterministic Legal Retriever**, **Dual-Layer Verifier**, dan **Regex PII Masking**.
+- **Metode & Model AI:** Arsitektur hibrida yang menggabungkan **Google Gemini API (`gemini-3.5-flash`, `temperature=0.1`)**, **Deterministic Legal Retriever**, **Dual-Layer Verifier**, dan **Regex PII Masking**.
 - **Input:**
   - *Mode 1:* Teks rencana perjalanan/booking, tanggal mulai & selesai, status wisatawan (WNA/WNI).
   - *Mode 2:* Teks klaim insiden atau keterangan unggahan media sosial.
 - **Proses & Alasan AI Diperlukan:**
   1. *PII Masking (`ocr_masking.py`):* Menyamarkan email, telepon, paspor, kartu kredit, dan kode booking sebelum teks menyentuh model AI.
   2. *Retrieval & Layer-2 Abstain Guard (`corpus_loader.py` & `verifier.py`):* Menyeleksi pasal relevan dari korpus dan memblokir pemanggilan LLM jika tidak ada bukti hukum yang cukup.
-  3. *Constrained LLM Synthesis (`rag_engine.py`):* Gemini 2.5 Flash menyusun sintesis ringkas yang mudah dipahami pengguna namun terikat ketat (*grounded*) hanya pada teks pasal yang lolos seleksi. Dilengkapi *deterministic fallback* agar sistem tetap berfungsi dengan ringkasan lokal apabila API eksternal tidak tersedia.
+  3. *Constrained LLM Synthesis (`rag_engine.py`):* Gemini 3.5 Flash menyusun sintesis ringkas yang mudah dipahami pengguna namun terikat ketat (*grounded*) hanya pada teks pasal yang lolos seleksi. Dilengkapi *deterministic fallback* agar sistem tetap berfungsi dengan ringkasan lokal apabila API eksternal tidak tersedia.
   4. *Layer-1 Local Corpus Match (`verifier.py`):* Memvalidasi bahwa kutipan pasal yang ditampilkan ada di dalam teks entri korpus lokal setelah normalisasi spasi. Ini bukan verifikasi ulang karakter-demi-karakter terhadap dokumen JDIH secara real-time.
 - **Output:** Ringkasan kepatuhan rute, peringatan kalender Nyepi, pendeteksi *framing* emosional, kutipan pasal dari korpus (verbatim hanya untuk entri yang ditandai), komentar siap salin, dan berkas kalender `.ics`.
 
@@ -77,7 +77,7 @@ Sebagai destinasi pariwisata utama dunia, Bali menghadapi tantangan krusial pada
       ├──► 2. Balinese Calendar Service (calendar_service.py -> Nyepi/Pawukon + .ics)
       ├──► 3. Legal Corpus Manager (corpus_loader.py -> corpus/bali_regulations.json)
       ├──► 4. Dual-Layer Verifier (verifier.py -> Layer-1 Exact Match & Layer-2 Abstain)
-      └──► 5. Strict-RAG AI Engine (rag_engine.py -> Gemini 2.5 Flash API + Fallback)
+      └──► 5. Strict-RAG AI Engine (rag_engine.py -> Gemini 3.5 Flash API + Fallback)
       │
       ▼
 [Verified Response -> UI Cards, Corpus Statute Drawer, WhatsApp Copy, & .ics Download]
@@ -113,7 +113,7 @@ Sebagai destinasi pariwisata utama dunia, Bali menghadapi tantangan krusial pada
 - **Frontend:** Svelte 5, Vite 5.4.x, Tailwind CSS 3
 - **Backend:** Python 3.11+, FastAPI, Pydantic v2, Uvicorn, HTTPX
 - **Database / Storage:** Structured JSON Legal Corpus (`corpus/bali_regulations.json`)
-- **AI Model / Method:** Google Gemini API (`gemini-2.5-flash`) + Deterministic Strict-RAG + Dual-Layer Verifier + Regex PII Masking
+- **AI Model / Method:** Google Gemini API (`gemini-3.5-flash`) + Deterministic Strict-RAG + Dual-Layer Verifier + Regex PII Masking
 - **Dataset:** Peraturan resmi dari JDIH BPK, `peraturan.go.id`, Pemerintah Kabupaten Buleleng, Disparda Bali, dan Kesbangpol Bali (Domain Publik, Pasal 42 huruf b UU Hak Cipta No. 28/2014)
 - **AI Coding Assistant:** Google Antigravity / Gemini digunakan sebagai asisten pengembangan kode dan pengujian; seluruh kode sumber dan arsitektur diuji serta dipertanggungjawabkan penuh oleh tim.
 
