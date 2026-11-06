@@ -25,7 +25,7 @@ Bali DigiFest 2026 — AI Web Innovation Challenge
 | Sintesis Gemini | 🟡 Prototype | Structured JSON + evidence span; `AI_MODE=required` di submission |
 | Verifikasi silang JDIH real-time | ⚪ Planned | Belum diimplementasikan |
 | Benchmark publik | 🟡 Internal eval | 40 kasus berlabel; baseline retrieval-only di `eval/results/`; belum benchmark publik |
-| Antarmuka bilingual ID/EN | 🟡 Prototype | Smart Gate ID/EN; ringkasan AI Mode 1/2 punya toggle ID/EN |
+| Antarmuka bilingual ID/EN | ✅ Live | Korpus bilingual offline (42 chunk + 29 dokumen), toggle ID/EN di seluruh mode, verifier naskah asli (ID) |
 
 ---
 
@@ -381,18 +381,53 @@ Pustaka open-source: FastAPI, Pydantic, Uvicorn, HTTPX, Pytest, Svelte 5, Vite, 
 | **Framework / Frontend** | Svelte 5, Vite 5.4.x, Tailwind CSS 3 |
 | **Backend / Runtime** | Python 3.11+, FastAPI, Uvicorn |
 | **Database / Storage** | JSON korpus dan zone registry di memori (`corpus/bali_regulations.json`, `corpus/zones.json`); tidak ada database |
-| **Hosting / Deployment** | Belum ada deployment publik yang diverifikasi; jalankan secara lokal atau self-hosted |
+| **Hosting / Deployment** | Frontend: https://pramana1.vercel.app (Vercel) · Backend: https://pramana1.onrender.com (Render) |
 | **AI Model / API** | Gemini API (`gemini-3.5-flash`) dengan structured JSON + evidence span verifier + Layer-1/Layer-2 guard |
 | **Peran AI** | Menyusun ringkasan eksekutif (Mode 1), catatan konteks netral (Mode 2), dan AI brief Smart Gate (Mode 3) dari sitasi terverifikasi. AI tidak membuat sitasi; setiap claim harus menunjuk evidence span. `AI_MODE=required` di submission. |
 | **Phygital Interface** | URL record NFC NTAG213 / QR, Web Speech API (TTS). Tidak memakai Web NFC API dan tidak memverifikasi identitas. |
 | **Dataset** | Korpus kurasi manual dari sumber resmi; lihat bagian Sumber Data |
 | **Open-source Libraries** | `fastapi`, `pydantic`, `uvicorn`, `httpx`, `python-dotenv`, `pytest`, `svelte`, `vite`, `tailwindcss`, `qrcode`, `lucide-svelte` |
 | **Template / Boilerplate** | Dibangun khusus, tanpa template komersial pihak ketiga |
-| **AI Coding Assistant** | Digunakan sebagai alat bantu pengembangan dan pengujian; arsitektur dan keputusan verifikasi tetap ditinjau manusia |
+| **AI Coding Assistant** | Google Antigravity & Google Gemini (penulisan kode, pengetesan, translasi korpus offline, dan dokumentasi; arsitektur, verifier, dan korpus verbatim ditinjau manusia) |
 | **Pre-existing Components** | Tidak ada komponen komersial pihak ketiga |
 
 ---
 
-## Tim
 
-Tim Pengembang Pramana: Azzaky Raihan (Fullstack & AI Engineer) — Bali DigiFest 2026 AI Web Innovation Challenge.
+---
+
+## Deployment & Panduan Operasional
+
+### 1. URL Produksi
+- **Web App (Frontend)**: [https://pramana1.vercel.app](https://pramana1.vercel.app)
+- **API Server (Backend)**: [https://pramana1.onrender.com](https://pramana1.onrender.com)
+- **API Health Check**: [https://pramana1.onrender.com/api/v1/health](https://pramana1.onrender.com/api/v1/health)
+
+### 2. Konfigurasi `AI_MODE`
+Backend mendukung variabel lingkungan `AI_MODE`:
+- `optional` (Disarankan untuk demo): Jika kuota Gemini habis atau API mengalami gangguan, sistem secara otomatis beralih ke fallback deterministik berlabel jelas tanpa merusak alur aplikasi pengguna.
+- `required`: Mode penegakan murni. Jika API Gemini gagal, sistem mengembalikan status `unavailable`.
+
+### 3. Mitigasi Cold-Start (Uptime Robot / Keep-Alive)
+Hosting gratis Render memberlakukan penonaktifan kontainer otomatis (spin-down) setelah periode tidak aktif:
+- Frontend Pramana memiliki toleransi cold-start otomatis dengan timer 5 detik, banner informasi pemanasan server ("Server sedang bangun, harap tunggu"), dan percobaan ulang otomatis (retry).
+- Untuk menjaga ketersediaan respons cepat bagi juri kompetisi, konfigurasikan monitor HTTP HEAD/GET berkala (setiap 5–10 menit) ke `https://pramana1.onrender.com/health` melalui layanan seperti UptimeRobot, Cron-Job.org, atau GitHub Actions scheduled workflow.
+
+## Tim dan Pernyataan Orisinalitas
+
+**Tim Pramana — Bali DigiFest 2026 AI Web Innovation Challenge:**
+- **Azzaky Raihan Ramdhani** — Developer (Fullstack & AI Architecture)
+- **Wilda Ghoniyu Jiddan** — Developer (Backend, RAG Engine & Evaluasi)
+- **Andhika Guntur Ramadan** — Proposal, Dokumentasi & Kurasi Regulasi
+
+> `[BUTUH-MANUSIA]`: Tambahkan nama perguruan tinggi, program studi, dan nomor kontak ketua tim sebelum pengumpulan akhir.
+
+### Pernyataan Kepatuhan dan Etika AI (Lampiran C Panduan Kompetisi)
+Kami menyatakan bahwa seluruh kode sumber, materi proposal, dan prototipe web yang diserahkan untuk Bali DigiFest 2026 merupakan karya orisinal tim pengembang. Alat bantu AI generatif (Google Antigravity dan model Google Gemini) digunakan secara transparan sebagai akselerator koding, pembuatan fixture uji, asistensi terjemahan korpus offline, dan visual art prototipe. Naskah regulasi verbatim Bahasa Indonesia dijaga tanpa modifikasi LLM, dan verifikasi hukum dilakukan secara deterministik tanpa halusinasi buatan.
+
+---
+
+## Kredit Aset Visual
+- `frontend/public/assets/opero_bali_hero.jpg` & `hero_sky_clouds.png`: Dibuat secara sintetis menggunakan asistensi Generative AI (pointillist impasto style, siluet Candi Bentar Bali) khusus sebagai backdrop visual prototipe Pramana.
+- `frontend/public/assets/pramana_logo_flower_option1.svg`: Ikon grafis brutalist cut-paper bunga Jepun (kamboja Bali) yang dirancang khusus untuk identitas visual Pramana.
+- Font: *Plus Jakarta Sans* (Gumpita Rahayu / Tokotype), *Newsreader* (Production Type), *JetBrains Mono* (JetBrains) — berlisensi SIL Open Font License 1.1.
