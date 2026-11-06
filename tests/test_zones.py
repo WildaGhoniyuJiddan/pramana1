@@ -152,6 +152,8 @@ def test_zone_brief_rejects_hallucinated_article(engine, monkeypatch):
 
     assert result["ai_synthesis_status"] == "deterministic"
     assert result["guard_status"] == "FALLBACK_GUARD"
+    assert result["resolution_mode"] == "VERIFIED_GROUNDED"
+    assert result["citation_ids"]
     assert "Pasal 999" not in result["brief"]
     assert "Rp999.000" not in result["brief"]
 

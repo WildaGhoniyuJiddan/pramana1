@@ -41,6 +41,7 @@ from backend.services.legal_taxonomy import (
     build_deterministic_guidance,
     build_triage_summary,
     detect_prompt_injection,
+    TRIP_BRIEF_REWRITES,
 )
 from backend.services.zone_registry import ZoneRegistry
 
@@ -839,9 +840,7 @@ class StrictRAGEngine:
             "ai_engine": result["ai_engine"],
             "ai_synthesis_status": result["ai_synthesis_status"],
             "guard_status": result["guard_status"],
-            "resolution_mode": result.get(
-                "resolution_mode", "VERIFIED_GROUNDED"
-            ),
+            "resolution_mode": "VERIFIED_GROUNDED",
             "detected_framing_or_tone": result.get(
                 "detected_framing_or_tone", ""
             ),
@@ -1020,6 +1019,9 @@ class StrictRAGEngine:
             guidance = self._finalize_guidance(
                 ai_result.get("user_guidance"), taxonomy, final_mode
             )
+            guidance["suggested_query_rewrites"] = list(
+                TRIP_BRIEF_REWRITES
+            )
             return triage_response(
                 final_mode, ai_result, guidance, summary_id, summary_en
             )
@@ -1084,6 +1086,9 @@ class StrictRAGEngine:
             summary_en = build_triage_summary(taxonomy, final_mode, "en")
             guidance = self._finalize_guidance(
                 ai_result.get("user_guidance"), taxonomy, final_mode
+            )
+            guidance["suggested_query_rewrites"] = list(
+                TRIP_BRIEF_REWRITES
             )
             return triage_response(
                 final_mode, ai_result, guidance, summary_id, summary_en

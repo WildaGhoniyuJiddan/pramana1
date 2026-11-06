@@ -435,6 +435,12 @@ IN_SCOPE_EXAMPLES = [
     "Apa sanksi bagi warga negara asing yang bekerja di Bali tanpa izin tinggal?",
 ]
 
+TRIP_BRIEF_REWRITES = [
+    "Liburan ke Pura Besakih dan menginap di Ubud selama 3 hari",
+    "Sewa motor di Canggu dan berkunjung ke pantai selama seminggu",
+    "Perjalanan ke Bali saat Nyepi bersama keluarga",
+]
+
 CLUSTER_NEXT_STEPS = {
     "DISKRIMINASI_DAN_KONSUMEN": [
         "Tuliskan kronologi: jenis tempat usaha, siapa yang menolak atau membedakan, dan bentuk perlakuan yang diterima.",
