@@ -1,6 +1,6 @@
 /**
  * API client for Pramana backend with timeout, 429 backoff, 422 array formatting,
- * and HTML fallback detection (e.g. Vercel SPA rewrite when backend is unreachable).
+ * cold-start 5s wake-up detection with automatic retry, and HTML fallback detection.
  */
 
 import { i18n } from './i18n.svelte.js';
@@ -8,6 +8,11 @@ import { i18n } from './i18n.svelte.js';
 const ENV_BASE = (import.meta.env.VITE_API_BASE_URL || '').trim().replace(/\/+$/, '');
 const API_BASE = `${ENV_BASE}/api/v1`;
 const DEFAULT_TIMEOUT_MS = 25000;
+
+export const apiState = $state({
+  isWakingUp: false,
+  message: ''
+});
 
 function formatDetail(detail) {
   if (!detail) return '';
@@ -24,13 +29,21 @@ function formatDetail(detail) {
   return String(detail);
 }
 
-async function apiFetch(endpoint, options = {}) {
+async function apiFetch(endpoint, options = {}, isRetry = false) {
   const url = `${API_BASE}${endpoint}`;
   const controller = new AbortController();
   const timeoutId = setTimeout(
     () => controller.abort(),
     options.timeoutMs || DEFAULT_TIMEOUT_MS
   );
+
+  const wakeTimer = setTimeout(() => {
+    apiState.isWakingUp = true;
+    apiState.message =
+      i18n.lang === 'en'
+        ? 'Server is waking up, please wait...'
+        : 'Server sedang bangun, harap tunggu...';
+  }, 5000);
 
   try {
     const res = await fetch(url, {
@@ -74,17 +87,31 @@ async function apiFetch(endpoint, options = {}) {
 
     return await res.json();
   } catch (err) {
+    // Cold start auto-retry once after 1.5s
+    if (!isRetry && (err.name === 'AbortError' || err.name === 'TypeError')) {
+      apiState.isWakingUp = true;
+      apiState.message =
+        i18n.lang === 'en'
+          ? 'Server is waking up, retrying once...'
+          : 'Server sedang bangun, mencoba ulang sekali...';
+      await new Promise((r) => setTimeout(r, 1500));
+      return apiFetch(endpoint, options, true);
+    }
+
     if (err.name === 'AbortError') {
       const isEn = i18n.lang === 'en';
       throw new Error(
         isEn
-          ? 'Connection timed out. Server backend may be starting up from cold sleep, please retry.'
+          ? 'Connection timed out. Server backend may still be starting up from cold sleep, please retry.'
           : 'Koneksi timeout. Server backend mungkin sedang cold start, silakan coba lagi.'
       );
     }
     throw err;
   } finally {
     clearTimeout(timeoutId);
+    clearTimeout(wakeTimer);
+    apiState.isWakingUp = false;
+    apiState.message = '';
   }
 }
 
@@ -101,18 +128,20 @@ export async function fetchCorpus() {
 }
 
 export async function requestTripBrief(payload) {
+  const body = { lang: i18n.lang, ...payload };
   return apiFetch('/trip-brief', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(payload)
+    body: JSON.stringify(body)
   });
 }
 
 export async function requestContextNote(payload) {
+  const body = { lang: i18n.lang, ...payload };
   return apiFetch('/context-note', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(payload)
+    body: JSON.stringify(body)
   });
 }
 

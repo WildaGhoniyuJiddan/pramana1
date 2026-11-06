@@ -170,7 +170,13 @@
   }
 
   function statusLabel(citation) {
-    if (citation.status === 'Disempurnakan') return 'HISTORIS';
+    if (citation.status === 'Disempurnakan') return lang === 'en' ? 'HISTORICAL' : 'HISTORIS';
+    if (lang === 'en') {
+      if (citation.translation_status === 'human-reviewed') return 'HUMAN-REVIEWED (EN)';
+      if (citation.translation_status === 'ai-assisted') return 'AI-ASSISTED (EN)';
+      if (citation.text_status === 'verbatim') return 'VERBATIM (ID)';
+      return 'NON-VERBATIM';
+    }
     if (citation.text_status === 'verbatim') return 'VERBATIM';
     return (citation.text_status || 'TEKS').toUpperCase();
   }
@@ -572,10 +578,10 @@
                     </span>
                   </div>
                   <h3 class="text-xs sm:text-[13px] font-semibold leading-snug" style="color: #0a0a0a;">
-                    {citation.official_doc_title}
+                    {lang === 'en' ? (citation.display_title || citation.title_en || citation.official_doc_title) : citation.official_doc_title}
                   </h3>
                   <p class="text-[11px] leading-relaxed" style="color: #3a3935;">
-                    {excerpt(citation.quoted_text)}
+                    {excerpt(lang === 'en' ? (citation.display_text || citation.text_en || citation.quoted_text) : citation.quoted_text)}
                   </p>
                   <span class="font-mono text-[10px] font-bold" style="color: #0c249c;">
                     {t.openSource} ↗
@@ -619,10 +625,10 @@
                       </span>
                     </div>
                     <h3 class="text-xs font-semibold leading-snug" style="color: #0a0a0a;">
-                      {citation.official_doc_title}
+                      {lang === 'en' ? (citation.display_title || citation.title_en || citation.official_doc_title) : citation.official_doc_title}
                     </h3>
                     <p class="font-mono text-[10px]" style="color: #8a3b00;">
-                      {citation.superseded_by || citation.status}
+                      {lang === 'en' ? (citation.display_status_note || citation.status_note_en || citation.superseded_by || citation.status) : (citation.superseded_by || citation.status)}
                     </p>
                   </button>
                 {/each}

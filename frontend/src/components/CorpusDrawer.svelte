@@ -13,6 +13,11 @@
   };
 
   function textStatusLabel(status, isVerbatim) {
+    if (i18n.lang === 'en') {
+      if (item?.translation_status === 'human-reviewed') return 'HUMAN-REVIEWED (EN)';
+      if (item?.translation_status === 'ai-assisted') return 'AI-ASSISTED (EN)';
+      return isVerbatim === false ? 'NON-VERBATIM' : 'VERBATIM (ID)';
+    }
     if (status && TEXT_STATUS_LABELS[status]) return TEXT_STATUS_LABELS[status];
     return isVerbatim === false ? 'NON-VERBATIM' : 'VERBATIM';
   }
@@ -83,7 +88,7 @@
             {i18n.lang === 'en' ? 'Official Statute Title' : 'Nomenklatur Peraturan Resmi'}
           </span>
           <p class="text-sm font-medium leading-snug" style="color: #0a0a0a;">
-            {item.title || item.official_doc_title}
+            {i18n.lang === 'en' ? (item.title_en || item.display_title || item.title || item.official_doc_title) : (item.title || item.official_doc_title)}
           </p>
           <div class="flex flex-wrap gap-1.5">
             {#if item.status}
@@ -108,64 +113,107 @@
               </span>
             {/if}
           </div>
-          {#if item.status_note}
-            <p class="text-[11px] leading-snug" style="color: #8a3b00;">{item.status_note}</p>
+          {#if (i18n.lang === 'en' ? (item.status_note_en || item.display_status_note || item.status_note) : item.status_note)}
+            <p class="text-[11px] leading-snug" style="color: #8a3b00;">
+              {i18n.lang === 'en' ? (item.status_note_en || item.display_status_note || item.status_note) : item.status_note}
+            </p>
           {/if}
-          {#if item.source_note}
-            <p class="text-[11px] leading-snug" style="color: #5c5952;">{i18n.lang === 'en' ? 'Source note:' : 'Catatan sumber:'} {item.source_note}</p>
+          {#if (i18n.lang === 'en' ? (item.source_note_en || item.display_source_note || item.source_note) : item.source_note)}
+            <p class="text-[11px] leading-snug" style="color: #5c5952;">
+              {i18n.lang === 'en' ? 'Source note:' : 'Catatan sumber:'} {i18n.lang === 'en' ? (item.source_note_en || item.display_source_note || item.source_note) : item.source_note}
+            </p>
           {/if}
           {#if item.source_type}
             <p class="font-mono text-[10px] leading-snug" style="color: #5c5952;">
               {i18n.lang === 'en' ? 'Source type:' : 'Jenis sumber:'} {item.source_type}
             </p>
           {/if}
-          {#if item.superseded_by}
-            <p class="text-[11px] leading-snug" style="color: #5c5952;">
-              {i18n.lang === 'en' ? 'Superseded by:' : 'Disempurnakan oleh:'}
+          {#if item.superseded_by || item.status === 'Disempurnakan'}
+            <div class="p-3 border text-xs" style="background-color: #fff3cd; border-color: #8a3b00; color: #5c2d00;">
+              <span class="font-bold">⚠️ {i18n.t('supersededBanner')}</span>
               {#if item.superseded_by_url}
-                <a href={item.superseded_by_url} target="_blank" rel="noopener noreferrer" class="underline" style="color: #0c249c;">
-                  {item.superseded_by}
-                </a>
-              {:else}
-                {item.superseded_by}
+                <div class="mt-1">
+                  <a href={item.superseded_by_url} target="_blank" rel="noopener noreferrer" class="underline font-mono text-[11px]" style="color: #0c249c;">
+                    {item.superseded_by || 'SE Gubernur Bali No. 7 Tahun 2025'} ↗
+                  </a>
+                </div>
               {/if}
-            </p>
+            </div>
           {/if}
         </div>
 
         <div>
-          <span class="font-mono text-[10px] uppercase tracking-wider block mb-2" style="color: #5c5b57;">
-            {item.is_verbatim === false 
-              ? (i18n.lang === 'en' ? 'Stored Summary (Non-Verbatim Guidance)' : 'Ringkasan Tersimpan (Bukan Kutipan Verbatim)') 
-              : (i18n.lang === 'en' ? 'Verified Stored Text (Layer-1 Corpus Reference)' : 'Teks Tersimpan (Rujukan Layer-1 Korpus)')}
-          </span>
-          <div
-            class="p-5 border text-xs sm:text-sm leading-relaxed font-mono whitespace-pre-line"
-            style="background-color: #faf9f6; border: 1px solid #dcd7cb; color: #0a0a0a;"
-          >
-            {item.full_text || item.quoted_text}
-          </div>
-          {#if item.is_verbatim === false}
-            <p class="mt-2 text-[11px] leading-snug" style="color: #8a3b00;">
-              {i18n.lang === 'en'
-                ? 'This entry is a summary/compilation, not an official statutory transcript. Do not cite as verbatim text.'
-                : 'Entri ini adalah ringkasan/kompilasi, bukan salinan pasal. Jangan dikutip sebagai bunyi pasal verbatim.'}
-            </p>
-          {/if}
-          {#if item.quote_sha256}
-            <p class="mt-2 font-mono text-[10px] break-all" style="color: #5c5952;">
-              {i18n.lang === 'en' ? 'Quote SHA-256:' : 'SHA-256 kutipan:'} {item.quote_sha256}
-            </p>
+          {#if i18n.lang === 'en' && (item.text_en || item.display_text)}
+            <div class="mb-4">
+              <div class="flex flex-wrap items-center justify-between gap-1 mb-2">
+                <span class="font-mono text-[10px] uppercase tracking-wider" style="color: #5c5b57;">
+                  English Translation
+                </span>
+                <span class="text-[10px] font-mono px-2 py-0.5 border" style="background-color: #f3f1eb; border-color: #c8c4ba; color: #5c5952;">
+                  {item.translation_status === 'human-reviewed' ? i18n.t('humanReviewedNotice') : i18n.t('aiAssistedNotice')}
+                </span>
+              </div>
+              <div
+                class="p-4 border text-xs sm:text-sm leading-relaxed font-mono whitespace-pre-line"
+                style="background-color: #faf9f6; border: 1.5px solid #0c249c; color: #0a0a0a;"
+              >
+                {item.text_en || item.display_text}
+              </div>
+              <p class="mt-1.5 text-[11px] leading-snug" style="color: #5c5952;">
+                ℹ️ {i18n.t('translationNotice')}
+              </p>
+            </div>
+
+            <!-- Authoritative Indonesian Text (Collapsible, open by default) -->
+            <details open class="border p-3" style="background-color: #f2f0ea; border-color: #c8c4ba;">
+              <summary class="font-mono text-[11px] font-bold cursor-pointer select-none" style="color: #0c249c;">
+                🇮🇩 {i18n.t('originalAuthoritativeLabel')} · {i18n.t('verbatimNotice')}
+              </summary>
+              <div
+                class="mt-3 p-3 border text-xs leading-relaxed font-mono whitespace-pre-line"
+                style="background-color: #ffffff; border: 1px solid #dcd7cb; color: #0a0a0a;"
+              >
+                {item.text_original || item.full_text || item.quoted_text}
+              </div>
+              {#if item.quote_sha256}
+                <p class="mt-2 font-mono text-[10px] break-all" style="color: #5c5952;">
+                  SHA-256: {item.quote_sha256}
+                </p>
+              {/if}
+            </details>
+          {:else}
+            <!-- Indonesian authoritative text only -->
+            <span class="font-mono text-[10px] uppercase tracking-wider block mb-2" style="color: #5c5b57;">
+              {item.is_verbatim === false 
+                ? 'Ringkasan Tersimpan (Bukan Kutipan Verbatim)' 
+                : 'Teks Tersimpan (Rujukan Layer-1 Korpus Verbatim)'}
+            </span>
+            <div
+              class="p-5 border text-xs sm:text-sm leading-relaxed font-mono whitespace-pre-line"
+              style="background-color: #faf9f6; border: 1px solid #dcd7cb; color: #0a0a0a;"
+            >
+              {item.text_original || item.full_text || item.quoted_text}
+            </div>
+            {#if item.is_verbatim === false}
+              <p class="mt-2 text-[11px] leading-snug" style="color: #8a3b00;">
+                Entri ini adalah ringkasan/kompilasi, bukan salinan pasal. Jangan dikutip sebagai bunyi pasal verbatim.
+              </p>
+            {/if}
+            {#if item.quote_sha256}
+              <p class="mt-2 font-mono text-[10px] break-all" style="color: #5c5952;">
+                SHA-256 kutipan: {item.quote_sha256}
+              </p>
+            {/if}
           {/if}
         </div>
 
-        {#if item.penalties}
+        {#if (i18n.lang === 'en' ? (item.penalties_en || item.display_penalties || item.penalties) : item.penalties)}
           <div class="pt-4 border-t" style="border-color: #c8c4ba;">
             <span class="font-mono text-[10px] uppercase tracking-wider block mb-1.5" style="color: #5c5b57;">
-              {i18n.lang === 'en' ? 'Sanctions & Enforcement Provisions' : 'Ketentuan Sanksi & Penegakan'}
+              {i18n.t('penaltiesTitle')}
             </span>
             <p class="text-xs leading-relaxed" style="color: #2b2b29;">
-              {item.penalties}
+              {i18n.lang === 'en' ? (item.penalties_en || item.display_penalties || item.penalties) : item.penalties}
             </p>
           </div>
         {/if}

@@ -1,5 +1,5 @@
 <script>
-  import { requestTripBrief } from '../lib/api.js';
+  import { requestTripBrief, apiState } from '../lib/api.js';
   import { i18n, DICT } from '../lib/i18n.svelte.js';
 
   let { onOpenDoc = () => {} } = $props();
@@ -38,45 +38,23 @@
 
   function getShortTabLabel(item, idx) {
     const isEn = i18n.lang === 'en';
-    const cat = (item.category || '').toLowerCase();
     const num = `0${idx + 1}`;
-    if (cat.includes('pungutan') || cat.includes('levy')) return `${num} · ${isEn ? 'Tourist Levy' : 'Retribusi Wisman'}`;
-    if (cat.includes('kewajiban') || cat.includes("do's")) return `${num} · ${isEn ? 'Sacred Area Etiquette' : 'Etika Kawasan Suci'}`;
-    if (cat.includes('larangan') || cat.includes("don'ts")) return `${num} · ${isEn ? 'Tourist Restrictions' : 'Larangan Wisatawan'}`;
-    if (cat.includes('keimigrasian')) return `${num} · ${isEn ? 'Immigration Rules' : 'Izin Keimigrasian'}`;
-    if (cat.includes('nyepi')) return `${num} · ${isEn ? 'Nyepi Observance' : 'Catur Brata Nyepi'}`;
-    if (cat.includes('lalu lintas') || cat.includes('angkutan')) return `${num} · ${isEn ? 'Traffic & Scooter' : 'Lalu Lintas & Motor'}`;
-    return `${num} · ${item.category.split(' ')[0]}`;
+    if (item.id === 'SE_GUB_04_2023_DO') return `${num} · ${isEn ? "Do's (Points 1-7)" : "Kewajiban (1-7)"}`;
+    if (item.id === 'SE_GUB_04_2023_DONT') return `${num} · ${isEn ? "Don'ts (Points 2.a-2.h)" : "Larangan (2.a-2.h)"}`;
+    if (item.id === 'PERDA_BALI_06_2023_LEVY') return `${num} · ${isEn ? 'Tourist Levy' : 'Pungutan Wisman'}`;
+    if (item.id === 'PERDA_BALI_05_2020_PASAL_7') return `${num} · ${isEn ? 'Sacred Sites' : 'Perusakan DTW'}`;
+    if (item.id === 'UU_22_2009_PASAL_77_281') return `${num} · ${isEn ? 'Driver License' : 'SIM Motor'}`;
+    if (item.id === 'UU_22_2009_PASAL_291') return `${num} · ${isEn ? 'Helmet Mandate' : 'Kewajiban Helm'}`;
+    if (item.display_title) {
+      const clean = item.display_title.split('(')[0].trim();
+      return `${num} · ${clean.slice(0, 18)}`;
+    }
+    return `${num} · ${item.category}`;
   }
 
   function getHumanTitle(item) {
-    const isEn = i18n.lang === 'en';
-    const cat = (item.category || '').toLowerCase();
-    if (cat.includes('pungutan') || cat.includes('levy')) {
-      return isEn
-        ? 'Foreign Tourist Levy Rp150,000 (Love Bali Mandatory)'
-        : 'Kewajiban Retribusi Wisatawan Asing Rp150.000 (Love Bali)';
-    }
-    if (cat.includes('kewajiban') || cat.includes("do's") || cat.includes('dos')) {
-      return isEn
-        ? 'Modest Dress & Sacred Temple Etiquette'
-        : 'Kewajiban Berbusana Adat/Sopan & Menghormati Kesucian Pura';
-    }
-    if (cat.includes('larangan') || cat.includes("don'ts") || cat.includes('donts')) {
-      return isEn
-        ? 'Prohibition on Climbing Sacred Trees & Desecrating Temples'
-        : 'Larangan Memanjat Pohon Suci & Perilaku Menodai Kawasan Pura';
-    }
-    if (cat.includes('keimigrasian')) {
-      return isEn
-        ? 'Prohibition on Illegal Employment on Tourist Visas'
-        : 'Larangan Bekerja atau Berbisnis Ilegal dengan Visa Kunjungan';
-    }
-    if (cat.includes('nyepi')) {
-      return isEn
-        ? 'Catur Brata Nyepi 24-Hour Islandwide Lockdown'
-        : 'Kepatuhan Catur Brata Penyepian (Penghentian Aktivitas 24 Jam)';
-    }
+    if (item.display_title) return item.display_title;
+    if (i18n.lang === 'en' && item.title_en) return item.title_en;
     return item.title;
   }
 
@@ -292,7 +270,14 @@
               </select>
             </div>
 
-            {#if errorMsg}
+            {#if apiState.isWakingUp}
+          <div class="brutal-card p-4 flex items-center gap-3" style="background-color: #fff3cd; border-color: #8a3b00; color: #8a3b00;">
+            <span class="animate-spin text-lg">⏳</span>
+            <span class="font-mono text-xs font-bold">{apiState.message || common.serverWakingUp}</span>
+          </div>
+        {/if}
+
+        {#if errorMsg}
               <div role="alert" aria-live="polite" class="p-3 text-xs font-medium" style="background-color: #ffffff; border: 1.5px solid #c92a2a; color: #c92a2a;">
                 {errorMsg}
               </div>
@@ -554,12 +539,23 @@
                     class="font-mono text-[10px] font-bold px-2 py-0.5"
                     style="background-color: #dfd6c3; color: #0a0a0a; border: 1px solid #0a0a0a;"
                   >
-                    {activeItem.category}
+                    {i18n.lang === 'en' ? (activeItem.category_en || activeItem.category) : activeItem.category}
                   </span>
                   <span class="font-mono text-xs font-bold" style="color: #0c249c;">
                     {activeItem.pasal}
                   </span>
                 </div>
+
+                <!-- Superseded banner if status is Disempurnakan or superseded_by is present -->
+                {#if activeItem.status === 'Disempurnakan' || activeItem.superseded_by}
+                  <div
+                    class="p-3 text-xs font-semibold flex items-center gap-2"
+                    style="background-color: #fff3cd; border: 1.5px solid #8a3b00; color: #8a3b00;"
+                  >
+                    <span>⚠️</span>
+                    <span>{common.supersededBanner}</span>
+                  </div>
+                {/if}
 
                 <div class="flex flex-wrap gap-1.5">
                   <span
@@ -568,16 +564,25 @@
                   >
                     Status: {activeItem.status || '-'}
                   </span>
-                  <span
-                    class="font-mono text-[10px] font-bold px-2 py-0.5"
-                    style={activeItem.is_verbatim
-                      ? 'background-color: #e7f0ff; color: #0c249c; border: 1px solid #0c249c;'
-                      : 'background-color: #fff3cd; color: #8a3b00; border: 1px solid #8a3b00;'}
-                  >
-                    {activeItem.text_status === 'compilation'
-                      ? common.compilationNotice
-                      : activeItem.is_verbatim ? common.verbatimNotice : common.summaryNotice}
-                  </span>
+                  {#if i18n.lang === 'en'}
+                    <span
+                      class="font-mono text-[10px] font-bold px-2 py-0.5"
+                      style="background-color: #fff3cd; color: #8a3b00; border: 1px solid #8a3b00;"
+                    >
+                      {activeItem.translation_status === 'human-reviewed' ? common.humanReviewedNotice : common.aiAssistedNotice}
+                    </span>
+                  {:else}
+                    <span
+                      class="font-mono text-[10px] font-bold px-2 py-0.5"
+                      style={activeItem.is_verbatim
+                        ? 'background-color: #e7f0ff; color: #0c249c; border: 1px solid #0c249c;'
+                        : 'background-color: #fff3cd; color: #8a3b00; border: 1px solid #8a3b00;'}
+                    >
+                      {activeItem.text_status === 'compilation'
+                        ? common.compilationNotice
+                        : activeItem.is_verbatim ? common.verbatimNotice : common.summaryNotice}
+                    </span>
+                  {/if}
                 </div>
 
                 {#if activeItem.trigger_reason}
@@ -595,17 +600,40 @@
                   <h3 class="text-base sm:text-lg font-medium tracking-tight" style="color: #0a0a0a;">
                     {getHumanTitle(activeItem)}
                   </h3>
-                  <p class="text-xs sm:text-[13px] leading-relaxed" style="color: #3a3935;">
-                    {activeItem.summary}
-                  </p>
-                  {#if activeItem.status_note}
-                    <p class="text-[11px] leading-snug" style="color: #8a3b00;">
-                      {activeItem.status_note}
+
+                  {#if i18n.lang === 'en'}
+                    <!-- Translation notice & English display text -->
+                    <div class="p-2.5 bg-[#fbfaf8] border border-[#dcd7cb] text-[11px] text-[#8a3b00] font-mono">
+                      ℹ️ {common.translationNotice}
+                    </div>
+                    <p class="text-xs sm:text-[13px] leading-relaxed font-sans" style="color: #2b2b29;">
+                      {activeItem.display_text || activeItem.summary}
+                    </p>
+
+                    <!-- Open Collapsible Drawer for Verbatim Original Indonesian Statute Text -->
+                    <details open class="mt-3 border border-[#0a0a0a] bg-[#faf9f6]">
+                      <summary class="px-3 py-2 font-mono text-[10px] font-bold cursor-pointer uppercase bg-[#dfd6c3] flex items-center justify-between text-[#0c249c]">
+                        <span>{common.originalAuthoritativeLabel}</span>
+                        <span class="text-[9px] font-normal text-[#5c5952]">[KLIK UNTUK BUKA/TUTUP]</span>
+                      </summary>
+                      <div class="p-3.5 text-xs font-mono whitespace-pre-line leading-relaxed text-[#0a0a0a]">
+                        {activeItem.text_original || activeItem.full_text}
+                      </div>
+                    </details>
+                  {:else}
+                    <p class="text-xs sm:text-[13px] leading-relaxed" style="color: #3a3935;">
+                      {activeItem.summary}
                     </p>
                   {/if}
-                  {#if activeItem.source_note}
+
+                  {#if activeItem.display_status_note || activeItem.status_note}
+                    <p class="text-[11px] leading-snug" style="color: #8a3b00;">
+                      {activeItem.display_status_note || activeItem.status_note}
+                    </p>
+                  {/if}
+                  {#if activeItem.display_source_note || activeItem.source_note}
                     <p class="text-[11px] leading-snug" style="color: #5c5952;">
-                      {activeItem.source_note}
+                      {activeItem.display_source_note || activeItem.source_note}
                     </p>
                   {/if}
                   {#if activeItem.superseded_by}
@@ -622,7 +650,7 @@
                   {/if}
                 </div>
 
-                {#if activeItem.penalties}
+                {#if activeItem.display_penalties || activeItem.penalties}
                   <div
                     class="p-3 text-xs space-y-1"
                     style="background-color: #dfd6c3; border: 1px solid #0a0a0a; color: #0a0a0a;"
@@ -630,13 +658,13 @@
                     <span class="font-mono text-[10px] font-bold uppercase block">
                       {common.penaltiesTitle}
                     </span>
-                    <p class="leading-snug">{activeItem.penalties}</p>
+                    <p class="leading-snug">{activeItem.display_penalties || activeItem.penalties}</p>
                   </div>
                 {/if}
 
                 <div class="pt-1 flex flex-wrap items-center justify-between gap-2">
                   <span class="font-mono text-[10px] truncate max-w-md" style="color: #5c5952;">
-                    Sumber: {activeItem.title}{#if activeItem.last_verified_date} · {formatDate(activeItem.last_verified_date)}{/if}
+                    {i18n.lang === 'en' ? 'Source: ' : 'Sumber: '}{activeItem.display_title || activeItem.title}{#if activeItem.last_verified_date} · {formatDate(activeItem.last_verified_date)}{/if}
                   </span>
 
                   <button

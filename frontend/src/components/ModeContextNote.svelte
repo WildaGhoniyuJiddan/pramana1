@@ -1,5 +1,5 @@
 <script>
-  import { requestContextNote } from '../lib/api.js';
+  import { requestContextNote, apiState } from '../lib/api.js';
   import { i18n, DICT } from '../lib/i18n.svelte.js';
 
   let { onOpenDoc = () => {} } = $props();
@@ -141,7 +141,14 @@
               ></textarea>
             </div>
 
-            {#if errorMsg}
+            {#if apiState.isWakingUp}
+          <div class="brutal-card p-4 flex items-center gap-3" style="background-color: #fff3cd; border-color: #8a3b00; color: #8a3b00;">
+            <span class="animate-spin text-lg">⏳</span>
+            <span class="font-mono text-xs font-bold">{apiState.message || common.serverWakingUp}</span>
+          </div>
+        {/if}
+
+        {#if errorMsg}
               <div role="alert" aria-live="polite" class="p-3 text-xs font-medium" style="background-color: #ffffff; border: 1.5px solid #c92a2a; color: #c92a2a;">
                 {errorMsg}
               </div>
@@ -355,46 +362,89 @@
                     </span>
                   </div>
 
+                  <!-- Superseded banner -->
+                  {#if activeCite.status === 'Disempurnakan' || activeCite.superseded_by}
+                    <div
+                      class="p-3 text-xs font-semibold flex items-center gap-2"
+                      style="background-color: #fff3cd; border: 1.5px solid #8a3b00; color: #8a3b00;"
+                    >
+                      <span>⚠️</span>
+                      <span>{common.supersededBanner}</span>
+                    </div>
+                  {/if}
+
                   <h3 class="text-sm sm:text-base font-medium leading-snug" style="color: #0a0a0a;">
-                    {activeCite.official_doc_title}
+                    {activeCite.display_title || activeCite.title_en || activeCite.official_doc_title}
                   </h3>
 
                   <div class="flex flex-wrap gap-1.5">
                     <span class="font-mono text-[10px] font-bold px-2 py-0.5" style="background-color: #ffffff; color: #0a0a0a; border: 1px solid #0a0a0a;">
                       Status: {activeCite.status || '-'}
                     </span>
-                    <span
-                      class="font-mono text-[10px] font-bold px-2 py-0.5"
-                      style={activeCite.is_verbatim
-                        ? 'background-color: #e7f0ff; color: #0c249c; border: 1px solid #0c249c;'
-                        : 'background-color: #fff3cd; color: #8a3b00; border: 1px solid #8a3b00;'}
-                    >
-                      {activeCite.text_status === 'compilation'
-                        ? common.compilationNotice
-                        : activeCite.is_verbatim ? common.verbatimNotice : common.summaryNotice}
-                    </span>
-                  </div>
-
-                  <!-- Full-border architectural quote box (no cliché left stripe) -->
-                  <div
-                    class="p-4 text-xs sm:text-[13px] leading-relaxed"
-                    style="background-color: #f3f1eb; border: 1.5px solid #0a0a0a; color: #0a0a0a;"
-                  >
-                    {#if activeCite.is_verbatim}
-                      "{activeCite.quoted_text}"
+                    {#if i18n.lang === 'en'}
+                      <span
+                        class="font-mono text-[10px] font-bold px-2 py-0.5"
+                        style="background-color: #fff3cd; color: #8a3b00; border: 1px solid #8a3b00;"
+                      >
+                        {activeCite.translation_status === 'human-reviewed' ? common.humanReviewedNotice : common.aiAssistedNotice}
+                      </span>
                     {:else}
-                      {activeCite.quoted_text}
-                      <p class="mt-2 font-mono text-[10px] leading-snug" style="color: #8a3b00;">
-                        {common.summaryNotice}
-                      </p>
+                      <span
+                        class="font-mono text-[10px] font-bold px-2 py-0.5"
+                        style={activeCite.is_verbatim
+                          ? 'background-color: #e7f0ff; color: #0c249c; border: 1px solid #0c249c;'
+                          : 'background-color: #fff3cd; color: #8a3b00; border: 1px solid #8a3b00;'}
+                      >
+                        {activeCite.text_status === 'compilation'
+                          ? common.compilationNotice
+                          : activeCite.is_verbatim ? common.verbatimNotice : common.summaryNotice}
+                      </span>
                     {/if}
                   </div>
 
-                  {#if activeCite.status_note}
-                    <p class="text-[11px] leading-snug" style="color: #8a3b00;">{activeCite.status_note}</p>
+                  {#if i18n.lang === 'en'}
+                    <!-- Unofficial English Translation -->
+                    <div class="p-2.5 bg-[#fbfaf8] border border-[#dcd7cb] text-[11px] text-[#8a3b00] font-mono">
+                      ℹ️ {common.translationNotice}
+                    </div>
+                    <div
+                      class="p-4 text-xs sm:text-[13px] leading-relaxed font-sans"
+                      style="background-color: #f3f1eb; border: 1.5px solid #0a0a0a; color: #0a0a0a;"
+                    >
+                      "{activeCite.display_text || activeCite.text_en || activeCite.quoted_text}"
+                    </div>
+
+                    <!-- Collapsible Verbatim Indonesian Legal Text -->
+                    <details open class="border border-[#0a0a0a] bg-[#faf9f6]">
+                      <summary class="px-3 py-2 font-mono text-[10px] font-bold cursor-pointer uppercase bg-[#dfd6c3] flex items-center justify-between text-[#0c249c]">
+                        <span>{common.originalAuthoritativeLabel}</span>
+                        <span class="text-[9px] font-normal text-[#5c5952]">[KLIK UNTUK BUKA/TUTUP]</span>
+                      </summary>
+                      <div class="p-3 text-xs font-mono whitespace-pre-line leading-relaxed text-[#0a0a0a]">
+                        "{activeCite.text_original || activeCite.quoted_text}"
+                      </div>
+                    </details>
+                  {:else}
+                    <div
+                      class="p-4 text-xs sm:text-[13px] leading-relaxed"
+                      style="background-color: #f3f1eb; border: 1.5px solid #0a0a0a; color: #0a0a0a;"
+                    >
+                      {#if activeCite.is_verbatim}
+                        "{activeCite.quoted_text}"
+                      {:else}
+                        {activeCite.quoted_text}
+                        <p class="mt-2 font-mono text-[10px] leading-snug" style="color: #8a3b00;">
+                          {common.summaryNotice}
+                        </p>
+                      {/if}
+                    </div>
                   {/if}
-                  {#if activeCite.source_note}
-                    <p class="text-[11px] leading-snug" style="color: #5c5952;">{activeCite.source_note}</p>
+
+                  {#if activeCite.display_status_note || activeCite.status_note}
+                    <p class="text-[11px] leading-snug" style="color: #8a3b00;">{activeCite.display_status_note || activeCite.status_note}</p>
+                  {/if}
+                  {#if activeCite.display_source_note || activeCite.source_note}
+                    <p class="text-[11px] leading-snug" style="color: #5c5952;">{activeCite.display_source_note || activeCite.source_note}</p>
                   {/if}
                   {#if activeCite.superseded_by}
                     <p class="text-[11px] leading-snug" style="color: #5c5952;">
@@ -422,7 +472,7 @@
                       <span class="font-mono text-[10px] font-bold uppercase block">
                         {common.penaltiesTitle}
                       </span>
-                      <p class="leading-snug">{activeCite.penalties}</p>
+                      <p class="leading-snug">{activeCite.display_penalties || activeCite.penalties}</p>
                     </div>
                   {/if}
 
