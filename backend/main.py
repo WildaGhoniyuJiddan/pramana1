@@ -128,12 +128,12 @@ async def security_and_rate_limit(request: Request, call_next):
             if int(content_length) > MAX_REQUEST_BODY_BYTES:
                 return JSONResponse(
                     status_code=413,
-                    content={"detail": "Ukuran permintaan melebihi batas."},
+                    content={"detail": "Ukuran permintaan melebihi batas / Request payload exceeds maximum allowed size."},
                 )
         except ValueError:
             return JSONResponse(
                 status_code=400,
-                content={"detail": "Header Content-Length tidak valid."},
+                content={"detail": "Header Content-Length tidak valid / Invalid Content-Length header."},
             )
 
     if request.method == "POST" and (
@@ -148,8 +148,7 @@ async def security_and_rate_limit(request: Request, call_next):
                 status_code=429,
                 content={
                     "detail": (
-                        "Terlalu banyak permintaan. Silakan coba lagi dalam "
-                        "satu menit."
+                        "Terlalu banyak permintaan. Silakan coba lagi dalam satu menit / Rate limit exceeded. Please try again in 1 minute."
                     )
                 },
                 headers={"Retry-After": str(RATE_LIMIT_WINDOW_SECONDS)},
@@ -242,8 +241,7 @@ def get_totem_card(
         raise HTTPException(
             status_code=500,
             detail=(
-                "Terjadi kesalahan internal saat memuat kartu gerbang. "
-                "Silakan coba lagi."
+                "Terjadi kesalahan internal saat memuat kartu gerbang / Internal error loading smart gate card."
             ),
         )
 
@@ -262,8 +260,7 @@ def generate_totem_brief(zone_id: str, req: ZoneBriefRequest):
         raise HTTPException(
             status_code=500,
             detail=(
-                "Terjadi kesalahan internal saat menyusun panduan gerbang. "
-                "Kartu deterministik tetap dapat digunakan."
+                "Terjadi kesalahan internal saat menyusun panduan gerbang / Internal error generating smart gate brief."
             ),
         )
 
@@ -281,6 +278,7 @@ def generate_trip_brief(req: TripBriefRequest):
             start_date=req.start_date,
             end_date=req.end_date,
             traveler_origin=req.traveler_origin,
+            lang=req.lang,
         )
     except ValueError as exc:
         raise HTTPException(status_code=422, detail=str(exc)) from exc
@@ -289,8 +287,7 @@ def generate_trip_brief(req: TripBriefRequest):
         raise HTTPException(
             status_code=500,
             detail=(
-                "Terjadi kesalahan internal saat memproses trip brief. "
-                "Silakan coba lagi."
+                "Terjadi kesalahan internal saat memproses trip brief / Internal error processing trip brief."
             ),
         )
 
@@ -302,7 +299,7 @@ def generate_context_note(req: ContextNoteRequest):
     Identifies legal grounds, emotional framing, and returns corpus citations.
     """
     try:
-        return rag_engine.analyze_viral_post(post_content=req.post_content)
+        return rag_engine.analyze_viral_post(post_content=req.post_content, lang=req.lang)
     except ValueError as exc:
         raise HTTPException(status_code=422, detail=str(exc)) from exc
     except Exception:
@@ -310,8 +307,7 @@ def generate_context_note(req: ContextNoteRequest):
         raise HTTPException(
             status_code=500,
             detail=(
-                "Terjadi kesalahan internal saat memproses catatan konteks. "
-                "Silakan coba lagi."
+                "Terjadi kesalahan internal saat memproses catatan konteks / Internal error processing context note."
             ),
         )
 

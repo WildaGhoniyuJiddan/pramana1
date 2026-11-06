@@ -365,11 +365,29 @@ class StrictRAGEngine:
     def _build_briefing_items(
         self,
         regulations: List[Dict[str, Any]],
+        lang: str = "id",
     ) -> List[Dict[str, Any]]:
+        is_en = (lang == "en")
         briefing_items: List[Dict[str, Any]] = []
         for reg in regulations:
             text = reg.get("text", "")
+            text_en = reg.get("text_en")
+            title_en = reg.get("title_en")
+            status_note_en = reg.get("status_note_en")
+            source_note_en = reg.get("source_note_en")
+            penalties_en = reg.get("penalties_en")
+            category_en = reg.get("category_en")
+            tier_label_en = reg.get("tier_label_en")
+            translation_status = reg.get("translation_status")
+
             tr_reason, tr_reason_en = self._get_trigger_reason(reg)
+
+            display_text = (text_en if is_en and text_en else text)
+            display_title = (title_en if is_en and title_en else reg["doc_title"])
+            display_status_note = (status_note_en if is_en and status_note_en else reg.get("status_note"))
+            display_source_note = (source_note_en if is_en and source_note_en else reg.get("source_note"))
+            display_penalties = (penalties_en if is_en and penalties_en else reg.get("penalties", "Sanksi administratif dan adat setempat."))
+
             briefing_items.append({
                 "id": reg["id"],
                 "title": reg["doc_title"],
@@ -399,6 +417,20 @@ class StrictRAGEngine:
                 "superseded_by_url": reg.get("superseded_by_url"),
                 "trigger_reason": tr_reason,
                 "trigger_reason_en": tr_reason_en,
+                "display_text": display_text,
+                "display_title": display_title,
+                "display_status_note": display_status_note,
+                "display_source_note": display_source_note,
+                "display_penalties": display_penalties,
+                "text_original": text,
+                "text_en": text_en,
+                "title_en": title_en,
+                "status_note_en": status_note_en,
+                "source_note_en": source_note_en,
+                "penalties_en": penalties_en,
+                "category_en": category_en,
+                "tier_label_en": tier_label_en,
+                "translation_status": translation_status,
             })
         return briefing_items
 
@@ -423,12 +455,13 @@ class StrictRAGEngine:
     def _build_citations_for_regulations(
         self,
         regulations: List[Dict[str, Any]],
+        lang: str = "id",
     ) -> List[Dict[str, Any]]:
         raw_citations = [
             {"reg_id": reg["id"], "quoted_text": reg["text"]}
             for reg in regulations
         ]
-        return self.verifier.verify_and_filter_citations(raw_citations)
+        return self.verifier.verify_and_filter_citations(raw_citations, lang=lang)
 
     @staticmethod
     def _validate_zone_language(lang: str) -> str:
@@ -441,6 +474,7 @@ class StrictRAGEngine:
         self,
         zone: Dict[str, Any],
         historical: bool = False,
+        lang: str = "id",
     ) -> List[Dict[str, Any]]:
         """Build Layer-1 verified citations for one zone."""
         field = "historical_regulation_ids" if historical else "regulation_ids"
@@ -455,7 +489,7 @@ class StrictRAGEngine:
                 "quoted_text": reg["text"],
             })
 
-        verified = self.verifier.verify_and_filter_citations(raw_citations)
+        verified = self.verifier.verify_and_filter_citations(raw_citations, lang=lang)
         if len(verified) != len(regulation_ids):
             raise ValueError(
                 "Kartu zona gagal verifikasi Layer-1 untuk chunk: "
@@ -486,13 +520,14 @@ class StrictRAGEngine:
 
     def get_zone_card(self, zone_id: str, lang: str = "id") -> Dict[str, Any]:
         """Return a deterministic zone card with Layer-1 verified citations."""
-        lang = self._validate_zone_language(lang)
+        clean_lang = self._validate_zone_language(lang)
         zone = self.zone_registry.get_zone_or_raise(zone_id)
 
-        citations = self._build_zone_citations(zone, historical=False)
+        citations = self._build_zone_citations(zone, historical=False, lang=clean_lang)
         historical_citations = self._build_zone_citations(
-            zone, historical=True
+            zone, historical=True, lang=clean_lang
         )
+        lang = clean_lang
 
         name = zone["name"][lang]
         location_note = zone["location_note"][lang]
@@ -708,6 +743,7 @@ class StrictRAGEngine:
         start_date: str,
         end_date: Optional[str] = None,
         traveler_origin: str = "international",
+        lang: str = "id",
     ) -> Dict[str, Any]:
         """
         Mode 1: Generate a verified Trip Brief.
@@ -834,9 +870,9 @@ class StrictRAGEngine:
             if levy_reg and all(reg["id"] != levy_reg["id"] for reg in matched_regs):
                 matched_regs.append(levy_reg)
 
-        briefing_items = self._build_briefing_items(matched_regs)
+        briefing_items = self._build_briefing_items(matched_regs, lang=lang)
         confidence = self._confidence_label(scores)
-        citations = self._build_citations_for_regulations(matched_regs)
+        citations = self._build_citations_for_regulations(matched_regs, lang=lang)
 
         calendar_note = self._calendar_note(calendar_check)
         categories = ", ".join(
@@ -898,15 +934,23 @@ class StrictRAGEngine:
             calendar_check,
             briefing_items,
             is_grounded=True,
+            lang=lang,
+        )
+
+        is_en_brief = (lang == "en")
+        ics_desc = (
+            f"Verification status: {guard_status}. "
+            f"Nyepi conflict: {calendar_check.get('has_nyepi', False)}. "
+            "Check official sources for each item."
+            if is_en_brief else
+            f"Status verifikasi: {guard_status}. "
+            f"Bentrok Nyepi: {calendar_check.get('has_nyepi', False)}. "
+            "Periksa sumber resmi pada setiap butir."
         )
 
         ics_calendar = generate_ics_calendar(
             title="Pramana: Bali Travel Brief",
-            description=(
-                f"Status verifikasi: {guard_status}. "
-                f"Bentrok Nyepi: {calendar_check.get('has_nyepi', False)}. "
-                "Periksa sumber resmi pada setiap butir."
-            ),
+            description=ics_desc,
             start_date_str=start_date,
             end_date_str=effective_end_date,
         )
@@ -937,7 +981,7 @@ class StrictRAGEngine:
             "confidence_note": CONFIDENCE_NOTE,
         }
 
-    def analyze_viral_post(self, post_content: str) -> Dict[str, Any]:
+    def analyze_viral_post(self, post_content: str, lang: str = "id") -> Dict[str, Any]:
         """
         Mode 2: Generate a neutral, verifiable Context Note for viral content.
 
@@ -1085,7 +1129,7 @@ class StrictRAGEngine:
                 "verified_layer1": True,
             })
 
-        citations = self.verifier.verify_and_filter_citations(raw_citations)
+        citations = self.verifier.verify_and_filter_citations(raw_citations, lang=lang)
 
         if not citations:
             abstain_text = (
@@ -1232,10 +1276,17 @@ class StrictRAGEngine:
             "framing_markers": framing_markers,
             "citations": citations,
             "copyable_comment": (
-                f"Catatan Konteks (Pramana):\n{neutral_summary}\n"
-                f"Rujukan: {top_citation['official_doc_title']} "
-                f"({top_citation['pasal']})\n"
-                f"Sumber: {top_citation['source_url']}\n\n{DISCLAIMER}"
+                (
+                    f"Context Note (Pramana):\n{neutral_summary_en}\n"
+                    f"Reference: {top_citation.get('display_title') or top_citation['official_doc_title']} "
+                    f"({top_citation['pasal']})\n"
+                    f"Source: {top_citation['source_url']}\n\n{DISCLAIMER}"
+                ) if lang == "en" else (
+                    f"Catatan Konteks (Pramana):\n{neutral_summary}\n"
+                    f"Rujukan: {top_citation['official_doc_title']} "
+                    f"({top_citation['pasal']})\n"
+                    f"Sumber: {top_citation['source_url']}\n\n{DISCLAIMER}"
+                )
             ),
             "disclaimer": DISCLAIMER,
         }
@@ -1248,47 +1299,75 @@ class StrictRAGEngine:
         calendar_check: Dict[str, Any],
         briefing_items: List[Dict[str, Any]],
         is_grounded: bool = True,
+        lang: str = "id",
     ) -> str:
+        is_en = (lang == "en")
         date_span = f"{start_date}" + (
-            f" s/d {end_date}" if end_date and end_date != start_date else ""
+            (f" to {end_date}" if is_en else f" s/d {end_date}") if end_date and end_date != start_date else ""
         )
         lines = [
             "*PRAMANA: Bali Trip Brief & Local Rules*",
-            f"Tanggal: {date_span}",
+            f"Date: {date_span}" if is_en else f"Tanggal: {date_span}",
             "",
         ]
 
         if calendar_check.get("has_nyepi"):
-            lines.append("*PERINGATAN NYEPI (Catur Brata Penyepian)*")
-            lines.append(
-                "Berlaku larangan keluar hotel, pemadaman lampu luar, "
-                "penutupan bandara, dan pemadaman data seluler selama 24 jam "
-                "(06.00 WITA sampai 06.00 WITA keesokan harinya)."
-            )
+            if is_en:
+                lines.append("*NYEPI WARNING (Day of Silence / Catur Brata Penyepian)*")
+                lines.append(
+                    "Mandatory hotel confinement, exterior lights extinguished, "
+                    "airport closed, and mobile internet suspended for 24 hours "
+                    "(06:00 WITA until 06:00 WITA the following morning)."
+                )
+            else:
+                lines.append("*PERINGATAN NYEPI (Catur Brata Penyepian)*")
+                lines.append(
+                    "Berlaku larangan keluar hotel, pemadaman lampu luar, "
+                    "penutupan bandara, dan pemadaman data seluler selama 24 jam "
+                    "(06.00 WITA sampai 06.00 WITA keesokan harinya)."
+                )
             lines.append("")
 
         if not is_grounded:
-            lines.append("*STATUS: TIDAK_DITEMUKAN*")
-            lines.append(
-                "Tidak ditemukan aturan spesifik di korpus Pramana yang cocok "
-                "dengan rencana perjalanan ini. Tidak ada klaim hukum tambahan "
-                "yang disusun."
-            )
-        else:
-            lines.append("*Aturan Utama yang Wajib Dipatuhi:*")
-            for index, item in enumerate(briefing_items[:3], 1):
+            if is_en:
+                lines.append("*STATUS: NOT_FOUND*")
                 lines.append(
-                    f"{index}. *{item['category']}* ({item['tier_label']})"
+                    "No specific rules in the Pramana corpus matched this itinerary. "
+                    "No additional legal claims were generated."
                 )
-                summary = item["summary"][:120]
-                lines.append(f"   {summary}...")
+            else:
+                lines.append("*STATUS: TIDAK_DITEMUKAN*")
+                lines.append(
+                    "Tidak ditemukan aturan spesifik di korpus Pramana yang cocok "
+                    "dengan rencana perjalanan ini. Tidak ada klaim hukum tambahan "
+                    "yang disusun."
+                )
+        else:
+            if is_en:
+                lines.append("*Key Rules You Must Comply With:*")
+                for index, item in enumerate(briefing_items[:3], 1):
+                    cat = item.get("category_en") or item.get("category", "")
+                    tier = item.get("tier_label_en") or item.get("tier_label", "")
+                    lines.append(f"{index}. *{cat}* ({tier})")
+                    summary = (item.get("display_text") or item.get("summary", ""))[:120]
+                    lines.append(f"   {summary}...")
+            else:
+                lines.append("*Aturan Utama yang Wajib Dipatuhi:*")
+                for index, item in enumerate(briefing_items[:3], 1):
+                    lines.append(
+                        f"{index}. *{item['category']}* ({item['tier_label']})"
+                    )
+                    summary = item["summary"][:120]
+                    lines.append(f"   {summary}...")
 
         if briefing_items:
             lines.append("")
-            lines.append(f"Sumber: {briefing_items[0].get('source_url', '')}")
+            src_label = "Source: " if is_en else "Sumber: "
+            lines.append(f"{src_label}{briefing_items[0].get('source_url', '')}")
 
         if PUBLIC_BASE_URL:
-            lines.append(f"Verifikasi naskah resmi: {PUBLIC_BASE_URL}")
+            pub_label = "Verify official text: " if is_en else "Verifikasi naskah resmi: "
+            lines.append(f"{pub_label}{PUBLIC_BASE_URL}")
 
         lines.append("")
         lines.append(f"Disclaimer: {DISCLAIMER}")

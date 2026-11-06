@@ -49,6 +49,10 @@ class TripBriefRequest(BaseModel):
         "international",
         description="Traveler origin ('international' or 'domestic')",
     )
+    lang: Literal["id", "en"] = Field(
+        "id",
+        description="Output language ('id' for Indonesian, 'en' for English)",
+    )
 
     @field_validator("itinerary_text")
     @classmethod
@@ -119,6 +123,20 @@ class BriefingItem(BaseModel):
     superseded_by_url: Optional[str] = None
     trigger_reason: Optional[str] = None
     trigger_reason_en: Optional[str] = None
+    display_text: Optional[str] = None
+    display_title: Optional[str] = None
+    display_status_note: Optional[str] = None
+    display_source_note: Optional[str] = None
+    display_penalties: Optional[str] = None
+    text_original: Optional[str] = None
+    text_en: Optional[str] = None
+    title_en: Optional[str] = None
+    status_note_en: Optional[str] = None
+    source_note_en: Optional[str] = None
+    penalties_en: Optional[str] = None
+    category_en: Optional[str] = None
+    tier_label_en: Optional[str] = None
+    translation_status: Optional[str] = None
 
 
 class TripBriefResponse(BaseModel):
@@ -154,6 +172,10 @@ class ContextNoteRequest(BaseModel):
         min_length=1,
         max_length=5000,
         description="Text of viral post, incident description, or caption",
+    )
+    lang: Literal["id", "en"] = Field(
+        "id",
+        description="Output language ('id' for Indonesian, 'en' for English)",
     )
 
     @field_validator("post_content")
@@ -195,6 +217,20 @@ class CitationItem(BaseModel):
     related_document_ids: List[str] = Field(default_factory=list)
     superseded_by: Optional[str] = None
     superseded_by_url: Optional[str] = None
+    display_text: Optional[str] = None
+    display_title: Optional[str] = None
+    display_status_note: Optional[str] = None
+    display_source_note: Optional[str] = None
+    display_penalties: Optional[str] = None
+    text_original: Optional[str] = None
+    text_en: Optional[str] = None
+    title_en: Optional[str] = None
+    status_note_en: Optional[str] = None
+    source_note_en: Optional[str] = None
+    penalties_en: Optional[str] = None
+    category_en: Optional[str] = None
+    tier_label_en: Optional[str] = None
+    translation_status: Optional[str] = None
 
 
 class ContextNoteResponse(BaseModel):

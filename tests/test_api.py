@@ -395,3 +395,98 @@ def test_rate_limit_trusted_proxy_headers(monkeypatch):
     r2 = DummyRequest({"x-forwarded-for": "198.51.100.25"})
     assert main_module._client_key(r1) == "203.0.113.10"
     assert main_module._client_key(r2) == "198.51.100.25"
+
+def test_trip_brief_bilingual_fields():
+    # Test English request
+    res_en = client.post(
+        "/api/v1/trip-brief",
+        json={
+            "itinerary_text": "Visiting Uluwatu temple and renting a scooter",
+            "start_date": "2026-06-01",
+            "end_date": "2026-06-05",
+            "traveler_origin": "international",
+            "lang": "en",
+        },
+    )
+    assert res_en.status_code == 200
+    data_en = res_en.json()
+    assert data_en["briefing_items"]
+    first_en = data_en["briefing_items"][0]
+    assert first_en.get("display_text")
+    assert first_en.get("display_title")
+    assert first_en.get("text_original")
+    assert first_en.get("display_penalties")
+    assert "Date: 2026-06-01" in data_en["whatsapp_text"]
+    assert "Verification status:" in data_en["ics_content"]
+
+    # Test Indonesian request
+    res_id = client.post(
+        "/api/v1/trip-brief",
+        json={
+            "itinerary_text": "Mengunjungi pura uluwatu dan sewa motor",
+            "start_date": "2026-06-01",
+            "end_date": "2026-06-05",
+            "traveler_origin": "international",
+            "lang": "id",
+        },
+    )
+    assert res_id.status_code == 200
+    data_id = res_id.json()
+    first_id = data_id["briefing_items"][0]
+    assert first_id.get("display_text") == first_id.get("text_original")
+    assert "Tanggal: 2026-06-01" in data_id["whatsapp_text"]
+    assert "Status verifikasi:" in data_id["ics_content"]
+
+
+def test_context_note_bilingual_fields():
+    # Test English request
+    res_en = client.post(
+        "/api/v1/context-note",
+        json={
+            "post_content": "Foreign tourist arrested for climbing a sacred banyan tree at temple in Bali",
+            "lang": "en",
+        },
+    )
+    assert res_en.status_code == 200
+    data_en = res_en.json()
+    if data_en.get("citations"):
+        first_cite = data_en["citations"][0]
+        assert first_cite.get("display_text")
+        assert first_cite.get("display_title")
+        assert first_cite.get("text_original")
+        assert first_cite.get("display_penalties")
+        assert "Context Note (Pramana):" in data_en["copyable_comment"]
+
+    # Test Indonesian request
+    res_id = client.post(
+        "/api/v1/context-note",
+        json={
+            "post_content": "Bule naik pohon keramat pura bali ditangkap",
+            "lang": "id",
+        },
+    )
+    assert res_id.status_code == 200
+    data_id = res_id.json()
+    if data_id.get("citations"):
+        first_cite = data_id["citations"][0]
+        assert first_cite.get("display_text") == first_cite.get("text_original")
+        assert "Catatan Konteks (Pramana):" in data_id["copyable_comment"]
+
+
+def test_totem_bilingual_citations():
+    # Test EN
+    res_en = client.get("/api/v1/totem/pura-besakih?lang=en")
+    assert res_en.status_code == 200
+    data_en = res_en.json()
+    for cite in data_en["citations"]:
+        assert cite.get("display_text")
+        assert cite.get("display_title")
+        assert cite.get("text_original")
+
+    # Test ID
+    res_id = client.get("/api/v1/totem/pura-besakih?lang=id")
+    assert res_id.status_code == 200
+    data_id = res_id.json()
+    for cite in data_id["citations"]:
+        assert cite.get("display_text") == cite.get("text_original")
+
