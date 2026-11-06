@@ -5,8 +5,16 @@
 
 import { i18n } from './i18n.svelte.js';
 
-const ENV_BASE = (import.meta.env.VITE_API_BASE_URL || '').trim().replace(/\/+$/, '');
-const API_BASE = `${ENV_BASE}/api/v1`;
+const DEFAULT_REMOTE_BACKEND = 'https://pramana1.onrender.com';
+const RESOLVED_BASE = (
+  import.meta.env.VITE_API_BASE_URL ||
+  (typeof window !== 'undefined' &&
+  (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')
+    ? 'http://127.0.0.1:8000'
+    : DEFAULT_REMOTE_BACKEND)
+).trim().replace(/\/+$/, '');
+
+const API_BASE = `${RESOLVED_BASE}/api/v1`;
 const DEFAULT_TIMEOUT_MS = 25000;
 
 export const apiState = $state({
