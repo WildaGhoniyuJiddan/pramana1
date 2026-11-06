@@ -173,9 +173,9 @@ async def security_and_rate_limit(request: Request, call_next):
     return response
 
 
-@app.get("/")
-@app.get("/health")
-@app.get("/api/v1/health")
+@app.api_route("/", methods=["GET", "HEAD"])
+@app.api_route("/health", methods=["GET", "HEAD"])
+@app.api_route("/api/v1/health", methods=["GET", "HEAD"])
 def healthcheck():
     stats = corpus_manager.get_stats()
     return {

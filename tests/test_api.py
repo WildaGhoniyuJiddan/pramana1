@@ -24,6 +24,8 @@ def test_healthcheck_endpoint():
         assert response.status_code == 200
         data = response.json()
         assert data["status"] == "healthy"
+        head_res = client.head(path)
+        assert head_res.status_code == 200
     assert data["version"] == "1.4.0"
     assert data["total_regulations_indexed"] == 42
     assert data["total_documents_registered"] == 29
