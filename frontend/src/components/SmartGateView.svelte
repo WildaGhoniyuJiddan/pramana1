@@ -312,7 +312,10 @@
     window.speechSynthesis.cancel();
     const utterance = new SpeechSynthesisUtterance(text);
     utterance.lang = lang === 'id' ? 'id-ID' : 'en-US';
-    utterance.rate = 0.95;
+    utterance.rate =
+      typeof window !== 'undefined'
+        ? parseFloat(localStorage.getItem('pramana_tts_rate') || '0.95')
+        : 0.95;
     utterance.onend = () => {
       speaking = false;
     };
