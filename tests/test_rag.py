@@ -275,3 +275,51 @@ def test_prompt_injection_is_not_echoed(engine):
     ])
     assert "Pasal 999" not in haystack
     assert "Rp999.000.000" not in haystack
+
+
+def test_gemini_3x_payload_disables_thinking(monkeypatch):
+    from backend.services import rag_engine
+
+    monkeypatch.setattr(rag_engine, "GEMINI_MODEL", "gemini-3.5-flash")
+    monkeypatch.setattr(
+        rag_engine, "get_gemini_api_key", lambda: "test-key"
+    )
+    monkeypatch.setattr(rag_engine, "get_ai_mode", lambda: "required")
+
+    captured = {}
+
+    class FakeResponse:
+        status_code = 200
+
+        def json(self):
+            return {
+                "candidates": [{
+                    "content": {
+                        "parts": [{"text": '{"abstain": true}'}]
+                    }
+                }]
+            }
+
+    class FakeClient:
+        def __init__(self, *args, **kwargs):
+            pass
+
+        def __enter__(self):
+            return self
+
+        def __exit__(self, *args):
+            return False
+
+        def post(self, url, json=None, headers=None):
+            captured["payload"] = json
+            return FakeResponse()
+
+    monkeypatch.setattr(rag_engine.httpx, "Client", FakeClient)
+    engine = rag_engine.StrictRAGEngine()
+    engine._call_gemini_structured(
+        "system", "user", {"type": "OBJECT"}
+    )
+
+    generation = captured["payload"]["generationConfig"]
+    assert generation["maxOutputTokens"] == 1800
+    assert generation["thinkingConfig"] == {"thinkingBudget": 0}

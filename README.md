@@ -136,7 +136,7 @@ python eval/run_eval.py --mode fast   # deterministik, tanpa AI
 python eval/run_eval.py --mode live   # Gemini live + rate-limit-safe
 ```
 
-Baseline internal 45 kasus: 15 in-scope, 10 triage, 10 out-of-scope, 4 adversarial, 6 PII. Pada 6 November 2026, `--mode fast` 45/45; `--mode live` dengan `gemini-3.1-flash-lite` + hybrid retrieval juga 45/45, 75 sitasi terverifikasi, 45 klaim terverifikasi, epistemic routing 1.0, guidance completeness 1.0, PII leak 0, dan rewrite recovery 1.0. Latensi live P50/P95 sekitar 4,3/7,7 detik. **Ini bukan benchmark publik** dan tidak mengklaim “nol halusinasi”. Hasil lengkap ada di [`eval/results/latest.md`](eval/results/latest.md).
+Baseline internal 45 kasus: 15 in-scope, 10 triage, 10 out-of-scope, 4 adversarial, 6 PII. Dengan `gemini-3.1-flash-lite`, `--mode live` mencapai 45/45, 75 sitasi terverifikasi, 45 klaim, epistemic routing 1.0, guidance completeness 1.0, PII leak 0, dan latensi P50/P95 sekitar 4,3/7,7 detik. Setelah default diganti ke `gemini-3.5-flash`, targeted test Tier 1/2/3 berhasil, tetapi full 45-case run pada key uji lokal menemui `HTTP 429` untuk sebagian besar panggilan AI; routing dan guidance deterministik tetap 45/45. Untuk eval AI penuh dengan 3.5-flash, gunakan key/kuota yang mencukupi. **Ini bukan benchmark publik** dan tidak mengklaim “nol halusinasi”. Hasil lengkap ada di [`eval/results/latest.md`](eval/results/latest.md).
 
 ---
 
@@ -186,7 +186,7 @@ Catatan penting:
 - **Frontend:** Svelte 5 (runes), Vite 5.4.x, Tailwind CSS 3, Web Speech API, `qrcode`.
 - **Backend:** Python 3.11+ (diuji pada 3.12.10), FastAPI, Pydantic v2, Uvicorn, HTTPX.
 - **Penyimpanan:** JSON korpus terstruktur dan zone registry di memori; tidak ada database.
-- **AI:** Google Gemini API (`gemini-3.1-flash-lite`, `temperature=0.1`) dengan structured JSON + evidence span verifier. `AI_MODE=required` untuk submission; `optional` untuk pengembangan.
+- **AI:** Google Gemini API (`gemini-3.5-flash`, `temperature=0.1`) dengan structured JSON + evidence span verifier. `AI_MODE=required` untuk submission; `optional` untuk pengembangan.
 - **Evaluasi:** `eval/run_eval.py`, 45 kasus berlabel, baseline `--mode fast` dan live `--mode live` dengan metrik epistemic routing, guidance completeness, citation/span validity, PII recall, dan latensi.
 - **Testing:** Pytest + FastAPI TestClient.
 
@@ -272,7 +272,7 @@ npm run build
 pytest -q
 ```
 
-Status terakhir dijalankan (6 November 2026): **124 passed**. Build frontend dengan Vite 5.4.21 juga berhasil tanpa warning Svelte. Dua peringatan deprecation berasal dari kombinasi Starlette/HTTPX di lingkungan test, bukan kegagalan aplikasi.
+Status terakhir dijalankan (6 November 2026): **125 passed**. Build frontend dengan Vite 5.4.21 juga berhasil tanpa warning Svelte. Dua peringatan deprecation berasal dari kombinasi Starlette/HTTPX di lingkungan test, bukan kegagalan aplikasi.
 
 ---
 
@@ -280,9 +280,9 @@ Status terakhir dijalankan (6 November 2026): **124 passed**. Build frontend den
 
 | Variabel | Default | Fungsi |
 | :--- | :--- | :--- |
-| `AI_MODE` | `optional` | `required` untuk submission; `optional` untuk dev; `disabled` untuk eval retrieval-only. |
+| `AI_MODE` | `required` | `required` untuk submission; `optional` untuk dev; `disabled` untuk eval retrieval-only. |
 | `GEMINI_API_KEY` | kosong | Wajib untuk AI. Jangan commit nilai asli. |
-| `GEMINI_MODEL` | `gemini-3.1-flash-lite` | Model generasi; dapat diganti via env. |
+| `GEMINI_MODEL` | `gemini-3.5-flash` | Model generasi; dapat diganti via env. |
 | `GEMINI_EMBEDDING_MODEL` | `gemini-embedding-001` | Diverifikasi ulang sebelum membangun embedding. |
 | `PRAMANA_PUBLIC_URL` | kosong | Opsional. URL publik frontend untuk tautan QR dan teks WhatsApp, misalnya `https://pramana.example.com`. Jika kosong, tautan memakai origin browser. |
 | `CORS_ALLOW_ORIGINS` | `http://localhost:5173,http://127.0.0.1:5173` | Daftar origin yang diizinkan, dipisahkan koma. |
@@ -390,7 +390,7 @@ Pustaka open-source: FastAPI, Pydantic, Uvicorn, HTTPX, Pytest, Svelte 5, Vite, 
 | **Backend / Runtime** | Python 3.11+, FastAPI, Uvicorn |
 | **Database / Storage** | JSON korpus dan zone registry di memori (`corpus/bali_regulations.json`, `corpus/zones.json`); tidak ada database |
 | **Hosting / Deployment** | Belum ada deployment publik yang diverifikasi; jalankan secara lokal atau self-hosted |
-| **AI Model / API** | Gemini API (`gemini-3.1-flash-lite`, dapat diganti via `GEMINI_MODEL`) dengan structured JSON + evidence span verifier + Layer-1/Layer-2 guard |
+| **AI Model / API** | Gemini API (`gemini-3.5-flash`, dapat diganti via `GEMINI_MODEL`) dengan structured JSON + evidence span verifier + Layer-1/Layer-2 guard |
 | **Peran AI** | Menyusun ringkasan eksekutif (Mode 1), catatan konteks netral (Mode 2), dan AI brief Smart Gate (Mode 3) dari sitasi terverifikasi. AI tidak membuat sitasi; setiap claim harus menunjuk evidence span. `AI_MODE=required` di submission. |
 | **Phygital Interface** | URL record NFC NTAG213 / QR, Web Speech API (TTS). Tidak memakai Web NFC API dan tidak memverifikasi identitas. |
 | **Dataset** | Korpus kurasi manual dari sumber resmi; lihat bagian Sumber Data |

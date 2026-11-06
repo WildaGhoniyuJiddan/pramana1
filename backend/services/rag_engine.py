@@ -182,6 +182,10 @@ class StrictRAGEngine:
                 "responseSchema": response_schema,
             },
         }
+        if GEMINI_MODEL.startswith(("gemini-3", "gemini-2.5")):
+            payload["generationConfig"]["thinkingConfig"] = {
+                "thinkingBudget": 0
+            }
 
         try:
             with httpx.Client(timeout=45.0) as client:

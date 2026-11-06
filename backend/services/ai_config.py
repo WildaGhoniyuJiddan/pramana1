@@ -15,15 +15,15 @@ from dotenv import load_dotenv
 load_dotenv()
 
 VALID_AI_MODES = {"required", "optional", "disabled"}
-GEMINI_MODEL = os.getenv("GEMINI_MODEL", "gemini-3.1-flash-lite")
+GEMINI_MODEL = os.getenv("GEMINI_MODEL", "gemini-3.5-flash")
 GEMINI_EMBEDDING_MODEL = os.getenv(
     "GEMINI_EMBEDDING_MODEL", "gemini-embedding-001"
 )
 
 
 def get_ai_mode() -> str:
-    value = os.getenv("AI_MODE", "optional").strip().lower()
-    return value if value in VALID_AI_MODES else "optional"
+    value = os.getenv("AI_MODE", "required").strip().lower()
+    return value if value in VALID_AI_MODES else "required"
 
 
 def get_gemini_api_key() -> str:

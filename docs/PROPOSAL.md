@@ -38,7 +38,7 @@ Sebagai destinasi pariwisata utama dunia, Bali menghadapi tantangan krusial pada
 
 ## 4. AI Implementation
 
-- **Metode & Model AI:** Arsitektur hibrida yang menggabungkan **Google Gemini API (`gemini-3.1-flash-lite`, `temperature=0.1`)**, **Deterministic Legal Retriever**, **3-Tier Epistemic Router**, **Dual-Layer Verifier**, dan **Regex PII Masking**.
+- **Metode & Model AI:** Arsitektur hibrida yang menggabungkan **Google Gemini API (`gemini-3.5-flash`, `temperature=0.1`)**, **Deterministic Legal Retriever**, **3-Tier Epistemic Router**, **Dual-Layer Verifier**, dan **Regex PII Masking**.
 - **Input:**
   - *Mode 1:* Teks rencana perjalanan/booking, tanggal mulai & selesai, status wisatawan (WNA/WNI).
   - *Mode 2:* Teks klaim insiden atau keterangan unggahan media sosial.
@@ -113,7 +113,7 @@ Sebagai destinasi pariwisata utama dunia, Bali menghadapi tantangan krusial pada
 - **Frontend:** Svelte 5, Vite 5.4.x, Tailwind CSS 3
 - **Backend:** Python 3.11+, FastAPI, Pydantic v2, Uvicorn, HTTPX
 - **Database / Storage:** Structured JSON Legal Corpus (`corpus/bali_regulations.json`)
-- **AI Model / Method:** Google Gemini API (`gemini-3.1-flash-lite`) + Deterministic Strict-RAG + 3-Tier Epistemic Router + Dual-Layer Verifier + Regex PII Masking
+- **AI Model / Method:** Google Gemini API (`gemini-3.5-flash`) + Deterministic Strict-RAG + 3-Tier Epistemic Router + Dual-Layer Verifier + Regex PII Masking
 - **Dataset:** Peraturan resmi dari JDIH BPK, `peraturan.go.id`, Pemerintah Kabupaten Buleleng, Disparda Bali, dan Kesbangpol Bali (Domain Publik, Pasal 42 huruf b UU Hak Cipta No. 28/2014)
 - **AI Coding Assistant:** Google Antigravity / Gemini digunakan sebagai asisten pengembangan kode dan pengujian; seluruh kode sumber dan arsitektur diuji serta dipertanggungjawabkan penuh oleh tim.
 

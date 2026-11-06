@@ -1,4 +1,4 @@
-"""
+﻿"""
 Integration tests for FastAPI endpoints.
 """
 
@@ -32,7 +32,7 @@ def test_healthcheck_endpoint():
     assert data["corpus_version"] == "1.3.0"
     assert data["ai_mode"] == "optional"
     assert data["ai_enabled"] is False
-    assert data["ai_model"] == "gemini-3.1-flash-lite"
+    assert data["ai_model"] == "gemini-3.5-flash"
     assert data["calendar_coverage"] == "2025-2028"
     assert data["verification_scope"] == "corpus"
 
@@ -43,14 +43,14 @@ def test_ai_status_endpoint():
     data = response.json()
     assert data["mode"] == "optional"
     assert data["enabled"] is False
-    assert data["model"] == "gemini-3.1-flash-lite"
+    assert data["model"] == "gemini-3.5-flash"
     assert "calls" in data
     assert "guard_rejections" in data
     assert "last_error" in data
     assert data["hybrid_retrieval_available"] is False
     assert data["embedding_vectors_loaded"] == 40
     assert data["ai_mode"] == "optional"
-    assert data["model_name"] == "gemini-3.1-flash-lite"
+    assert data["model_name"] == "gemini-3.5-flash"
     assert data["api_key_configured"] is False
     assert data["active_chunks_count"] == 40
     assert data["registry_docs_count"] == 4
