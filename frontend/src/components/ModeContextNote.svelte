@@ -1,5 +1,4 @@
 <script>
-  import { onMount } from 'svelte';
   import { requestContextNote } from '../lib/api.js';
   import { i18n, DICT } from '../lib/i18n.svelte.js';
 
@@ -14,27 +13,25 @@
   let errorMsg = $state('');
   let result = $state(null);
   let copySuccess = $state(false);
-  let activePresetIdx = $state(0);
+  let activePresetIdx = $state(-1);
+  let lastPresetText = $state('');
   let activeCiteIdx = $state(0);
   let showTechAudit = $state(false);
   let summaryLang = $derived(i18n.lang);
 
-  onMount(() => {
-    applyPreset(presets[0], 0, true);
-  });
-
   // Keep preset text in sync if language switches while on a preset
   $effect(() => {
-    const currPreset = presets[activePresetIdx];
-    if (currPreset && (!postContent || presets.some(p => p.text === postContent))) {
+    const currPreset = activePresetIdx >= 0 ? presets[activePresetIdx] : null;
+    if (currPreset && postContent === lastPresetText && lastPresetText !== '') {
       postContent = currPreset.text;
+      lastPresetText = currPreset.text;
     }
   });
 
-  function applyPreset(p, idx, autoRun = false) {
+  function applyPreset(p, idx) {
     activePresetIdx = idx;
     postContent = p.text;
-    if (autoRun) handleSubmit();
+    lastPresetText = p.text;
   }
 
   async function handleSubmit(e) {
@@ -102,7 +99,7 @@
         {#each presets as preset, idx}
           <button
             type="button"
-            onclick={() => applyPreset(preset, idx, true)}
+            onclick={() => applyPreset(preset, idx)}
             style={activePresetIdx === idx
               ? 'background-color: #0c249c; color: #ffffff; border: 1.5px solid #0a0a0a; box-shadow: 2px 2px 0px #0a0a0a;'
               : 'background-color: #f3f1eb; color: #0a0a0a; border: 1.5px solid #0a0a0a;'}
@@ -145,7 +142,7 @@
             </div>
 
             {#if errorMsg}
-              <div class="p-3 text-xs font-medium" style="background-color: #ffffff; border: 1.5px solid #c92a2a; color: #c92a2a;">
+              <div role="alert" aria-live="polite" class="p-3 text-xs font-medium" style="background-color: #ffffff; border: 1.5px solid #c92a2a; color: #c92a2a;">
                 {errorMsg}
               </div>
             {/if}

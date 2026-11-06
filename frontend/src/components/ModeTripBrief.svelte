@@ -1,5 +1,4 @@
 <script>
-  import { onMount } from 'svelte';
   import { requestTripBrief } from '../lib/api.js';
   import { i18n, DICT } from '../lib/i18n.svelte.js';
 
@@ -18,7 +17,8 @@
   let result = $state(null);
   let copySuccess = $state(false);
   let showTechAudit = $state(false);
-  let activePresetIdx = $state(0);
+  let activePresetIdx = $state(-1);
+  let lastPresetText = $state('');
   let activeRuleIdx = $state(0);
   let summaryLang = $derived(i18n.lang);
 
@@ -29,9 +29,10 @@
   ];
 
   $effect(() => {
-    const curr = presets[activePresetIdx];
-    if (curr && (!itineraryText || presets.some(p => p.text === itineraryText))) {
+    const curr = activePresetIdx >= 0 ? presets[activePresetIdx] : null;
+    if (curr && itineraryText === lastPresetText && lastPresetText !== '') {
       itineraryText = curr.text;
+      lastPresetText = curr.text;
     }
   });
 
@@ -89,18 +90,14 @@
     return ruleName;
   }
 
-  onMount(() => {
-    applyPreset(presets[0], 0, true);
-  });
-
-  function applyPreset(p, idx, autoRun = false) {
+  function applyPreset(p, idx) {
     activePresetIdx = idx;
     itineraryText = p.text;
+    lastPresetText = p.text;
     const meta = PRESET_DATES[idx] || PRESET_DATES[0];
     startDate = meta.start;
     endDate = meta.end;
     travelerOrigin = meta.origin;
-    if (autoRun) handleSubmit();
   }
 
   async function handleSubmit(e) {
@@ -210,7 +207,7 @@
         {#each presets as preset, idx}
           <button
             type="button"
-            onclick={() => applyPreset(preset, idx, true)}
+            onclick={() => applyPreset(preset, idx)}
             style={activePresetIdx === idx
               ? 'background-color: #0c249c; color: #ffffff; border: 1.5px solid #0a0a0a; box-shadow: 2px 2px 0px #0a0a0a;'
               : 'background-color: #f3f1eb; color: #0a0a0a; border: 1.5px solid #0a0a0a;'}
@@ -296,7 +293,7 @@
             </div>
 
             {#if errorMsg}
-              <div class="p-3 text-xs font-medium" style="background-color: #ffffff; border: 1.5px solid #c92a2a; color: #c92a2a;">
+              <div role="alert" aria-live="polite" class="p-3 text-xs font-medium" style="background-color: #ffffff; border: 1.5px solid #c92a2a; color: #c92a2a;">
                 {errorMsg}
               </div>
             {/if}
@@ -582,6 +579,17 @@
                       : activeItem.is_verbatim ? common.verbatimNotice : common.summaryNotice}
                   </span>
                 </div>
+
+                {#if activeItem.trigger_reason}
+                  <div>
+                    <span
+                      class="font-mono text-[10px] font-bold px-2 py-0.5 inline-block"
+                      style="background-color: #dfd6c3; color: #0a0a0a; border: 1px solid #0a0a0a;"
+                    >
+                      {i18n.lang === 'en' && activeItem.trigger_reason_en ? activeItem.trigger_reason_en : activeItem.trigger_reason}
+                    </span>
+                  </div>
+                {/if}
 
                 <div class="space-y-2">
                   <h3 class="text-base sm:text-lg font-medium tracking-tight" style="color: #0a0a0a;">
