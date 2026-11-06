@@ -173,3 +173,103 @@ def test_pipeline_supports_abstain(citations, monkeypatch):
     assert result["ai_synthesis_status"] == "abstain"
     assert result["guard_status"] == "AI_ABSTAIN"
     assert result["claims"] == []
+
+
+def test_pipeline_tier2_hard_locks_citations_and_sanitizes(citations, monkeypatch):
+    monkeypatch.setenv("AI_MODE", "required")
+    span_index = build_span_index(citations)
+    span_id = next(iter(span_index))
+    parsed = {
+        "abstain": False,
+        "resolution_mode": "NEEDS_CLARIFICATION",
+        "detected_framing_or_tone": "Keluhan subjektif",
+        "summary_indonesian": (
+            "Berdasarkan Pasal 999 dan UU No. 8 Tahun 1999, denda "
+            "Rp999.000.000 berlaku."
+        ),
+        "summary_english": "Under Pasal 999, a Rp999.000.000 fine applies.",
+        "claims": [{
+            "claim_text_indonesian": "Pasal 999 mewajibkan denda.",
+            "claim_text_english": "Pasal 999 requires a fine.",
+            "citation_id": "PERDA_BALI_06_2023_LEVY",
+            "span_ids": [span_id],
+            "exact_source_span": "",
+        }],
+        "user_guidance": {
+            "missing_context_diagnosis": ["Lokasi kejadian belum jelas."],
+            "what_user_should_do_next": ["Tulis kronologi."],
+            "suggested_query_rewrites": [
+                "Wisatawan lokal ditolak masuk di beach club Bali",
+            ],
+            "relevant_authority_or_channel": "BPSK",
+        },
+    }
+
+    result = _pipeline(parsed).answer(
+        citations=citations,
+        system_prompt="test",
+        user_prompt="test",
+        fallback_summary="fallback",
+        resolution_mode="NEEDS_CLARIFICATION",
+        taxonomy={
+            "candidate_clusters": ["DISKRIMINASI_DAN_KONSUMEN"],
+            "is_factually_complete": False,
+            "tone": "Keluhan subjektif",
+        },
+        top_score=0.8,
+        fallback_guidance={
+            "suggested_query_rewrites": [
+                "Wisatawan lokal ditolak masuk dan dibedakan di beach club Bali",
+                "Pelaku usaha restoran menolak melayani pengunjung lokal",
+                "Staf tempat wisata menghina pengunjung berdasarkan etnis",
+            ],
+            "relevant_authority_or_channel": "BPSK",
+        },
+        allowed_rupiah={"150000"},
+    )
+
+    assert result["resolution_mode"] == "NEEDS_CLARIFICATION"
+    assert result["claims"] == []
+    assert "Pasal 999" not in (result["summary_id"] or "")
+    assert "UU No. 8 Tahun 1999" not in (result["summary_id"] or "")
+    assert "Rp999.000.000" not in (result["summary_id"] or "")
+    assert len(result["user_guidance"]["suggested_query_rewrites"]) == 3
+
+
+def test_pipeline_tier1_downgrades_when_all_claims_fail(citations, monkeypatch):
+    monkeypatch.setenv("AI_MODE", "required")
+    parsed = {
+        "abstain": False,
+        "resolution_mode": "VERIFIED_GROUNDED",
+        "detected_framing_or_tone": "Kronologi faktual",
+        "summary_indonesian": "Wisatawan asing wajib membayar pungutan Rp150.000.",
+        "summary_english": "Foreign tourists must pay the IDR 150,000 levy.",
+        "claims": [{
+            "claim_text_indonesian": "Klaim tanpa span yang valid.",
+            "claim_text_english": "A claim without a valid span.",
+            "citation_id": "PERDA_BALI_06_2023_LEVY",
+            "span_ids": ["PERDA_BALI_06_2023_LEVY#s999"],
+            "exact_source_span": "",
+        }],
+        "user_guidance": {
+            "missing_context_diagnosis": [],
+            "what_user_should_do_next": [],
+            "suggested_query_rewrites": [],
+            "relevant_authority_or_channel": "",
+        },
+    }
+
+    result = _pipeline(parsed).answer(
+        citations=citations,
+        system_prompt="test",
+        user_prompt="test",
+        fallback_summary="fallback",
+        resolution_mode="VERIFIED_GROUNDED",
+        taxonomy={"candidate_clusters": ["PUNGUTAN_DAN_KEWAJIBAN_WNA"]},
+        top_score=0.8,
+        allowed_rupiah={"150000"},
+    )
+
+    assert result["resolution_mode"] == "NEEDS_CLARIFICATION"
+    assert result["claims"] == []
+    assert result["guard_status"] in {"AI_OUTPUT_DITOLAK", "FALLBACK_GUARD"}

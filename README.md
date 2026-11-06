@@ -18,13 +18,15 @@ Bali DigiFest 2026 — AI Web Innovation Challenge
 | Kalender Nyepi & Pawukon | ✅ Live | Cakupan deterministik 2025–2028, jendela Nyepi 24 jam |
 | Ekspor `.ics` (RFC 5545) | ✅ Live | Escaping teks, line folding, UID stabil, validasi tanggal |
 | AI Core Hardening | ✅ Live | Structured output, evidence span, claim verifier, `AI_MODE`, telemetri, eval harness |
-| Mode 1 — Trip Brief | 🟡 Prototype | Retrieval, kalender, PII, ICS, teks WhatsApp; AI-first dengan fallback dev |
-| Mode 2 — Context Note | 🟡 Prototype | Sitasi korpus, deteksi framing, claim verifier, abstain; AI-first |
+| 3-Tier Epistemic Routing | ✅ Live | `VERIFIED_GROUNDED`, `NEEDS_CLARIFICATION`, `OUT_OF_SCOPE_GUIDANCE`; hard-lock sitasi untuk Tier 2/3 |
+| Active Legal Triage | ✅ Live | Diagnosis unsur yang kurang, langkah konkret, kanal resmi, dan 3 query rewrite yang bisa diklik |
+| Mode 1 — Trip Brief | 🟡 Prototype | Retrieval, kalender, PII, ICS, teks WhatsApp; AI-first dengan triage bila konteks kurang |
+| Mode 2 — Context Note | 🟡 Prototype | Sitasi korpus, deteksi framing, claim verifier, triage aktif; AI-first |
 | Mode 3 — Smart Gate (NFC/QR) | 🟡 Prototype | 3 zona, kartu deterministik, AI brief grounded, TTS, QR; offline belum |
 | Corpus Explorer | 🟡 Prototype | Menampilkan registry dokumen, chunk retrieval, provenance, dan keterbatasan korpus |
 | Sintesis Gemini | 🟡 Prototype | Structured JSON + evidence span; `AI_MODE=required` di submission |
 | Verifikasi silang JDIH real-time | ⚪ Planned | Belum diimplementasikan |
-| Benchmark publik | 🟡 Internal eval | 40 kasus berlabel; baseline retrieval-only di `eval/results/`; belum benchmark publik |
+| Benchmark publik | 🟡 Internal eval | 45 kasus berlabel; baseline `--mode fast` dan live di `eval/results/`; belum benchmark publik |
 | Antarmuka bilingual ID/EN | 🟡 Prototype | Smart Gate ID/EN; ringkasan AI Mode 1/2 punya toggle ID/EN |
 
 ---
@@ -36,22 +38,24 @@ Pramana membantu dua kelompok masalah:
 1. **Wisatawan** yang perlu memahami aturan kawasan suci, pungutan wisatawan asing, lalu lintas, dan penutupan Nyepi sebelum berangkat.
 2. **Masyarakat, jurnalis, dan pengelola akomodasi** yang perlu merespons klaim viral tentang insiden wisata dengan konteks hukum yang dapat ditelusuri, bukan spekulasi.
 
-Aplikasi ini tidak menjawab pertanyaan hukum bebas. Ia mengambil kecocokan dari korpus regulasi terbatas, menampilkan sumber, dan memilih **abstain** (`TIDAK_DITEMUKAN`) ketika tidak ada kecocokan yang melewati ambang relevansi.
+Aplikasi ini tidak menjawab pertanyaan hukum bebas. Ia mengambil kecocokan dari korpus regulasi terbatas, menampilkan sumber, dan memilih salah satu dari tiga mode epistemik: `VERIFIED_GROUNDED` (bukti cukup), `NEEDS_CLARIFICATION` (konteks belum lengkap), atau `OUT_OF_SCOPE_GUIDANCE` (di luar cakupan). Pada dua mode terakhir, sitasi pasal dikunci kosong secara deterministik dan AI tetap memberi panduan praktis.
 
 ### Mode 1 — Trip Brief
 
 - Menyamarkan PII dari teks rencana perjalanan.
 - Mendeteksi bentrok dengan Nyepi 24 jam, Malam Pengerupukan, Galungan, dan Kuningan.
-- Mengambil entri korpus yang relevan dan menerapkan Layer-2 guard.
+- Mengambil entri korpus yang relevan dan menerapkan routing epistemik.
 - Menambahkan entri pungutan untuk wisatawan internasional **setelah** grounding berhasil.
-- Menghasilkan teks WhatsApp dan berkas kalender `.ics` (tersedia juga saat abstain).
+- Jika konteks belum lengkap, memberi diagnosis, langkah awal, kanal resmi, dan 3 query rewrite yang bisa diklik.
+- Menghasilkan teks WhatsApp dan berkas kalender `.ics` (tersedia juga saat triage).
 
 ### Mode 2 — Context Note
 
 - Menyamarkan PII dari teks postingan/klaim.
 - Mendeteksi frasa framing sensasional (generalisasi, tuduhan tanpa dasar, dan sejenisnya).
 - Mengambil entri korpus yang relevan, lalu memverifikasi kutipan terhadap teks korpus (Layer-1).
-- Menghasilkan catatan konteks netral dan komentar yang dapat disalin, atau abstain.
+- Menghasilkan catatan konteks netral dan komentar yang dapat disalin.
+- Jika input masih subjektif/awam, menghasilkan triage dengan 3 skenario perbaikan; jika di luar cakupan, memberi panduan non-hukum yang jujur.
 
 ### Mode 3 — Smart Gate (NFC/QR)
 
@@ -75,7 +79,10 @@ Pramana sengaja membedakan beberapa tingkat klaim:
 | Istilah | Arti sebenarnya |
 | :--- | :--- |
 | **Layer-1 exact match** | Kutipan ada di dalam teks entri korpus lokal setelah normalisasi spasi. Ini bukan verifikasi independen ke JDIH. |
-| **Layer-2 guard** | Tidak ada hasil retrieval yang melewati ambang skor, sehingga sistem abstain sebelum memanggil LLM. |
+| **Layer-2 / routing epistemik** | Skor retrieval + kelengkapan fakta menentukan Tier 1/2/3. Tier 2/3 mengunci `citations = []`; AI tetap dipanggil untuk triage. |
+| **`VERIFIED_GROUNDED`** | Skor ≥ 0.50 dan unsur peristiwa cukup; klaim wajib terikat ke `citation_id` dan evidence span yang valid. |
+| **`NEEDS_CLARIFICATION`** | Skor 0.15–0.49, fakta belum lengkap, atau instrumen registry-only; AI memberi diagnosis, langkah, kanal resmi, dan 3 query rewrite. |
+| **`OUT_OF_SCOPE_GUIDANCE`** | Skor < 0.15 dan tidak ada gugus hukum; AI menjelaskan batas cakupan dan memberi saran non-hukum. |
 | **`is_verbatim: true`** | Entri korpus disimpan sebagai kutipan teks, bukan ringkasan. |
 | **`is_verbatim: false`** | Entri adalah ringkasan/kompilasi. UI tidak menampilkannya sebagai bunyi pasal verbatim. |
 | **`text_status`** | Status teks eksplisit: `verbatim`, `verbatim-ocr-dibersihkan`, `compilation`, `non-verbatim`, atau `belum-diambil`. Chunk `compilation` tidak boleh dikutip sebagai bunyi pasal. |
@@ -108,25 +115,27 @@ Pramana memakai `AI_MODE` untuk mencegah AI “menghilang” diam-diam:
 
 Alur AI:
 
-1. Retrieval deterministik + Layer-2 guard.
-2. Sitasi diverifikasi Layer-1.
-3. Gemini menerima sitasi + evidence span IDs, lalu mengembalikan JSON `summary_id`, `summary_en`, `claims[]`.
-4. Python memverifikasi setiap claim: `citation_id` valid, `span_ids` milik sitasi, tidak ada pasal/rupiah liar.
-5. AI bisa `abstain` untuk prompt injection atau permintaan yang tidak didukung bukti.
+1. PII masking dan pemetaan bahasa awam ke 7 gugus hukum (`legal_taxonomy.py`).
+2. Retrieval hybrid (keyword + embedding) dengan query expansion; skor dan kelengkapan fakta menentukan tier.
+3. Untuk Tier 1: sitasi diverifikasi Layer-1, lalu Gemini menerima sitasi + evidence span IDs dan mengembalikan klaim terikat.
+4. Untuk Tier 2/3: Gemini tetap dipanggil sebagai konsultan triage, tetapi `claims` dan `citations` dikunci kosong.
+5. Python memverifikasi setiap claim (citation_id valid, span_ids milik sitasi, tidak ada pasal/rupiah liar) dan menyensor nomor pasal/nominal tak terverifikasi di teks bebas Tier 2/3.
+6. Prompt injection dan permintaan pasal/nominal fiktif ditolak secara deterministik.
 
-Telemetri tersedia di `GET /api/v1/ai/status` (tanpa prompt/PII). Hybrid retrieval opsional memakai embedding korpus yang dihitung offline:
+Telemetri tersedia di `GET /api/v1/ai/status` (tanpa prompt/PII), termasuk `total_requests`, `verified_grounded_count`, `needs_clarification_count`, `out_of_scope_count`, `guard_rejections_count`, `active_chunks_count`, `registry_docs_count`, dan `epistemic_routing_enabled`. Hybrid retrieval opsional memakai embedding korpus yang dihitung offline:
 
 ```bash
 python scripts/build_embeddings.py   # butuh GEMINI_API_KEY
 ```
 
-Hasilnya `corpus/embeddings.json`; runtime menghitung cosine query + keyword, dan otomatis kembali ke keyword jika file/API tidak tersedia. Vektor 40 chunk sudah disertakan; jalankan ulang skrip setelah korpus berubah. Eval harness ada di `eval/run_eval.py`; baseline retrieval-only dijalankan dengan:
+Hasilnya `corpus/embeddings.json`; runtime menghitung cosine query + keyword, dan otomatis kembali ke keyword jika file/API tidak tersedia. Vektor 40 chunk sudah disertakan; jalankan ulang skrip setelah korpus berubah. Eval harness ada di `eval/run_eval.py`:
 
 ```bash
-python eval/run_eval.py --retrieval-only
+python eval/run_eval.py --mode fast   # deterministik, tanpa AI
+python eval/run_eval.py --mode live   # Gemini live + rate-limit-safe
 ```
 
-Baseline internal 40 kasus: 20 in-scope, 12 out-of-scope, 3 adversarial, 5 PII. Pada 5 November 2026, baseline retrieval-only 40/40; run AI-assisted dengan `gemini-3.1-flash-lite` + hybrid retrieval juga 40/40 pada set internal yang sama, dengan latensi P50/P95 sekitar 2,8/3,8 detik. **Ini bukan benchmark publik** dan tidak mengklaim “nol halusinasi”. Hasil lengkap ada di [`eval/results/latest.md`](eval/results/latest.md).
+Baseline internal 45 kasus: 15 in-scope, 10 triage, 10 out-of-scope, 4 adversarial, 6 PII. Pada 6 November 2026, `--mode fast` 45/45; `--mode live` dengan `gemini-3.1-flash-lite` + hybrid retrieval juga 45/45, 75 sitasi terverifikasi, 45 klaim terverifikasi, epistemic routing 1.0, guidance completeness 1.0, PII leak 0, dan rewrite recovery 1.0. Latensi live P50/P95 sekitar 4,3/7,7 detik. **Ini bukan benchmark publik** dan tidak mengklaim “nol halusinasi”. Hasil lengkap ada di [`eval/results/latest.md`](eval/results/latest.md).
 
 ---
 
@@ -177,7 +186,7 @@ Catatan penting:
 - **Backend:** Python 3.11+ (diuji pada 3.12.10), FastAPI, Pydantic v2, Uvicorn, HTTPX.
 - **Penyimpanan:** JSON korpus terstruktur dan zone registry di memori; tidak ada database.
 - **AI:** Google Gemini API (`gemini-3.1-flash-lite`, `temperature=0.1`) dengan structured JSON + evidence span verifier. `AI_MODE=required` untuk submission; `optional` untuk pengembangan.
-- **Evaluasi:** `eval/run_eval.py`, 40 kasus berlabel, baseline retrieval-only dan metrik AI bila API key tersedia.
+- **Evaluasi:** `eval/run_eval.py`, 45 kasus berlabel, baseline `--mode fast` dan live `--mode live` dengan metrik epistemic routing, guidance completeness, citation/span validity, PII recall, dan latensi.
 - **Testing:** Pytest + FastAPI TestClient.
 
 ---
@@ -262,7 +271,7 @@ npm run build
 pytest -q
 ```
 
-Status terakhir dijalankan (5 November 2026): **107 passed**. Build frontend dengan Vite 5.4.21 juga berhasil. Dua peringatan deprecation berasal dari kombinasi Starlette/HTTPX di lingkungan test, bukan kegagalan aplikasi.
+Status terakhir dijalankan (6 November 2026): **123 passed**. Build frontend dengan Vite 5.4.21 juga berhasil tanpa warning Svelte. Dua peringatan deprecation berasal dari kombinasi Starlette/HTTPX di lingkungan test, bukan kegagalan aplikasi.
 
 ---
 
@@ -290,7 +299,7 @@ Jangan commit `.env` atau kunci API nyata.
 | Metode | Path | Keterangan |
 | :--- | :--- | :--- |
 | `GET` | `/api/v1/health` | Status, versi korpus, jumlah chunk/dokumen, status AI, cakupan kalender, dan scope verifikasi. |
-| `GET` | `/api/v1/ai/status` | Telemetri AI: mode, model, calls, failures, guard rejections, latency. |
+| `GET` | `/api/v1/ai/status` | Telemetri AI: mode, model, calls, failures, guard rejections, latency, dan counter epistemic routing. |
 | `GET` | `/api/v1/corpus` | Metadata korpus, tier, chunk retrieval, dan registry dokumen. |
 | `GET` | `/api/v1/zones` | Direktori zona Smart Gate. |
 | `GET` | `/api/v1/totem/{zone_id}?lang=id\|en` | Kartu zona deterministik + sitasi Layer-1. |
@@ -333,7 +342,7 @@ Kode kesalahan yang relevan: `404` untuk zona tidak dikenal, `422` untuk input/l
 12. **Kunci Gemini di deployment harus diset agar AI aktif.** Dengan `AI_MODE=required`, kegagalan AI menghasilkan status `unavailable`, bukan template.
 13. **SE Gubernur Bali No. 7 Tahun 2025 hanya ada di registry**, bukan chunk retrieval, karena PDF resminya belum diperoleh.
 14. **Kalender hanya 2025–2028.** Di luar rentang itu, hasil tidak lengkap dan diberi peringatan.
-15. **Belum ada benchmark publik.** Eval internal 40 kasus bukan klaim akurasi universal.
+15. **Belum ada benchmark publik.** Eval internal 45 kasus bukan klaim akurasi universal.
 16. **Belum ada QR/NFC verifikasi dokumen fisik.** QR/NFC hanya membuka URL; tidak memverifikasi identitas atau pembayaran.
 
 ---

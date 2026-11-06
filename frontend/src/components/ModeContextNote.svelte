@@ -1,6 +1,8 @@
 <script>
   import { onMount } from 'svelte';
   import { requestContextNote } from '../lib/api.js';
+  import EpistemicBadge from './EpistemicBadge.svelte';
+  import TriageGuidance from './TriageGuidance.svelte';
 
   let { onOpenDoc = () => {} } = $props();
 
@@ -75,6 +77,12 @@
     } catch (e) {
       console.error(e);
     }
+  }
+
+  async function applyRewrite(rewrite) {
+    postContent = rewrite;
+    activePresetIdx = -1;
+    await handleSubmit();
   }
 </script>
 
@@ -205,7 +213,99 @@
       <!-- RIGHT COLUMN: HIERARCHICAL VERIFICATION DOSSIER (7 cols) -->
       <div class="lg:col-span-7 space-y-5">
         {#if result}
-          {#if result.status === 'TIDAK_DITEMUKAN'}
+          <EpistemicBadge {result} />
+
+          {#if result.resolution_mode === 'NEEDS_CLARIFICATION'}
+            <!-- TIER 2: DIAGNOSTIC TRIAGE -->
+            <div class="brutal-card p-6 sm:p-8 space-y-4" style="background-color: #fff3cd;">
+              <div class="flex flex-wrap items-center justify-between gap-2">
+                <span class="font-mono text-[10px] font-bold px-2 py-0.5" style="background-color: #8a3b00; color: #ffffff;">
+                  TIER 2 // PERLU DETAIL KONTEKS
+                </span>
+                <span class="font-mono text-xs font-bold" style="color: #8a3b00;">
+                  DIAGNOSTIC TRIAGE
+                </span>
+              </div>
+
+              <h2 class="opero-h1 text-2xl sm:text-3xl" style="color: #0a0a0a;">
+                Cerita Anda Butuh <span class="opero-serif">Konteks Tambahan</span>
+              </h2>
+
+              <p class="text-xs sm:text-sm leading-relaxed" style="color: #3a3935;">
+                {summaryLang === 'en' && result.neutral_summary_en
+                  ? result.neutral_summary_en
+                  : result.neutral_summary}
+              </p>
+
+              {#if result.detected_framing_or_tone}
+                <p class="font-mono text-[10px]" style="color: #5c2d00;">
+                  ANALISIS NADA: {result.detected_framing_or_tone}
+                </p>
+              {/if}
+
+              <div class="p-3 text-[11px] leading-snug" style="background-color: #ffffff; border: 1.5px solid #0a0a0a; color: #3a3935;">
+                <strong>Teks tersamarkan:</strong> {result.masked_post}
+                <br />
+                <strong>PII disamarkan:</strong> {result.pii_redacted_count ?? 0} entitas
+                <br />
+                <strong>Sitasi:</strong> dikunci kosong secara deterministik sampai unsur peristiwa lengkap.
+              </div>
+            </div>
+
+            <TriageGuidance
+              guidance={result.user_guidance}
+              mode={result.resolution_mode}
+              onSelectRewrite={applyRewrite}
+            />
+
+            {#if result.disclaimer}
+              <p class="text-[11px] leading-snug" style="color: #5c5952;">
+                <strong>Disclaimer:</strong> {result.disclaimer}
+              </p>
+            {/if}
+          {:else if result.resolution_mode === 'OUT_OF_SCOPE_GUIDANCE'}
+            <!-- TIER 3: GRACEFUL OUT-OF-SCOPE -->
+            <div class="brutal-card p-6 sm:p-8 space-y-4" style="background-color: #dfd6c3;">
+              <div class="flex flex-wrap items-center justify-between gap-2">
+                <span class="font-mono text-[10px] font-bold px-2 py-0.5" style="background-color: #3a3935; color: #ffffff;">
+                  TIER 3 // DI LUAR RANAH REGULASI
+                </span>
+                <span class="font-mono text-xs font-bold" style="color: #3a3935;">
+                  OUT-OF-SCOPE GUIDANCE
+                </span>
+              </div>
+
+              <h2 class="opero-h1 text-2xl sm:text-3xl">
+                Di Luar <span class="opero-serif">Cakupan Regulasi Pramana</span>
+              </h2>
+
+              <p class="text-xs sm:text-sm leading-relaxed" style="color: #3a3935;">
+                {summaryLang === 'en' && result.neutral_summary_en
+                  ? result.neutral_summary_en
+                  : result.neutral_summary}
+              </p>
+
+              <div class="p-3 text-[11px] leading-snug" style="background-color: #ffffff; border: 1.5px solid #0a0a0a; color: #3a3935;">
+                <strong>Teks tersamarkan:</strong> {result.masked_post}
+                <br />
+                <strong>PII disamarkan:</strong> {result.pii_redacted_count ?? 0} entitas
+                <br />
+                <strong>Sitasi:</strong> dikunci kosong; tidak ada pasal yang dikarang.
+              </div>
+            </div>
+
+            <TriageGuidance
+              guidance={result.user_guidance}
+              mode={result.resolution_mode}
+              onSelectRewrite={applyRewrite}
+            />
+
+            {#if result.disclaimer}
+              <p class="text-[11px] leading-snug" style="color: #5c5952;">
+                <strong>Disclaimer:</strong> {result.disclaimer}
+              </p>
+            {/if}
+          {:else if result.status === 'TIDAK_DITEMUKAN'}
             <!-- ABSTAIN CARD -->
             <div class="brutal-card p-6 sm:p-8 space-y-4" style="background-color: #dfd6c3;">
               <div class="flex items-center justify-between">
@@ -324,6 +424,24 @@
                 <p class="font-mono text-[10px]" style="color: #dfd6c3;">
                   {result.ai_claims.length} klaim AI terverifikasi terhadap evidence span.
                 </p>
+              {/if}
+
+              {#if result.user_guidance?.what_user_should_do_next?.length}
+                <div class="p-3.5 space-y-1.5" style="background-color: #f3f1eb; color: #0a0a0a; border: 1.5px solid #0a0a0a;">
+                  <span class="font-mono text-[10px] font-bold uppercase block" style="color: #0c249c;">
+                    Langkah Kepatuhan / Tindak Lanjut
+                  </span>
+                  {#each result.user_guidance.what_user_should_do_next as step, idx}
+                    <p class="text-[11px] leading-snug" style="color: #3a3935;">
+                      <strong>{idx + 1}.</strong> {step}
+                    </p>
+                  {/each}
+                  {#if result.user_guidance.relevant_authority_or_channel}
+                    <p class="text-[11px] leading-snug" style="color: #3a3935;">
+                      <strong>Kanal resmi:</strong> {result.user_guidance.relevant_authority_or_channel}
+                    </p>
+                  {/if}
+                </div>
               {/if}
 
               <div class="p-3 text-[11px] leading-snug" style="background-color: #f3f1eb; color: #3a3935; border: 1px solid #0a0a0a;">

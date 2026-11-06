@@ -153,3 +153,51 @@ def test_layer2_guard_reads_embedded_scores():
     is_grounded, status = verifier.enforce_layer2_guard(regs)
     assert is_grounded is True
     assert status == "TERVERIFIKASI"
+
+
+def test_sanitize_statute_references_removes_article_and_amount():
+    from backend.services.verifier import sanitize_statute_references
+
+    text = (
+        "Menurut Pasal 999 Ayat (2) UU No. 8 Tahun 1999, denda "
+        "Rp999.000.000 dan 1000 dolar berlaku."
+    )
+    cleaned = sanitize_statute_references(
+        text, "id", allowed_rupiah={"150000"}
+    )
+    assert "Pasal 999" not in cleaned
+    assert "Ayat (2)" not in cleaned
+    assert "UU No. 8 Tahun 1999" not in cleaned
+    assert "Rp999.000.000" not in cleaned
+    assert "1000 dolar" not in cleaned
+
+
+def test_enforce_epistemic_safety_hard_locks_tier2():
+    from backend.services.verifier import enforce_epistemic_safety
+
+    result = {
+        "summary_id": "Berdasarkan Pasal 999, denda Rp9.000.000 berlaku.",
+        "summary_en": "Under Pasal 999, a fine applies.",
+        "claims": [{"verified": True, "citation_id": "X", "span_ids": ["X#s1"]}],
+        "resolution_mode": "NEEDS_CLARIFICATION",
+        "detected_framing_or_tone": "Keluhan subjektif",
+        "user_guidance": {
+            "missing_context_diagnosis": ["Lokasi belum jelas."],
+            "what_user_should_do_next": ["Tulis kronologi."],
+            "suggested_query_rewrites": ["Saya ditolak masuk di beach club Bali"],
+            "relevant_authority_or_channel": "BPSK",
+        },
+        "ai_synthesis_status": "llm",
+        "guard_status": "LLM_TRIAGE",
+    }
+    cleaned = enforce_epistemic_safety(
+        result,
+        citations=[],
+        top_score=0.4,
+        taxonomy={"candidate_clusters": ["DISKRIMINASI_DAN_KONSUMEN"]},
+        allowed_rupiah={"150000"},
+    )
+    assert cleaned["claims"] == []
+    assert "Pasal 999" not in cleaned["summary_id"]
+    assert "Rp9.000.000" not in cleaned["summary_id"]
+    assert cleaned["guard_status"] == "EPISTEMIC_HARD_LOCK"

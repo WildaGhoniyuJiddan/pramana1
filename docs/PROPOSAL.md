@@ -29,23 +29,23 @@ Sebagai destinasi pariwisata utama dunia, Bali menghadapi tantangan krusial pada
 
 ## 3. Proposed Solution
 
-**Pramana** menyelesaikan masalah di atas melalui platform web berbasis **Strict-RAG (Retrieval-Augmented Generation)** dengan mekanisme **abstain deterministik** dan verifikasi kutipan terhadap korpus lokal, dalam dua alur pengguna utama:
+**Pramana** menyelesaikan masalah di atas melalui platform web berbasis **Strict-RAG (Retrieval-Augmented Generation)** dengan **3-tier epistemic routing**, verifikasi kutipan terhadap korpus lokal, dan triage hukum aktif, dalam dua alur pengguna utama:
 
 - **User Journey 1: Mode Pencegahan (Trip Brief):** Pengguna memasukkan rencana rute atau catatan pemesanan beserta tanggal perjalanan $\rightarrow$ Sistem menyamarkan data pribadi (PII) secara otomatis $\rightarrow$ Sistem memeriksa bentrok tanggal dengan Hari Suci Nyepi (*Catur Brata Penyepian*) dan upacara Pawukon $\rightarrow$ Sistem mengekstrak pasal hukum yang relevan dan menyusun ringkasan eksekutif beserta tombol unduh kalender `.ics` dan salin teks.
-- **User Journey 2: Mode Verifikasi (Context Note):** Pengguna menempelkan teks unggahan viral atau klaim insiden $\rightarrow$ Sistem mendeteksi frasa sensasional/generalisasi $\rightarrow$ Sistem mencari dasar hukum di korpus lokal Pramana yang bersumber dari dokumen resmi $\rightarrow$ Jika ditemukan, sistem menghasilkan Catatan Konteks netral dengan kutipan dari korpus (verbatim hanya untuk entri yang ditandai); jika klaim berada di luar cakupan hukum, sistem menolak berspekulasi (**Strict Abstain / `TIDAK_DITEMUKAN`**).
+- **User Journey 2: Mode Verifikasi (Context Note):** Pengguna menempelkan teks unggahan viral atau klaim insiden $\rightarrow$ Sistem mendeteksi frasa sensasional/generalisasi $\rightarrow$ Sistem mencari dasar hukum di korpus lokal Pramana $\rightarrow$ Jika bukti cukup, sistem menghasilkan Catatan Konteks netral dengan kutipan terverifikasi; jika konteks belum lengkap, sistem memberi diagnosis dan 3 skenario perbaikan; jika di luar cakupan, sistem memberi panduan non-hukum yang jujur tanpa mengarang pasal.
 
 ---
 
 ## 4. AI Implementation
 
-- **Metode & Model AI:** Arsitektur hibrida yang menggabungkan **Google Gemini API (`gemini-3.1-flash-lite`, `temperature=0.1`)**, **Deterministic Legal Retriever**, **Dual-Layer Verifier**, dan **Regex PII Masking**.
+- **Metode & Model AI:** Arsitektur hibrida yang menggabungkan **Google Gemini API (`gemini-3.1-flash-lite`, `temperature=0.1`)**, **Deterministic Legal Retriever**, **3-Tier Epistemic Router**, **Dual-Layer Verifier**, dan **Regex PII Masking**.
 - **Input:**
   - *Mode 1:* Teks rencana perjalanan/booking, tanggal mulai & selesai, status wisatawan (WNA/WNI).
   - *Mode 2:* Teks klaim insiden atau keterangan unggahan media sosial.
 - **Proses & Alasan AI Diperlukan:**
   1. *PII Masking (`ocr_masking.py`):* Menyamarkan email, telepon, paspor, kartu kredit, dan kode booking sebelum teks menyentuh model AI.
-  2. *Retrieval & Layer-2 Abstain Guard (`corpus_loader.py` & `verifier.py`):* Menyeleksi pasal relevan dari korpus dan memblokir pemanggilan LLM jika tidak ada bukti hukum yang cukup.
-  3. *Constrained LLM Synthesis (`rag_engine.py`):* Gemini 2.5 Flash menyusun sintesis ringkas yang mudah dipahami pengguna namun terikat ketat (*grounded*) hanya pada teks pasal yang lolos seleksi. Dilengkapi *deterministic fallback* agar sistem tetap berfungsi dengan ringkasan lokal apabila API eksternal tidak tersedia.
+  2. *Retrieval & Epistemic Routing (`corpus_loader.py`, `legal_taxonomy.py`, & `verifier.py`):* Menyeleksi pasal relevan dari korpus, memetakan bahasa awam ke gugus hukum, dan menentukan Tier 1/2/3 berdasarkan skor serta kelengkapan fakta.
+  3. *Constrained LLM Synthesis (`rag_engine.py`):* Gemini 3.1 Flash Lite menyusun sintesis ringkas yang terikat ketat (*grounded*) pada teks pasal yang lolos seleksi. Pada Tier 2/3, model tetap dipanggil sebagai konsultan triage, tetapi klaim dan sitasi dikunci kosong secara deterministik.
   4. *Layer-1 Local Corpus Match (`verifier.py`):* Memvalidasi bahwa kutipan pasal yang ditampilkan ada di dalam teks entri korpus lokal setelah normalisasi spasi. Ini bukan verifikasi ulang karakter-demi-karakter terhadap dokumen JDIH secara real-time.
 - **Output:** Ringkasan kepatuhan rute, peringatan kalender Nyepi, pendeteksi *framing* emosional, kutipan pasal dari korpus (verbatim hanya untuk entri yang ditandai), komentar siap salin, dan berkas kalender `.ics`.
 
@@ -56,7 +56,7 @@ Sebagai destinasi pariwisata utama dunia, Bali menghadapi tantangan krusial pada
 ### Status Fitur (lihat `README.md` untuk tabel status terbaru)
 1. **Mode 1: Trip Brief Generator** dengan deteksi otomatis kewajiban Pungutan Wisman (Love Bali) dan aturan kawasan suci.
 2. **Mode 2: Viral Claim Context Note** dengan pendeteksi *framing* sensasional dan mekanisme abstain deterministik.
-3. **Dual-Layer Verifier (Layer-1 Local Corpus Match & Layer-2 Abstain Gate).**
+3. **Dual-Layer Verifier (Layer-1 Local Corpus Match & Epistemic Safety Gate).**
 4. **Automated PII Masking Engine** untuk 5 kategori data sensitif.
 5. **Deterministic Balinese Calendar Engine** (Data resmi Nyepi 2025–2028, Pengerupukan, Galungan, Kuningan) + **RFC 5545 `.ics` Calendar Exporter**.
 6. **Interactive Statute Drawer & Transparency Modal** untuk menginspeksi teks yang tersimpan di korpus, status verbatim/ringkasan, dan tautan sumber resmi.
@@ -76,8 +76,8 @@ Sebagai destinasi pariwisata utama dunia, Bali menghadapi tantangan krusial pada
       ├──► 1. PII Masking Service (ocr_masking.py)
       ├──► 2. Balinese Calendar Service (calendar_service.py -> Nyepi/Pawukon + .ics)
       ├──► 3. Legal Corpus Manager (corpus_loader.py -> corpus/bali_regulations.json)
-      ├──► 4. Dual-Layer Verifier (verifier.py -> Layer-1 Exact Match & Layer-2 Abstain)
-      └──► 5. Strict-RAG AI Engine (rag_engine.py -> Gemini 2.5 Flash API + Fallback)
+      ├──► 4. Dual-Layer Verifier & Epistemic Safety (verifier.py -> Layer-1 Exact Match, Tier Hard-Lock)
+      └──► 5. Strict-RAG AI Engine (rag_engine.py -> Gemini 3.1 Flash Lite API + Triage/Fallback)
       │
       ▼
 [Verified Response -> UI Cards, Corpus Statute Drawer, WhatsApp Copy, & .ics Download]
@@ -113,7 +113,7 @@ Sebagai destinasi pariwisata utama dunia, Bali menghadapi tantangan krusial pada
 - **Frontend:** Svelte 5, Vite 5.4.x, Tailwind CSS 3
 - **Backend:** Python 3.11+, FastAPI, Pydantic v2, Uvicorn, HTTPX
 - **Database / Storage:** Structured JSON Legal Corpus (`corpus/bali_regulations.json`)
-- **AI Model / Method:** Google Gemini API (`gemini-3.1-flash-lite`) + Deterministic Strict-RAG + Dual-Layer Verifier + Regex PII Masking
+- **AI Model / Method:** Google Gemini API (`gemini-3.1-flash-lite`) + Deterministic Strict-RAG + 3-Tier Epistemic Router + Dual-Layer Verifier + Regex PII Masking
 - **Dataset:** Peraturan resmi dari JDIH BPK, `peraturan.go.id`, Pemerintah Kabupaten Buleleng, Disparda Bali, dan Kesbangpol Bali (Domain Publik, Pasal 42 huruf b UU Hak Cipta No. 28/2014)
 - **AI Coding Assistant:** Google Antigravity / Gemini digunakan sebagai asisten pengembangan kode dan pengujian; seluruh kode sumber dan arsitektur diuji serta dipertanggungjawabkan penuh oleh tim.
 

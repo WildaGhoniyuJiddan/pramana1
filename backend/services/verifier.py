@@ -11,14 +11,47 @@ does not independently re-download or re-validate the statute against JDIH.
 """
 
 import hashlib
-from typing import List, Dict, Any, Optional, Tuple
+import re
+from typing import List, Dict, Any, Optional, Tuple, Set
 
 from backend.services.corpus_loader import (
     CorpusManager,
     DEFAULT_RELEVANCE_THRESHOLD,
 )
+from backend.services.legal_taxonomy import choose_epistemic_mode
 
 CORPUS_SCOPE = "corpus"
+
+PASAL_PATTERN = re.compile(
+    r"\bPasal\s+\d+[A-Za-z]?(?:\s+Ayat\s*\(?\d+\)?)?",
+    re.IGNORECASE,
+)
+AYAT_PATTERN = re.compile(r"\bAyat\s*\(?\d+\)?", re.IGNORECASE)
+STATUTE_PATTERN = re.compile(
+    r"\b(?:UU|Undang[- ]Undang|Perda|Peraturan Daerah|Pergub|"
+    r"Peraturan Gubernur|SE|Surat Edaran|SKB|Kepgub|Keputusan Gubernur)"
+    r"(?:\s+(?:RI|Bali|Gubernur|Kapolri|Provinsi))*"
+    r"\s*(?:No\.?|Nomor)?\s*\d+\s*(?:Tahun|/)\s*\d{4}\b",
+    re.IGNORECASE,
+)
+GENERIC_STATUTE_PATTERN = re.compile(
+    r"\b(?:KUHP|KUHPerdata|UU\s+ITE|"
+    r"(?:Undang[- ]Undang|UU)\s+(?:HAM|ITE|Konsumen|Kepariwisataan|"
+    r"Keimigrasian))\b",
+    re.IGNORECASE,
+)
+RUPIAH_PATTERN = re.compile(r"Rp\s?[\d.,]+", re.IGNORECASE)
+FOREIGN_CURRENCY_PATTERN = re.compile(
+    r"\b(?:US\$\s?[\d.,]+|\d[\d.,]*\s*(?:dolar|dollar|USD))\b",
+    re.IGNORECASE,
+)
+
+ID_REGULATION_REPLACEMENT = "ketentuan dalam regulasi terkait"
+EN_REGULATION_REPLACEMENT = "the relevant regulation"
+ID_PROVISION_REPLACEMENT = "ketentuan terkait"
+EN_PROVISION_REPLACEMENT = "the relevant provision"
+ID_UNVERIFIED_AMOUNT = "nominal yang tidak terverifikasi"
+EN_UNVERIFIED_AMOUNT = "an unverified amount"
 
 
 def _normalize_text(value: str) -> str:
@@ -159,3 +192,133 @@ class DualLayerVerifier:
             return False, "TIDAK_DITEMUKAN"
 
         return True, "TERVERIFIKASI"
+
+
+def _replacement(lang: str, kind: str) -> str:
+    if kind == "provision":
+        return EN_PROVISION_REPLACEMENT if lang == "en" else ID_PROVISION_REPLACEMENT
+    if kind == "amount":
+        return EN_UNVERIFIED_AMOUNT if lang == "en" else ID_UNVERIFIED_AMOUNT
+    return EN_REGULATION_REPLACEMENT if lang == "en" else ID_REGULATION_REPLACEMENT
+
+
+def sanitize_statute_references(
+    text: Optional[str],
+    lang: str = "id",
+    allowed_rupiah: Optional[Set[str]] = None,
+) -> Optional[str]:
+    """Remove unverified article/statute/currency references from free text.
+
+    Tier 2 and Tier 3 are allowed to give practical guidance, but they must not
+    smuggle in a specific article number or fine amount that is not grounded in
+    the corpus. This function is deliberately deterministic.
+    """
+    if not text:
+        return text
+
+    cleaned = PASAL_PATTERN.sub(_replacement(lang, "regulation"), text)
+    cleaned = AYAT_PATTERN.sub(_replacement(lang, "provision"), cleaned)
+    cleaned = STATUTE_PATTERN.sub(_replacement(lang, "regulation"), cleaned)
+    cleaned = GENERIC_STATUTE_PATTERN.sub(
+        _replacement(lang, "regulation"), cleaned
+    )
+
+    if allowed_rupiah is not None:
+        def currency_repl(match: re.Match) -> str:
+            digits = re.sub(r"\D", "", match.group(0))
+            if digits and any(digits in allowed for allowed in allowed_rupiah):
+                return match.group(0)
+            return _replacement(lang, "amount")
+
+        cleaned = RUPIAH_PATTERN.sub(currency_repl, cleaned)
+        cleaned = FOREIGN_CURRENCY_PATTERN.sub(
+            _replacement(lang, "amount"), cleaned
+        )
+
+    return " ".join(cleaned.split())
+
+
+def _sanitize_guidance(
+    guidance: Dict[str, Any],
+    lang: str,
+    allowed_rupiah: Optional[Set[str]],
+) -> Dict[str, Any]:
+    sanitized = dict(guidance or {})
+    for key in (
+        "missing_context_diagnosis",
+        "what_user_should_do_next",
+        "suggested_query_rewrites",
+    ):
+        values = sanitized.get(key)
+        if isinstance(values, list):
+            sanitized[key] = [
+                sanitize_statute_references(item, lang, allowed_rupiah)
+                for item in values
+                if isinstance(item, str) and item.strip()
+            ]
+    authority = sanitized.get("relevant_authority_or_channel")
+    if isinstance(authority, str):
+        sanitized["relevant_authority_or_channel"] = (
+            sanitize_statute_references(authority, lang, allowed_rupiah)
+        )
+    return sanitized
+
+
+def enforce_epistemic_safety(
+    result: Dict[str, Any],
+    citations: List[Dict[str, Any]],
+    top_score: float,
+    taxonomy: Dict[str, Any],
+    allowed_rupiah: Optional[Set[str]] = None,
+) -> Dict[str, Any]:
+    """Hard-lock citations for non-grounded modes and sanitize free text.
+
+    Tier 1 claims are kept only when the pipeline marked them verified. If no
+    verified claim survives, the response is downgraded to Tier 2 so the user
+    still receives useful guidance instead of a dead end.
+    """
+    mode = result.get("resolution_mode")
+    if mode not in {
+        "VERIFIED_GROUNDED",
+        "NEEDS_CLARIFICATION",
+        "OUT_OF_SCOPE_GUIDANCE",
+    }:
+        mode = choose_epistemic_mode(top_score, taxonomy)
+
+    if mode == "VERIFIED_GROUNDED":
+        claims = [
+            claim for claim in (result.get("claims") or [])
+            if isinstance(claim, dict) and claim.get("verified") is True
+        ]
+        result["claims"] = claims
+        if not claims and result.get("ai_synthesis_status") == "llm":
+            mode = "NEEDS_CLARIFICATION"
+
+    # Guidance and tone are free text. Scrub specific article/statute
+    # references even in Tier 1 because the verified citations are rendered
+    # separately by the UI.
+    result["detected_framing_or_tone"] = sanitize_statute_references(
+        result.get("detected_framing_or_tone"), "id", allowed_rupiah
+    )
+    guidance = result.get("user_guidance")
+    if isinstance(guidance, dict):
+        result["user_guidance"] = _sanitize_guidance(
+            guidance, "id", allowed_rupiah
+        )
+
+    if mode != "VERIFIED_GROUNDED":
+        result["claims"] = []
+        result["summary_id"] = sanitize_statute_references(
+            result.get("summary_id"), "id", allowed_rupiah
+        )
+        result["summary_en"] = sanitize_statute_references(
+            result.get("summary_en"), "en", allowed_rupiah
+        )
+        if result.get("guard_status") not in {
+            "AI_TIDAK_TERSEDIA", "AI_OUTPUT_DITOLAK", "AI_ABSTAIN",
+            "FALLBACK_GUARD", "FALLBACK_DETERMINISTIK",
+        }:
+            result["guard_status"] = "EPISTEMIC_HARD_LOCK"
+
+    result["resolution_mode"] = mode
+    return result

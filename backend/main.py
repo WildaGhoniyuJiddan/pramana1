@@ -29,7 +29,12 @@ from backend.services.rag_engine import StrictRAGEngine
 from backend.services.corpus_loader import CorpusManager
 from backend.services.zone_registry import ZoneNotFoundError
 from backend.services import ai_metrics
-from backend.services.ai_config import GEMINI_MODEL, ai_enabled, get_ai_mode
+from backend.services.ai_config import (
+    GEMINI_MODEL,
+    ai_enabled,
+    get_ai_mode,
+    get_gemini_api_key,
+)
 
 logger = logging.getLogger("pramana")
 
@@ -198,6 +203,19 @@ def healthcheck():
 def ai_status():
     """Return AI runtime telemetry without prompts, responses, or PII."""
     data = ai_metrics.snapshot()
+    stats = corpus_manager.get_stats()
+    data["ai_mode"] = get_ai_mode()
+    data["model_name"] = GEMINI_MODEL
+    data["api_key_configured"] = bool(get_gemini_api_key())
+    data["active_chunks_count"] = stats["total_regulations_indexed"]
+    data["registry_docs_count"] = 4
+    data["registry_only_documents"] = [
+        "se-gubernur-bali-7-2025",
+        "se-kapolri-6-2015",
+        "skb-ite-2021",
+        "awig-awig-desa-adat-penglipuran",
+    ]
+    data["epistemic_routing_enabled"] = True
     data["hybrid_retrieval_available"] = rag_engine.hybrid.available
     data["embedding_vectors_loaded"] = rag_engine.hybrid.vector_count
     return data

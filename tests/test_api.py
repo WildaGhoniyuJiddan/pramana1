@@ -49,6 +49,17 @@ def test_ai_status_endpoint():
     assert "last_error" in data
     assert data["hybrid_retrieval_available"] is False
     assert data["embedding_vectors_loaded"] == 40
+    assert data["ai_mode"] == "optional"
+    assert data["model_name"] == "gemini-3.1-flash-lite"
+    assert data["api_key_configured"] is False
+    assert data["active_chunks_count"] == 40
+    assert data["registry_docs_count"] == 4
+    assert data["epistemic_routing_enabled"] is True
+    assert "total_requests" in data
+    assert "verified_grounded_count" in data
+    assert "needs_clarification_count" in data
+    assert "out_of_scope_count" in data
+    assert "guard_rejections_count" in data
 
 
 def test_security_headers_present():
@@ -189,6 +200,9 @@ def test_trip_brief_endpoint():
 
     assert data["status"] == "SUCCESS"
     assert data["guard_status"] == "TERVERIFIKASI"
+    assert data["resolution_mode"] == "VERIFIED_GROUNDED"
+    assert data["epistemic_tier"] == 1
+    assert "user_guidance" in data
     assert len(data["briefing_items"]) > 0
     assert "ics_content" in data
     assert data["ics_content"].startswith("BEGIN:VCALENDAR")
@@ -220,8 +234,11 @@ def test_context_note_endpoint():
     data = response.json()
 
     assert data["status"] == "TERVERIFIKASI"
+    assert data["resolution_mode"] == "VERIFIED_GROUNDED"
+    assert data["epistemic_tier"] == 1
     assert len(data["citations"]) > 0
     assert "copyable_comment" in data
+    assert "user_guidance" in data
     assert data["verification_scope"] == "corpus"
     assert data["confidence"] in {"SEDANG", "RENDAH"}
     assert data["disclaimer"]
@@ -246,10 +263,36 @@ def test_context_note_abstain_endpoint():
     assert response.status_code == 200
     data = response.json()
     assert data["status"] == "TIDAK_DITEMUKAN"
+    assert data["resolution_mode"] == "OUT_OF_SCOPE_GUIDANCE"
+    assert data["epistemic_tier"] == 3
     assert data["citations"] == []
-    assert data["ai_synthesis_status"] == "abstain"
+    assert data["ai_synthesis_status"] == "deterministic"
     assert data["ai_claims"] == []
     assert data["neutral_summary_en"]
+    assert len(data["user_guidance"]["suggested_query_rewrites"]) == 3
+
+
+def test_context_note_subjective_input_returns_active_triage():
+    response = client.post(
+        "/api/v1/context-note",
+        json={
+            "post_content": (
+                "direndahkan, disepelekan, dianggap tidak memiliki uang"
+            )
+        },
+    )
+    assert response.status_code == 200
+    data = response.json()
+    assert data["status"] == "PERLU_KLARIFIKASI"
+    assert data["resolution_mode"] == "NEEDS_CLARIFICATION"
+    assert data["epistemic_tier"] == 2
+    assert data["citations"] == []
+    assert data["ai_claims"] == []
+    guidance = data["user_guidance"]
+    assert guidance["missing_context_diagnosis"]
+    assert len(guidance["what_user_should_do_next"]) >= 3
+    assert len(guidance["suggested_query_rewrites"]) == 3
+    assert guidance["relevant_authority_or_channel"]
 
 
 @pytest.mark.parametrize(

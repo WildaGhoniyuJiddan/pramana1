@@ -1,12 +1,14 @@
-"""Pramana evaluation harness.
+"""Pramana evaluation harness with epistemic-routing metrics.
 
-Runs a labeled set of in-scope, out-of-scope, adversarial, and PII cases.
-The default run uses whatever AI mode is configured. Use --retrieval-only to
-force AI_MODE=disabled for a deterministic retrieval/abstain baseline.
+Runs a labeled set of in-scope, triage, out-of-scope, adversarial, and PII
+cases. The default run uses whatever AI mode is configured. Use
+``--retrieval-only`` or ``--mode fast`` for a deterministic baseline, and
+``--mode live`` for a rate-limit-safe live Gemini evaluation.
 
 Usage:
     python eval/run_eval.py
-    python eval/run_eval.py --retrieval-only
+    python eval/run_eval.py --mode fast
+    python eval/run_eval.py --mode live
 """
 
 import argparse
@@ -24,6 +26,7 @@ if str(ROOT) not in sys.path:
 
 CASES_PATH = ROOT / "eval" / "cases.jsonl"
 RESULTS_DIR = ROOT / "eval" / "results"
+NON_GROUNDED_MODES = {"NEEDS_CLARIFICATION", "OUT_OF_SCOPE_GUIDANCE"}
 
 
 def load_cases():
@@ -42,6 +45,58 @@ def load_cases():
     return cases
 
 
+def validate_citations(engine, result):
+    """Independently check every emitted citation and claim span."""
+    from backend.services.evidence_spans import build_span_index
+
+    citations = result.get("citations") or []
+    claims = result.get("ai_claims") or []
+    citation_by_id = {}
+    citations_valid = 0
+    for citation in citations:
+        reg_id = citation.get("reg_id")
+        quote = citation.get("quoted_text") or ""
+        reg = engine.corpus_mgr.get_by_id(reg_id)
+        if not reg:
+            continue
+        normalized_quote = " ".join(quote.split())
+        normalized_text = " ".join(reg.get("text", "").split())
+        if normalized_quote and normalized_quote in normalized_text:
+            citations_valid += 1
+            citation_by_id[reg_id] = citation
+
+    span_index = build_span_index(citations)
+    claims_valid = 0
+    for claim in claims:
+        citation_id = claim.get("citation_id")
+        span_ids = claim.get("span_ids") or []
+        if citation_id not in citation_by_id or not span_ids:
+            continue
+        if all(
+            span_id in span_index
+            and span_index[span_id]["citation_id"] == citation_id
+            for span_id in span_ids
+        ):
+            claims_valid += 1
+
+    return {
+        "citations_emitted": len(citations),
+        "citations_valid": citations_valid,
+        "claims_emitted": len(claims),
+        "claims_valid": claims_valid,
+    }
+
+
+def guidance_is_complete(result):
+    guidance = result.get("user_guidance") or {}
+    return bool(
+        guidance.get("missing_context_diagnosis")
+        and guidance.get("what_user_should_do_next")
+        and len(guidance.get("suggested_query_rewrites") or []) >= 3
+        and guidance.get("relevant_authority_or_channel")
+    )
+
+
 def run_case(engine, case, ai_active=False):
     started = time.perf_counter()
     result = engine.analyze_viral_post(case["input"])
@@ -51,13 +106,27 @@ def run_case(engine, case, ai_active=False):
     citation_ids = [citation.get("reg_id") for citation in citations]
     expected = case.get("expected_citation_ids", [])
     category = case.get("category", "in_scope")
+    expected_mode = case.get("expected_mode")
+    actual_mode = result.get("resolution_mode", "UNKNOWN")
+    guidance_complete = guidance_is_complete(result)
+    validation = validate_citations(engine, result)
 
     forbidden_hits = []
     if case.get("forbidden_terms"):
         text_parts = [
             result.get("neutral_summary") or "",
+            result.get("neutral_summary_en") or "",
             result.get("copyable_comment") or "",
+            result.get("detected_framing_or_tone") or "",
         ]
+        guidance = result.get("user_guidance") or {}
+        for key in (
+            "missing_context_diagnosis",
+            "what_user_should_do_next",
+            "suggested_query_rewrites",
+        ):
+            text_parts.extend(guidance.get(key) or [])
+        text_parts.append(guidance.get("relevant_authority_or_channel") or "")
         text_parts.extend(
             claim.get("claim_text", "")
             for claim in result.get("ai_claims", [])
@@ -76,32 +145,83 @@ def run_case(engine, case, ai_active=False):
             if token.lower() in masked.lower()
         ]
 
+    probe_result = None
+    probe_passed = True
+    if case.get("rewrite_probe"):
+        probe = case["rewrite_probe"]
+        probe_started = time.perf_counter()
+        probe_result_raw = engine.analyze_viral_post(probe["input"])
+        probe_latency = int((time.perf_counter() - probe_started) * 1000)
+        probe_citations = [
+            citation.get("reg_id")
+            for citation in probe_result_raw.get("citations", [])
+        ]
+        probe_passed = (
+            probe_result_raw.get("resolution_mode") == probe.get("expected_mode")
+            and any(
+                item in probe_citations
+                for item in probe.get("expected_citation_ids", [])
+            )
+        )
+        probe_result = {
+            "input": probe["input"],
+            "resolution_mode": probe_result_raw.get("resolution_mode"),
+            "citation_ids": probe_citations,
+            "passed": probe_passed,
+            "latency_ms": probe_latency,
+        }
+
     if category == "pii":
         passed = not leaked_pii
     elif category == "out_of_scope":
-        passed = result.get("status") == "TIDAK_DITEMUKAN"
+        passed = (
+            actual_mode == expected_mode
+            and result.get("status") == "TIDAK_DITEMUKAN"
+            and not citations
+            and guidance_complete
+        )
+    elif category == "triage":
+        passed = (
+            actual_mode == expected_mode
+            and not citations
+            and not result.get("ai_claims")
+            and guidance_complete
+        )
     elif category == "adversarial":
-        passed = not forbidden_hits
-        if case.get("expected_abstain"):
-            passed = passed and result.get("status") == "TIDAK_DITEMUKAN"
-        if case.get("requires_ai_abstain") and ai_active:
-            passed = passed and result.get("status") == "TIDAK_DITEMUKAN"
+        passed = (
+            not forbidden_hits
+            and not citations
+            and not result.get("ai_claims")
+            and actual_mode in NON_GROUNDED_MODES
+        )
+    else:
+        passed = actual_mode == expected_mode
         if expected:
             passed = passed and any(item in citation_ids for item in expected)
-    else:
-        passed = any(item in citation_ids for item in expected)
+
+    if case.get("rewrite_probe"):
+        passed = passed and probe_passed
 
     return {
         "id": case["id"],
         "category": category,
         "passed": bool(passed),
         "status": result.get("status"),
+        "resolution_mode": actual_mode,
+        "expected_mode": expected_mode,
+        "epistemic_tier": result.get("epistemic_tier"),
+        "guidance_complete": guidance_complete,
         "ai_synthesis_status": result.get("ai_synthesis_status"),
         "citation_ids": citation_ids,
         "expected_citation_ids": expected,
         "forbidden_hits": forbidden_hits,
         "leaked_pii": leaked_pii,
         "latency_ms": latency_ms,
+        "citations_emitted": validation["citations_emitted"],
+        "citations_valid": validation["citations_valid"],
+        "claims_emitted": validation["claims_emitted"],
+        "claims_valid": validation["claims_valid"],
+        "rewrite_probe": probe_result,
     }
 
 
@@ -109,18 +229,29 @@ def summarize(cases, results):
     total = len(results)
     passed = sum(1 for result in results if result["passed"])
     in_scope = [r for r in results if r["category"] == "in_scope"]
+    triage = [r for r in results if r["category"] == "triage"]
     out_scope = [r for r in results if r["category"] == "out_of_scope"]
     adversarial = [r for r in results if r["category"] == "adversarial"]
     pii = [r for r in results if r["category"] == "pii"]
+    non_grounded = triage + out_scope
+    labeled = [r for r in results if r.get("expected_mode")]
 
-    total_citations = sum(len(r["citation_ids"]) for r in results)
-    verified_citations = 0
-    for result in results:
-        # Layer-1 verification is already enforced before a citation is emitted.
-        verified_citations += len(result["citation_ids"])
+    citations_emitted = sum(r["citations_emitted"] for r in results)
+    citations_valid = sum(r["citations_valid"] for r in results)
+    claims_emitted = sum(r["claims_emitted"] for r in results)
+    claims_valid = sum(r["claims_valid"] for r in results)
+    probes = [
+        r["rewrite_probe"] for r in results
+        if r.get("rewrite_probe")
+    ]
 
     latencies = sorted(result["latency_ms"] for result in results)
-    p95 = latencies[min(len(latencies) - 1, int(round(0.95 * (len(latencies) - 1))))] if latencies else 0
+    p95 = (
+        latencies[
+            min(len(latencies) - 1, int(round(0.95 * (len(latencies) - 1))))
+        ]
+        if latencies else 0
+    )
 
     return {
         "total_cases": total,
@@ -131,21 +262,51 @@ def summarize(cases, results):
         "retrieval_recall_at_3": round(
             sum(1 for r in in_scope if r["passed"]) / len(in_scope), 4
         ) if in_scope else 0.0,
+        "triage_cases": len(triage),
+        "triage_pass": sum(1 for r in triage if r["passed"]),
         "out_of_scope_cases": len(out_scope),
-        "abstain_accuracy": round(
-            sum(1 for r in out_scope if r["passed"]) / len(out_scope), 4
-        ) if out_scope else 0.0,
+        "out_of_scope_pass": sum(1 for r in out_scope if r["passed"]),
         "adversarial_cases": len(adversarial),
         "adversarial_pass": sum(1 for r in adversarial if r["passed"]),
         "pii_cases": len(pii),
         "pii_leak_rate": round(
             sum(1 for r in pii if r["leaked_pii"]) / len(pii), 4
         ) if pii else 0.0,
-        "citations_emitted": total_citations,
-        "citations_verified": verified_citations,
-        "citation_validity": 1.0 if total_citations else 0.0,
+        "pii_masking_recall": round(
+            1 - (
+                sum(1 for r in pii if r["leaked_pii"]) / len(pii)
+                if pii else 0.0
+            ),
+            4,
+        ),
+        "epistemic_routing_accuracy": round(
+            sum(1 for r in labeled if r["resolution_mode"] == r["expected_mode"])
+            / len(labeled),
+            4,
+        ) if labeled else 0.0,
+        "actionable_guidance_completeness_rate": round(
+            sum(1 for r in non_grounded if r["guidance_complete"])
+            / len(non_grounded),
+            4,
+        ) if non_grounded else 0.0,
+        "rewrite_recovery_rate": round(
+            sum(1 for probe in probes if probe["passed"]) / len(probes), 4
+        ) if probes else 0.0,
+        "citations_emitted": citations_emitted,
+        "citations_verified": citations_valid,
+        "citation_validity": round(
+            citations_valid / citations_emitted, 4
+        ) if citations_emitted else 1.0,
+        "claims_emitted": claims_emitted,
+        "claims_verified": claims_valid,
+        "claim_span_validity": round(
+            claims_valid / claims_emitted, 4
+        ) if claims_emitted else 1.0,
         "latency_p50_ms": latencies[len(latencies) // 2] if latencies else 0,
         "latency_p95_ms": p95,
+        "resolution_mode_counts": dict(
+            Counter(r["resolution_mode"] for r in results)
+        ),
         "ai_status_counts": dict(
             Counter(r["ai_synthesis_status"] for r in results)
         ),
@@ -167,15 +328,16 @@ def write_markdown(metrics, results, path):
         "",
         "## Case Results",
         "",
-        "| Case | Category | Passed | Status | AI | Citations |",
-        "| :--- | :--- | :--- | :--- | :--- | :--- |",
+        "| Case | Category | Passed | Mode | Status | Guidance | Citations |",
+        "| :--- | :--- | :--- | :--- | :--- | :--- | :--- |",
     ])
     for result in results:
         citations = ", ".join(result["citation_ids"]) or "-"
         lines.append(
             f"| {result['id']} | {result['category']} | "
             f"{'PASS' if result['passed'] else 'FAIL'} | "
-            f"{result['status']} | {result['ai_synthesis_status']} | "
+            f"{result['resolution_mode']} | {result['status']} | "
+            f"{'complete' if result['guidance_complete'] else 'incomplete'} | "
             f"{citations} |"
         )
     path.write_text("\n".join(lines) + "\n", encoding="utf-8")
@@ -188,9 +350,15 @@ def main():
         action="store_true",
         help="Force AI_MODE=disabled for a deterministic retrieval baseline.",
     )
+    parser.add_argument(
+        "--mode",
+        choices=("current", "fast", "live"),
+        default="current",
+        help="fast disables AI; live uses the configured AI key.",
+    )
     args = parser.parse_args()
 
-    if args.retrieval_only:
+    if args.retrieval_only or args.mode == "fast":
         os.environ["AI_MODE"] = "disabled"
 
     from backend.services.ai_config import get_ai_mode, get_gemini_api_key

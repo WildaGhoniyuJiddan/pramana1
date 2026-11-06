@@ -1,6 +1,8 @@
 <script>
   import { onMount } from 'svelte';
   import { requestTripBrief } from '../lib/api.js';
+  import EpistemicBadge from './EpistemicBadge.svelte';
+  import TriageGuidance from './TriageGuidance.svelte';
 
   let { onOpenDoc = () => {} } = $props();
 
@@ -164,6 +166,14 @@
       setTimeout(() => (copySuccess = false), 2500);
     } catch (e) {
       console.error(e);
+    }
+  }
+
+  async function applyRewrite(rewrite) {
+    itineraryText = rewrite;
+    activePresetIdx = -1;
+    if (startDate) {
+      await handleSubmit();
     }
   }
 </script>
@@ -344,6 +354,8 @@
               </span>
             </div>
 
+            <EpistemicBadge {result} />
+
             <div class="flex flex-wrap items-start justify-between gap-2">
               <p class="text-xs sm:text-[13px] leading-relaxed flex-1" style="color: #0a0a0a;">
                 {summaryLang === 'en' && result.ai_synthesis_en
@@ -507,7 +519,7 @@
             </div>
           {/if}
 
-          {#if result.status !== 'TIDAK_DITEMUKAN'}
+          {#if result.resolution_mode === 'VERIFIED_GROUNDED'}
           <!-- STEP 2: INTERACTIVE REGULATION INSPECTOR (No wall of text, 1 focused card at a time) -->
           <div class="brutal-card p-5 sm:p-6 space-y-5" style="background-color: #f3f1eb;">
             <!-- Header & Export Actions -->
@@ -683,29 +695,71 @@
             {/if}
           </div>
           {:else}
-            <!-- ABSTAIN CARD -->
-            <div class="brutal-card p-6 sm:p-8 space-y-4" style="background-color: #dfd6c3;">
-              <div class="flex flex-wrap items-center justify-between gap-2">
-                <span class="font-mono text-[10px] font-bold px-2 py-0.5" style="background-color: #0a0a0a; color: #ffffff;">
-                  LAYER-2 ABSTAIN // TIDAK_DITEMUKAN
-                </span>
-                <span class="font-mono text-xs font-bold" style="color: #8a3b00;">
-                  {result.guard_status}
-                </span>
+            {#if result.resolution_mode === 'NEEDS_CLARIFICATION'}
+              <!-- TIER 2: DIAGNOSTIC TRIAGE -->
+              <div class="brutal-card p-6 sm:p-8 space-y-4" style="background-color: #fff3cd;">
+                <div class="flex flex-wrap items-center justify-between gap-2">
+                  <span class="font-mono text-[10px] font-bold px-2 py-0.5" style="background-color: #8a3b00; color: #ffffff;">
+                    TIER 2 // PERLU DETAIL KONTEKS
+                  </span>
+                  <span class="font-mono text-xs font-bold" style="color: #8a3b00;">
+                    DIAGNOSTIC TRIAGE
+                  </span>
+                </div>
+
+                <h2 class="opero-h1 text-2xl sm:text-3xl" style="color: #0a0a0a;">
+                  Rencana Anda Butuh <span class="opero-serif">Konteks Tambahan</span>
+                </h2>
+
+                <p class="text-xs sm:text-sm leading-relaxed" style="color: #3a3935;">
+                  {summaryLang === 'en' && result.ai_synthesis_en
+                    ? result.ai_synthesis_en
+                    : result.ai_synthesis}
+                </p>
+
+                <div class="p-3 bg-white font-mono text-[11px] leading-relaxed" style="border: 1.5px solid #0a0a0a;">
+                  Pemeriksaan kalender tetap dijalankan. Sitasi pasal dikunci kosong sampai unsur peristiwa lengkap; Pramana tidak akan mengarang dasar hukum.
+                </div>
               </div>
 
-              <h2 class="opero-h1 text-2xl sm:text-3xl">
-                Tidak Ada Aturan Spesifik di <span class="opero-serif">Korpus Pramana</span>
-              </h2>
+              <TriageGuidance
+                guidance={result.user_guidance}
+                mode={result.resolution_mode}
+                onSelectRewrite={applyRewrite}
+              />
+            {:else}
+              <!-- TIER 3: GRACEFUL OUT-OF-SCOPE -->
+              <div class="brutal-card p-6 sm:p-8 space-y-4" style="background-color: #dfd6c3;">
+                <div class="flex flex-wrap items-center justify-between gap-2">
+                  <span class="font-mono text-[10px] font-bold px-2 py-0.5" style="background-color: #3a3935; color: #ffffff;">
+                    TIER 3 // DI LUAR RANAH REGULASI
+                  </span>
+                  <span class="font-mono text-xs font-bold" style="color: #3a3935;">
+                    OUT-OF-SCOPE GUIDANCE
+                  </span>
+                </div>
 
-              <p class="text-xs sm:text-sm leading-relaxed" style="color: #3a3935;">
-                {result.ai_synthesis}
-              </p>
+                <h2 class="opero-h1 text-2xl sm:text-3xl">
+                  Di Luar <span class="opero-serif">Cakupan Regulasi Pramana</span>
+                </h2>
 
-              <div class="p-3 bg-white font-mono text-[11px] leading-relaxed" style="border: 1.5px solid #0a0a0a;">
-                Pemeriksaan kalender tetap dijalankan. Peringatan Nyepi atau upacara budaya, jika ada, ditampilkan di atas. Tidak ada kutipan pasal yang dipaksakan.
+                <p class="text-xs sm:text-sm leading-relaxed" style="color: #3a3935;">
+                  {summaryLang === 'en' && result.ai_synthesis_en
+                    ? result.ai_synthesis_en
+                    : result.ai_synthesis}
+                </p>
+
+                <div class="p-3 bg-white font-mono text-[11px] leading-relaxed" style="border: 1.5px solid #0a0a0a;">
+                  Pemeriksaan kalender tetap dijalankan. Tidak ada kutipan pasal yang dipaksakan untuk topik di luar cakupan.
+                </div>
               </div>
-            </div>
+
+              <TriageGuidance
+                guidance={result.user_guidance}
+                mode={result.resolution_mode}
+                onSelectRewrite={applyRewrite}
+              />
+            {/if}
           {/if}
 
           {#if result.disclaimer}

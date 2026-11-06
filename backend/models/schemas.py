@@ -90,7 +90,16 @@ class AIClaim(BaseModel):
     claim_text_en: Optional[str] = None
     citation_id: str
     span_ids: List[str] = Field(default_factory=list)
+    source_spans: List[str] = Field(default_factory=list)
+    exact_source_span: Optional[str] = None
     verified: bool = True
+
+
+class UserGuidance(BaseModel):
+    missing_context_diagnosis: List[str] = Field(default_factory=list)
+    what_user_should_do_next: List[str] = Field(default_factory=list)
+    suggested_query_rewrites: List[str] = Field(default_factory=list)
+    relevant_authority_or_channel: str = ""
 
 
 class BriefingItem(BaseModel):
@@ -137,6 +146,13 @@ class TripBriefResponse(BaseModel):
     ai_latency_ms: int = 0
     ai_model: Optional[str] = None
     ai_guard_status: Optional[str] = None
+    resolution_mode: str = "VERIFIED_GROUNDED"
+    detected_framing_or_tone: Optional[str] = None
+    user_guidance: UserGuidance = Field(default_factory=UserGuidance)
+    retrieval_score: Optional[float] = None
+    epistemic_tier: int = 1
+    candidate_clusters: List[str] = Field(default_factory=list)
+    missing_context: List[str] = Field(default_factory=list)
     whatsapp_text: str
     ics_content: str
     disclaimer: str
@@ -212,6 +228,13 @@ class ContextNoteResponse(BaseModel):
     ai_latency_ms: int = 0
     ai_model: Optional[str] = None
     ai_guard_status: Optional[str] = None
+    resolution_mode: str = "VERIFIED_GROUNDED"
+    detected_framing_or_tone: Optional[str] = None
+    user_guidance: UserGuidance = Field(default_factory=UserGuidance)
+    retrieval_score: Optional[float] = None
+    epistemic_tier: int = 1
+    candidate_clusters: List[str] = Field(default_factory=list)
+    missing_context: List[str] = Field(default_factory=list)
     framing_markers: List[FramingMarker]
     citations: List[CitationItem]
     copyable_comment: Optional[str] = None
@@ -279,6 +302,11 @@ class ZoneBriefResponse(BaseModel):
     rejected_claims: int = 0
     ai_latency_ms: int = 0
     model: Optional[str] = None
+    resolution_mode: str = "VERIFIED_GROUNDED"
+    detected_framing_or_tone: Optional[str] = None
+    user_guidance: UserGuidance = Field(default_factory=UserGuidance)
+    retrieval_score: Optional[float] = None
+    epistemic_tier: int = 1
     disclaimer: str
     verification_scope: str = "corpus"
 
