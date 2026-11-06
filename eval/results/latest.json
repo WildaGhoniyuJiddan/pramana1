@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-11-05T20:20:37.369560+00:00",
+  "generated_at": "2026-11-06T02:30:21.624263+00:00",
   "metrics": {
     "total_cases": 65,
     "passed": 65,
@@ -13,11 +13,11 @@
     "adversarial_pass": 5,
     "pii_cases": 7,
     "pii_leak_rate": 0.0,
-    "citations_emitted": 92,
-    "citations_verified": 92,
+    "citations_emitted": 93,
+    "citations_verified": 93,
     "citation_validity": 1.0,
     "latency_p50_ms": 0,
-    "latency_p95_ms": 2,
+    "latency_p95_ms": 1,
     "ai_status_counts": {
       "deterministic": 39,
       "abstain": 26
@@ -61,7 +61,7 @@
       ],
       "forbidden_hits": [],
       "leaked_pii": [],
-      "latency_ms": 0
+      "latency_ms": 1
     },
     {
       "id": "tourism-03",
@@ -79,7 +79,7 @@
       ],
       "forbidden_hits": [],
       "leaked_pii": [],
-      "latency_ms": 1
+      "latency_ms": 0
     },
     {
       "id": "tourism-04",
@@ -185,7 +185,7 @@
       ],
       "forbidden_hits": [],
       "leaked_pii": [],
-      "latency_ms": 1
+      "latency_ms": 0
     },
     {
       "id": "tourism-10",
@@ -366,7 +366,7 @@
       ],
       "forbidden_hits": [],
       "leaked_pii": [],
-      "latency_ms": 1
+      "latency_ms": 0
     },
     {
       "id": "discourse-08",
@@ -385,7 +385,7 @@
       ],
       "forbidden_hits": [],
       "leaked_pii": [],
-      "latency_ms": 1
+      "latency_ms": 0
     },
     {
       "id": "out-01",
@@ -651,7 +651,7 @@
       ],
       "forbidden_hits": [],
       "leaked_pii": [],
-      "latency_ms": 2
+      "latency_ms": 1
     },
     {
       "id": "en-scope-02",
@@ -669,13 +669,13 @@
       ],
       "forbidden_hits": [],
       "leaked_pii": [],
-      "latency_ms": 2
+      "latency_ms": 1
     },
     {
       "id": "en-scope-03",
       "category": "in_scope",
       "passed": true,
-      "status": "BUKTI_TERBATAS",
+      "status": "TERVERIFIKASI",
       "ai_synthesis_status": "deterministic",
       "citation_ids": [
         "SE_GUB_04_2023_DONT"
@@ -702,7 +702,7 @@
       ],
       "forbidden_hits": [],
       "leaked_pii": [],
-      "latency_ms": 1
+      "latency_ms": 0
     },
     {
       "id": "en-scope-05",
@@ -738,7 +738,7 @@
       ],
       "forbidden_hits": [],
       "leaked_pii": [],
-      "latency_ms": 2
+      "latency_ms": 1
     },
     {
       "id": "en-scope-07",
@@ -747,7 +747,8 @@
       "status": "TERVERIFIKASI",
       "ai_synthesis_status": "deterministic",
       "citation_ids": [
-        "SE_GUB_04_2023_DONT"
+        "SE_GUB_04_2023_DONT",
+        "SE_GUB_04_2023_DO"
       ],
       "expected_citation_ids": [
         "PERGUB_BALI_25_2020_PASAL_45_46",
@@ -755,7 +756,7 @@
       ],
       "forbidden_hits": [],
       "leaked_pii": [],
-      "latency_ms": 2
+      "latency_ms": 1
     },
     {
       "id": "en-scope-08",
@@ -773,13 +774,13 @@
       ],
       "forbidden_hits": [],
       "leaked_pii": [],
-      "latency_ms": 2
+      "latency_ms": 1
     },
     {
       "id": "en-scope-09",
       "category": "in_scope",
       "passed": true,
-      "status": "BUKTI_TERBATAS",
+      "status": "TERVERIFIKASI",
       "ai_synthesis_status": "deterministic",
       "citation_ids": [
         "SE_GUB_04_2023_DONT"
@@ -828,7 +829,7 @@
       ],
       "forbidden_hits": [],
       "leaked_pii": [],
-      "latency_ms": 2
+      "latency_ms": 1
     },
     {
       "id": "en-scope-12",
@@ -845,7 +846,7 @@
       ],
       "forbidden_hits": [],
       "leaked_pii": [],
-      "latency_ms": 2
+      "latency_ms": 1
     },
     {
       "id": "en-scope-13",
@@ -923,7 +924,7 @@
       "expected_citation_ids": [],
       "forbidden_hits": [],
       "leaked_pii": [],
-      "latency_ms": 1
+      "latency_ms": 0
     },
     {
       "id": "en-out-03",
@@ -935,7 +936,7 @@
       "expected_citation_ids": [],
       "forbidden_hits": [],
       "leaked_pii": [],
-      "latency_ms": 1
+      "latency_ms": 0
     },
     {
       "id": "en-out-04",
