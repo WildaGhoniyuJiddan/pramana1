@@ -148,7 +148,7 @@
       </div>
 
       <!-- Mode Selector -->
-      <div class="grid grid-cols-2 gap-2 text-xs font-mono font-bold">
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs font-mono font-bold">
         <button
           type="button"
           onclick={() => { scannerMode = 'camera'; startCamera(); }}

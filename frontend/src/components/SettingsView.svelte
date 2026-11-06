@@ -158,7 +158,7 @@
         </div>
 
         <div class="space-y-3 pt-1">
-          <div class="grid grid-cols-2 gap-3 text-xs">
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
             <div>
               <label for="settings-voice-lang" class="font-mono text-[10px] font-bold text-[#5c5952] block mb-1">
                 {t.voiceLang}

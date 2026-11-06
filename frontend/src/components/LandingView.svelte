@@ -26,7 +26,7 @@
     <!-- 1. HERO ARTWORK SECTION -->
     <section class="p-3 sm:p-4">
       <div
-        class="relative w-full h-[540px] sm:h-[640px] lg:h-[700px] overflow-hidden"
+        class="relative w-full h-[420px] sm:h-[640px] lg:h-[700px] overflow-hidden"
         style="border-radius: 8px; background-color: #091e8a; border: 1px solid #b8b3a6;"
       >
         <img
@@ -101,7 +101,7 @@
       class="px-5 sm:px-10 pt-8 sm:pt-11 pb-12 sm:pb-16"
       style="border-bottom: 1px solid #cdc9be;"
     >
-      <h1 class="opero-h1 text-[38px] sm:text-[56px] lg:text-[66px] max-w-4xl">
+      <h1 class="opero-h1 text-[32px] sm:text-[56px] lg:text-[66px] max-w-4xl">
         The AI <span class="opero-serif">legal context</span> layer<br />
         for Bali tourism &amp; governance.
       </h1>

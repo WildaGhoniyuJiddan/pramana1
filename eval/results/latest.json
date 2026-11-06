@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-11-06T02:53:26.540803+00:00",
+  "generated_at": "2026-11-06T03:52:41.133839+00:00",
   "metrics": {
     "total_cases": 65,
     "passed": 65,
@@ -42,7 +42,7 @@
       ],
       "forbidden_hits": [],
       "leaked_pii": [],
-      "latency_ms": 0
+      "latency_ms": 1
     },
     {
       "id": "tourism-02",
@@ -61,7 +61,7 @@
       ],
       "forbidden_hits": [],
       "leaked_pii": [],
-      "latency_ms": 0
+      "latency_ms": 1
     },
     {
       "id": "tourism-03",
@@ -131,7 +131,7 @@
       ],
       "forbidden_hits": [],
       "leaked_pii": [],
-      "latency_ms": 0
+      "latency_ms": 1
     },
     {
       "id": "tourism-07",
@@ -203,7 +203,7 @@
       ],
       "forbidden_hits": [],
       "leaked_pii": [],
-      "latency_ms": 0
+      "latency_ms": 1
     },
     {
       "id": "tourism-11",
@@ -276,7 +276,7 @@
       ],
       "forbidden_hits": [],
       "leaked_pii": [],
-      "latency_ms": 0
+      "latency_ms": 1
     },
     {
       "id": "discourse-03",
@@ -348,7 +348,7 @@
       ],
       "forbidden_hits": [],
       "leaked_pii": [],
-      "latency_ms": 0
+      "latency_ms": 1
     },
     {
       "id": "discourse-07",
@@ -569,7 +569,7 @@
       "expected_citation_ids": [],
       "forbidden_hits": [],
       "leaked_pii": [],
-      "latency_ms": 0
+      "latency_ms": 1
     },
     {
       "id": "pii-01",
@@ -651,7 +651,7 @@
       ],
       "forbidden_hits": [],
       "leaked_pii": [],
-      "latency_ms": 1
+      "latency_ms": 2
     },
     {
       "id": "en-scope-02",
@@ -704,7 +704,7 @@
       ],
       "forbidden_hits": [],
       "leaked_pii": [],
-      "latency_ms": 0
+      "latency_ms": 1
     },
     {
       "id": "en-scope-05",
@@ -776,7 +776,7 @@
       ],
       "forbidden_hits": [],
       "leaked_pii": [],
-      "latency_ms": 2
+      "latency_ms": 1
     },
     {
       "id": "en-scope-09",
@@ -812,7 +812,7 @@
       ],
       "forbidden_hits": [],
       "leaked_pii": [],
-      "latency_ms": 1
+      "latency_ms": 2
     },
     {
       "id": "en-scope-11",
@@ -950,7 +950,7 @@
       "expected_citation_ids": [],
       "forbidden_hits": [],
       "leaked_pii": [],
-      "latency_ms": 0
+      "latency_ms": 1
     },
     {
       "id": "en-out-05",
@@ -1012,7 +1012,7 @@
       "expected_citation_ids": [],
       "forbidden_hits": [],
       "leaked_pii": [],
-      "latency_ms": 0
+      "latency_ms": 1
     },
     {
       "id": "en-pii-02",

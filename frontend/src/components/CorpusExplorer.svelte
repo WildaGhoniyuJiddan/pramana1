@@ -405,7 +405,7 @@
               </span>
             </div>
 
-            <div class="space-y-2">
+            <div class="space-y-2 max-h-[50vh] lg:max-h-[68vh] overflow-y-auto pr-1">
               {#each filteredRegs as reg, idx}
                 <button
                   type="button"
@@ -583,7 +583,7 @@
               </span>
             </div>
 
-            <div class="space-y-2 lg:max-h-[68vh] lg:overflow-y-auto lg:pr-1">
+            <div class="space-y-2 max-h-[50vh] lg:max-h-[68vh] overflow-y-auto pr-1">
               {#each filteredDocs as doc, idx}
                 <button
                   type="button"

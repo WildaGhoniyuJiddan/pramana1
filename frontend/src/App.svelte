@@ -120,7 +120,7 @@
         />
         <span class="font-semibold text-xs" style="color: #0a0a0a;">Pramana</span>
       </div>
-      <div class="flex items-center gap-5 font-mono text-[11px]" style="color: #5c5b57;">
+      <div class="flex flex-wrap items-center justify-center sm:justify-start gap-x-4 gap-y-2 font-mono text-[11px]" style="color: #5c5b57;">
         <a href="/" onclick={(e) => { e.preventDefault(); navigate('/'); }} class="hover:underline">/</a>
         <a href="/trip-brief" onclick={(e) => { e.preventDefault(); navigate('/trip-brief'); }} class="hover:underline">/trip-brief</a>
         <a href="/context-note" onclick={(e) => { e.preventDefault(); navigate('/context-note'); }} class="hover:underline">/context-note</a>

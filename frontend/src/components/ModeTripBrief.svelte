@@ -249,7 +249,7 @@
               ></textarea>
             </div>
 
-            <div class="grid grid-cols-2 gap-3">
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <div>
                 <label for="start-date" class="block text-xs font-semibold mb-1" style="color: #0a0a0a;">
                   {t.startDate}
@@ -475,7 +475,7 @@
               </div>
             </div>
           {:else}
-            <div class="brutal-card p-5 flex items-center justify-between" style="background-color: #dfd6c3;">
+            <div class="brutal-card p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-3" style="background-color: #dfd6c3;">
               <div class="space-y-1">
                 <span class="font-mono text-[10px] font-bold px-2 py-0.5" style="background-color: #0c249c; color: #ffffff; border: 1px solid #0a0a0a;">
                   {i18n.lang === 'en' ? 'SAKA CALENDAR STATUS' : 'STATUS KALENDER SAKA'}
