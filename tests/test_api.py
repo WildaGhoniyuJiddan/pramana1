@@ -19,10 +19,11 @@ def _disable_gemini(monkeypatch):
 
 
 def test_healthcheck_endpoint():
-    response = client.get("/api/v1/health")
-    assert response.status_code == 200
-    data = response.json()
-    assert data["status"] == "healthy"
+    for path in ["/", "/health", "/api/v1/health"]:
+        response = client.get(path)
+        assert response.status_code == 200
+        data = response.json()
+        assert data["status"] == "healthy"
     assert data["version"] == "1.4.0"
     assert data["total_regulations_indexed"] == 42
     assert data["total_documents_registered"] == 29
