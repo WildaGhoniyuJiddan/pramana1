@@ -1,6 +1,7 @@
 <script>
   import { onMount, onDestroy } from 'svelte';
   import { fetchZones, fetchTotem, requestTotemBrief } from '../lib/api.js';
+  import EpistemicBadge from './EpistemicBadge.svelte';
   import QrCode from './QrCode.svelte';
 
   let { zoneId = null, navigate = (path) => {}, onOpenDoc = () => {} } = $props();
@@ -489,6 +490,10 @@
                         : t.templateBadge}
                 </span>
               </div>
+
+              {#if brief}
+                <EpistemicBadge result={brief} />
+              {/if}
 
               {#if briefLoading}
                 <p class="text-sm leading-relaxed animate-pulse" style="color: #5c5952;" aria-live="polite">
