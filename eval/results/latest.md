@@ -1,6 +1,6 @@
 # Pramana Evaluation Results
 
-Generated: 2026-11-06T02:30:21.624968+00:00
+Generated: 2026-11-06T02:53:26.541397+00:00
 
 | Metric | Value |
 | :--- | :--- |
@@ -16,8 +16,8 @@ Generated: 2026-11-06T02:30:21.624968+00:00
 | adversarial_pass | 5 |
 | pii_cases | 7 |
 | pii_leak_rate | 0.0 |
-| citations_emitted | 93 |
-| citations_verified | 93 |
+| citations_emitted | 95 |
+| citations_verified | 95 |
 | citation_validity | 1.0 |
 | latency_p50_ms | 0 |
 | latency_p95_ms | 1 |
@@ -71,7 +71,7 @@ Generated: 2026-11-06T02:30:21.624968+00:00
 | pii-05 | pii | PASS | TIDAK_DITEMUKAN | abstain | - |
 | en-scope-01 | in_scope | PASS | TERVERIFIKASI | deterministic | SE_GUB_04_2023_DONT, SE_GUB_04_2023_DO, PERDA_BALI_05_2020_PASAL_25 |
 | en-scope-02 | in_scope | PASS | TERVERIFIKASI | deterministic | PERDA_BALI_06_2023_LEVY, PERDA_BALI_06_2023_PASAL_12, PERGUB_BALI_02_2024_PASAL_11 |
-| en-scope-03 | in_scope | PASS | TERVERIFIKASI | deterministic | SE_GUB_04_2023_DONT |
+| en-scope-03 | in_scope | PASS | TERVERIFIKASI | deterministic | SE_GUB_04_2023_DONT, UU_22_2009_PASAL_291, UU_22_2009_PASAL_77_281 |
 | en-scope-04 | in_scope | PASS | BUKTI_TERBATAS | deterministic | SE_GUB_04_2023_DONT |
 | en-scope-05 | in_scope | PASS | BUKTI_TERBATAS | deterministic | SE_GUB_04_2023_DO, SE_GUB_04_2023_DONT |
 | en-scope-06 | in_scope | PASS | TERVERIFIKASI | deterministic | PERDA_BALI_06_2023_LEVY, PERGUB_BALI_02_2024_PASAL_6, PERDA_BALI_06_2023_PASAL_12 |

@@ -53,7 +53,7 @@ adalah keputusan korpus v1.3.0.
 | 1 | `uu-15-2023` | UU 15/2023 tentang Provinsi Bali | 1 → 1A | verbatim | `verbatim` | `UU_15_2023_PASAL_8` |
 | 2 | `uu-18-2025` | UU 18/2025 tentang Perubahan Ketiga UU 10/2009 | 1 → 1A | verbatim | `verbatim-ocr-dibersihkan` | `UU_18_2025_*` (7 pasal) |
 | 3 | `uu-11-2010` | UU 11/2010 tentang Cagar Budaya | 1 → 1A | verbatim | `belum-diambil` | — |
-| 4 | `uu-22-2009` | UU 22/2009 tentang Lalu Lintas dan Angkutan Jalan | 1 → 1A | verbatim | `belum-diambil` | — |
+| 4 | `uu-22-2009` | UU 22/2009 tentang Lalu Lintas dan Angkutan Jalan | 1 → 1A | verbatim | `verbatim` | `UU_22_2009_PASAL_77_281`, `_PASAL_291` |
 | 5 | `uu-6-2011` | UU 6/2011 tentang Keimigrasian | 1 → 1A | verbatim | `verbatim` | `UU_06_2011_PASAL_75` |
 | 6 | `se-gubernur-bali-7-2025` | SE Gubernur Bali 7/2025 | 2 → 2 | non-verbatim | `non-verbatim` | — |
 | 7 | `perda-bali-2-2025` | Perda Bali 2/2025 (perubahan Perda 6/2023) | 2 → 1B | verbatim | `verbatim` | `PERDA_BALI_06_2023_LEVY` |
@@ -121,6 +121,7 @@ PDF berikut diunduh pada audit ini dan diperiksa dengan `pypdf`:
 | UU 1/2023 | 24.793.845 B | `975FC86CFA63204EE21810CB7A99918C3A16B5FD47E58DADD9562C5FF3F1DFA0` |
 | UU 39/1999 | 190.041 B | `069C6DDAAAFC356CA332779B3BDED58E9BF4C3BF78704DAAEA19241F6604AD6F` |
 | UU 8/1999 | 192.920 B | `DF253C489E78E66D9DA5337C85BEBE1384C68763AF2001335B4880B0F225D816` |
+| UU 22/2009 | 642.264 B | `30CA5AE5C81CEB5A9427A71E8BABFF6585E5399AB3859620BB425B67CFF5F16F` |
 
 PDF tidak disimpan di repo. Hash dicatat agar unduhan ulang dapat dibandingkan.
 
@@ -184,7 +185,7 @@ versi terbaru pada saat dibaca.
 
 ## 9. Tambahan Phase 2C — Korpus v1.3.0
 
-Korpus v1.3.0 memiliki **29 dokumen registry dan 40 chunk retrieval**. Sebanyak
+Korpus memiliki **29 dokumen registry dan 42 chunk retrieval**. Sebanyak
 30 chunk baru ditambahkan dari 10 dokumen: 5 dokumen baru dan 5 dokumen yang
 sudah ada di registry:
 

@@ -24,7 +24,7 @@ def test_healthcheck_endpoint():
     data = response.json()
     assert data["status"] == "healthy"
     assert data["version"] == "1.4.0"
-    assert data["total_regulations_indexed"] == 40
+    assert data["total_regulations_indexed"] == 42
     assert data["total_documents_registered"] == 29
     assert data["total_manifest_documents"] == 21
     assert data["total_smart_gate_zones"] == 3
@@ -66,7 +66,7 @@ def test_get_corpus_endpoint():
     assert "metadata" in data
     assert "tiers" in data
     assert data["metadata"]["version"] == "1.3.0"
-    assert len(data["regulations"]) == 40
+    assert len(data["regulations"]) == 42
     assert len(data["documents"]) == 29
 
     documents_by_id = {doc["id"]: doc for doc in data["documents"]}

@@ -13,7 +13,7 @@ Bali DigiFest 2026 — AI Web Innovation Challenge
 | Bagian | Status | Catatan |
 | :--- | :--- | :--- |
 | Retrieval deterministik + abstain (Layer-2) | ✅ Live | Ambang relevansi normalisasi `0.5` + pemotongan relatif `0.75` dari skor teratas |
-| Registry provenance korpus | ✅ Live | 29 dokumen registry, 40 chunk retrieval, validasi silang `document_id`, status teks, dan amendment |
+| Registry provenance korpus | ✅ Live | 29 dokumen registry, 42 chunk retrieval, validasi silang `document_id`, status teks, dan amendment |
 | PII masking (5 kategori) | ✅ Live | Email, telepon, kode booking, kartu, paspor. Bersifat best-effort, bukan DLP penuh |
 | Kalender Nyepi & Pawukon | ✅ Live | Cakupan deterministik 2025–2028, jendela Nyepi 24 jam |
 | Ekspor `.ics` (RFC 5545) | ✅ Live | Escaping teks, line folding, UID stabil, validasi tanggal |
@@ -137,7 +137,7 @@ Baseline internal 40 kasus: 20 in-scope, 12 out-of-scope, 3 adversarial, 5 PII. 
 Korpus memakai dua lapis yang sengaja dipisahkan:
 
 - **`documents` — registry provenance (29 dokumen):** 21 entri manifest awal, dokumen legacy SE Gubernur Bali No. 4 Tahun 2023, dan 7 dokumen tambahan Phase 2C. Registry mencatat status teks, cakupan, sumber PDF, SHA-256, dan keputusan audit. **Registry bukan bukti kutipan dan tidak menambah hasil retrieval.**
-- **`regulations` — chunk retrieval (40 chunk):** hanya chunk yang teksnya tersimpan dan boleh diverifikasi Layer-1.
+- **`regulations` — chunk retrieval (42 chunk):** hanya chunk yang teksnya tersimpan dan boleh diverifikasi Layer-1.
 
 Cakupan chunk:
 
@@ -320,7 +320,7 @@ Kode kesalahan yang relevan: `404` untuk zona tidak dikenal, `422` untuk input/l
 
 ## Keterbatasan yang Diketahui
 
-1. **Korpus retrieval masih terkurasi manual**: 40 chunk dari 29 dokumen registry. Belum mencakup seluruh Perda, Pergub, SE, dan awig-awig desa adat.
+1. **Korpus retrieval masih terkurasi manual**: 42 chunk dari 29 dokumen registry. Belum mencakup seluruh Perda, Pergub, SE, dan awig-awig desa adat.
 2. **Retrieval berbasis kata kunci**, bukan embedding atau entailment semantik. Kueri dengan sinonim jauh dapat gagal retrieval dan memicu abstain.
 3. **Tidak ada verifikasi real-time ke JDIH.** Layer-1 hanya mencocokkan kutipan dengan teks yang tersimpan di korpus.
 4. **Ringkasan AI tidak diverifikasi Layer-1.** AI claims diverifikasi terhadap evidence span; kebenaran parafrase tetap terbatas.

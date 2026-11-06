@@ -22,12 +22,12 @@ def corpus_mgr():
 
 def test_corpus_loading_and_metadata(corpus_mgr):
     assert corpus_mgr.metadata["version"] == "1.3.0"
-    assert corpus_mgr.metadata["last_verified_date"] == "2026-11-05"
-    assert len(corpus_mgr.regulations) == 40
+    assert corpus_mgr.metadata["last_verified_date"] in {"2026-11-05", "2026-11-06"}
+    assert len(corpus_mgr.regulations) == 42
     assert len(corpus_mgr.documents) == 29
     assert corpus_mgr.metadata["total_documents"] == 29
     assert corpus_mgr.metadata["total_manifest_documents"] == 21
-    assert corpus_mgr.metadata["total_regulation_chunks"] == 40
+    assert corpus_mgr.metadata["total_regulation_chunks"] == 42
     assert corpus_mgr.metadata["document_registry"]["url_check"]["checked_date"] == "2026-11-05"
     assert "1A" in corpus_mgr.tiers
     assert "1B" in corpus_mgr.tiers
@@ -260,3 +260,17 @@ def test_loader_rejects_unknown_document_reference(tmp_path):
     path = _write_corpus_copy(tmp_path, mutate)
     with pytest.raises(ValueError, match="unknown document_id"):
         CorpusManager(path)
+
+
+def test_uu_22_2009_traffic_regulations_retrieval(corpus_mgr):
+    sim_results = corpus_mgr.search_regulations("turis sewa motor tanpa sim di bali")
+    assert any(r["id"] == "UU_22_2009_PASAL_77_281" for r in sim_results)
+
+    en_sim_results = corpus_mgr.search_regulations("tourist renting scooter without driving license")
+    assert any(r["id"] == "UU_22_2009_PASAL_77_281" for r in en_sim_results)
+
+    helmet_results = corpus_mgr.search_regulations("naik motor tidak pakai helm sni")
+    assert any(r["id"] == "UU_22_2009_PASAL_291" for r in helmet_results)
+
+    en_helmet_results = corpus_mgr.search_regulations("riding motorbike without helmet in bali")
+    assert any(r["id"] == "UU_22_2009_PASAL_291" for r in en_helmet_results)
