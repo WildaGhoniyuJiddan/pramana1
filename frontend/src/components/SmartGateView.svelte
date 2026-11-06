@@ -44,13 +44,13 @@
       ttsUnsupported: 'Browser ini tidak mendukung Web Speech API.',
       ttsError: 'Audio gagal diputar. Gunakan teks panduan di samping.',
       checks: 'Panduan Utama',
-      legalBasis: 'Dasar Hukum Terverifikasi',
+      legalBasis: 'Dasar Hukum Resmi',
       historicalTitle: 'Rujukan Historis',
       historicalNote:
         'Rujukan ini sudah disempurnakan dan tidak boleh diperlakukan sebagai aturan aktif. Ditampilkan untuk transparansi.',
       openSource: 'Buka teks korpus',
       localAck: 'Konfirmasi Lokal',
-      ackButton: 'Tandai Sudah Dibaca',
+      ackButton: 'Tandai Sudah Dibaca (tersimpan di perangkat ini saja)',
       ackDone: 'Sudah ditandai di perangkat ini.',
       ackClear: 'Hapus Tanda',
       ackNote:
@@ -104,13 +104,13 @@
       ttsUnsupported: 'This browser does not support the Web Speech API.',
       ttsError: 'Audio could not be played. Use the text guidance instead.',
       checks: 'Key Guidance',
-      legalBasis: 'Verified Legal Basis',
+      legalBasis: 'Official Legal Basis',
       historicalTitle: 'Historical References',
       historicalNote:
         'These references have been superseded and must not be treated as current rules. They are shown for transparency.',
       openSource: 'Open corpus text',
       localAck: 'Local Acknowledgement',
-      ackButton: 'Mark as Read',
+      ackButton: 'Mark as Read (stored on this device only)',
       ackDone: 'Marked on this device.',
       ackClear: 'Clear Mark',
       ackNote:

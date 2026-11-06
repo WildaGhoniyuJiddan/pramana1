@@ -167,7 +167,7 @@
             ? 'background-color: #0c249c; color: #ffffff;'
             : 'background-color: #f3f1eb; color: #0a0a0a;'}
         >
-          📡 Simulasi Tap NFC
+          📡 Simulasi NFC (Tanpa Tag Fisik)
         </button>
       </div>
 
@@ -202,9 +202,12 @@
         <!-- NFC Simulation View -->
         <div class="space-y-3">
           <div class="p-3 bg-[#f3f1eb] border border-[#cdc9be] text-xs space-y-1">
-            <p class="font-bold text-[#0a0a0a]">Bagaimana NFC NTAG213 Bekerja di Lapangan?</p>
+            <div class="flex items-center gap-2">
+              <span class="px-1.5 py-0.5 font-mono text-[9px] font-bold bg-[#dfd6c3] text-[#0a0a0a] border border-[#0a0a0a]">SIMULASI PROTOTIPE</span>
+              <p class="font-bold text-[#0a0a0a]">Tanpa Perangkat Keras Fisik</p>
+            </div>
             <p class="text-[#5c5952] text-[11px] leading-relaxed">
-              Stiker NFC fisik di gerbang pura/bandara berisi rekaman NDEF URI standar (<code class="bg-[#e8dfc8] px-1 py-0.5">https://.../totem/[zona]</code>). Saat ponsel wisatawan menyentuh stiker, browser otomatis terbuka langsung pada kartu kepatuhan zona tersebut.
+              Tombol di bawah mensimulasikan event sentuhan NFC ponsel ke stiker NTAG213 di totem gerbang fisik secara perangkat lunak tanpa tag fisik nyata. Pada deployment fisik, stiker berisi tautan NDEF URI standar (<code class="bg-[#e8dfc8] px-1 py-0.5">https://.../totem/[zona]</code>).
             </p>
           </div>
 
