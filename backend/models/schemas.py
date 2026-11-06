@@ -117,6 +117,8 @@ class BriefingItem(BaseModel):
     related_document_ids: List[str] = Field(default_factory=list)
     superseded_by: Optional[str] = None
     superseded_by_url: Optional[str] = None
+    trigger_reason: Optional[str] = None
+    trigger_reason_en: Optional[str] = None
 
 
 class TripBriefResponse(BaseModel):

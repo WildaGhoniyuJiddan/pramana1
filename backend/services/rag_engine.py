@@ -313,6 +313,55 @@ class StrictRAGEngine:
                     matched_spans.append((start, end))
         return framing_markers
 
+    def _get_trigger_reason(self, reg: Dict[str, Any]) -> Tuple[str, str]:
+        reg_id = reg.get("id", "")
+        category = reg.get("category", "")
+        cat_lower = category.lower()
+        if "LEVY" in reg_id or "pungutan" in cat_lower or "retribusi" in cat_lower:
+            return (
+                "Kewajiban retribusi kedatangan wisatawan mancanegara (Perda No. 6/2023)",
+                "Mandatory tourist levy for international arrivals (Regional Reg. No. 6/2023)",
+            )
+        if (
+            reg_id in {"PERGUB_BALI_25_2020_PASAL_45_46", "PERGUB_BALI_25_2020_PASAL_3_4"}
+            or "pura" in cat_lower
+            or "suci" in cat_lower
+            or "kewajiban wisman" in cat_lower
+        ):
+            return (
+                "Dipicu aktivitas: Kunjungan Pura / Kawasan Suci",
+                "Triggered by activity: Sacred Area / Temple Visit",
+            )
+        if (
+            reg_id in {"PERGUB_BALI_52_2021_KENDARAAN", "UU_22_2009_LALULINTAS"}
+            or "lalu lintas" in cat_lower
+            or "angkutan" in cat_lower
+            or "sepeda motor" in cat_lower
+        ):
+            return (
+                "Dipicu aktivitas: Transportasi / Sewa Kendaraan",
+                "Triggered by activity: Transport / Vehicle Rental",
+            )
+        if (
+            reg_id in {"PERDA_BALI_05_2020_PARIWISATA_BUDAYA", "PERDA_BALI_5_2020_PASAL_33"}
+            or "dtw" in cat_lower
+            or "daya tarik" in cat_lower
+            or "pesisir" in cat_lower
+        ):
+            return (
+                "Dipicu aktivitas: Kawasan Wisata / DTW & Budaya",
+                "Triggered by activity: Tourist Attraction / Cultural Site",
+            )
+        if "nyepi" in cat_lower:
+            return (
+                "Dipicu kalender: Periode Hari Suci Nyepi",
+                "Triggered by calendar: Nyepi Holy Day Period",
+            )
+        return (
+            "Checklist kepatuhan umum wisatawan",
+            "General tourist compliance checklist",
+        )
+
     def _build_briefing_items(
         self,
         regulations: List[Dict[str, Any]],
@@ -320,6 +369,7 @@ class StrictRAGEngine:
         briefing_items: List[Dict[str, Any]] = []
         for reg in regulations:
             text = reg.get("text", "")
+            tr_reason, tr_reason_en = self._get_trigger_reason(reg)
             briefing_items.append({
                 "id": reg["id"],
                 "title": reg["doc_title"],
@@ -347,6 +397,8 @@ class StrictRAGEngine:
                 "related_document_ids": reg.get("related_document_ids", []),
                 "superseded_by": reg.get("superseded_by"),
                 "superseded_by_url": reg.get("superseded_by_url"),
+                "trigger_reason": tr_reason,
+                "trigger_reason_en": tr_reason_en,
             })
         return briefing_items
 
