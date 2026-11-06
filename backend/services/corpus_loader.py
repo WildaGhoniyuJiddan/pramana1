@@ -80,6 +80,9 @@ STOPWORDS = {
     "pedagang", "menjual", "taksi", "error", "memesan", "harganya",
     "tiga",
     # English stopwords
+    # English auxiliary & pronoun stopwords
+    "must", "him", "her", "without", "out", "canggu", "control", "should",
+    "can", "will", "been", "being", "having", "who", "whom", "whose",
     "the", "and", "is", "are", "was", "were", "at", "to", "in", "for", "of",
     "all", "do", "does", "did", "them", "they", "their", "this", "that", "it",
     "its", "really", "have", "has", "had", "you", "your", "with", "from", "by",
@@ -97,6 +100,15 @@ GENERIC_QUERY_TOKENS = {
 
 # Cross-lingual expansion for English viral posts and tourist queries
 EN_TO_ID_SYNONYMS: Dict[str, List[str]] = {
+    "posed": ["berfoto", "berpose", "busana", "telanjang"],
+    "mount": ["gunung", "kawasan suci"],
+    "batur": ["batur", "kawasan suci"],
+    "site": ["kawasan", "tempat suci", "tempat"],
+    "authorities": ["aparat", "pejabat", "imigrasi"],
+    "riding": ["mengendarai", "berkendara", "mengemudi", "sepeda motor"],
+    "ride": ["mengendarai", "berkendara", "mengemudi"],
+    "rented": ["sewa", "rental"],
+    "scooters": ["sepeda motor", "kendaraan"],
     "tourist": ["wisatawan", "wisman"],
     "tourists": ["wisatawan", "wisman"],
     "foreign": ["wisman", "asing"],
