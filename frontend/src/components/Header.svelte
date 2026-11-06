@@ -71,9 +71,9 @@
         style="color: #0a0a0a;"
       >
         <img
-          src="/assets/pramana_logo.svg?v=5"
+          src="/assets/pramana_logo.svg?v=6"
           alt="Pramana Logo"
-          class="w-4 h-4 object-contain shrink-0"
+          class="w-5 h-5 object-contain shrink-0"
         />
         <span>Pramana</span>
       </a>
