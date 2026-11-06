@@ -11,7 +11,7 @@
 
   const UI_TEXT = {
     id: {
-      badge: '04 // Phygital Smart Gate',
+      badge: '03 // Phygital Smart Gate',
       title: 'Gerbang Pintar',
       titleAccent: 'Pramana',
       subtitle:
@@ -71,7 +71,7 @@
       back: 'Kembali ke daftar gerbang'
     },
     en: {
-      badge: '04 // Phygital Smart Gate',
+      badge: '03 // Phygital Smart Gate',
       title: 'Smart Gate',
       titleAccent: 'Pramana',
       subtitle:
@@ -369,7 +369,7 @@
             style="background-color: #dfd6c3; color: #0a0a0a;"
             class="px-2 py-0.5 font-mono text-[10px] font-bold"
           >
-            04
+            03
           </span>
           <span class="px-3 py-0.5 text-[11px] font-semibold">{t.badge}</span>
         </div>

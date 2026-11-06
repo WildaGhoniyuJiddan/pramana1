@@ -240,7 +240,7 @@
             style="background-color: #dfd6c3; color: #0a0a0a;"
             class="px-2 py-0.5 font-mono text-[10px] font-bold"
           >
-            03
+            04
           </span>
           <span class="px-3 py-0.5 text-[11px] font-semibold">{t.badge}</span>
         </div>

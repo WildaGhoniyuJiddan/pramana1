@@ -97,7 +97,7 @@ export const DICT = {
       kuningan: 'Hari Raya Kuningan'
     },
     gate: {
-      badge: '04 // PANDUAN LOKASI WISATA',
+      badge: '03 // PANDUAN LOKASI WISATA',
       title: 'Gerbang Pintar',
       titleAccent: 'Pramana',
       subtitle: 'Kartu kepatuhan langsung di lokasi. Pilih gerbang wisata, dengarkan audio panduan, dan patuhi aturan setempat.',
@@ -198,7 +198,7 @@ export const DICT = {
       ]
     },
     corpus: {
-      badge: '03 // REGISTRY DOKUMEN',
+      badge: '04 // REGISTRY DOKUMEN',
       title: 'Korpus Regulasi Bali',
       subtitle: 'Telusuri chunk pasal resmi dari dokumen terdaftar JDIH BPK dan Pemprov Bali.',
       searchPlaceholder: 'Cari pasal, kata kunci...',
@@ -284,7 +284,7 @@ export const DICT = {
       kuningan: 'Kuningan Ceremony'
     },
     gate: {
-      badge: '04 // ON-SITE COMPLIANCE',
+      badge: '03 // ON-SITE COMPLIANCE',
       title: 'Smart Gate',
       titleAccent: 'Pramana',
       subtitle: 'Location-specific compliance cards. Select a destination, listen to audio guidance, and respect sacred cultural grounds.',
@@ -385,7 +385,7 @@ export const DICT = {
       ]
     },
     corpus: {
-      badge: '03 // DOCUMENT REGISTRY',
+      badge: '04 // DOCUMENT REGISTRY',
       title: 'Bali Legal Corpus',
       subtitle: 'Browse statutory chunks from registered legal documents of JDIH BPK and Bali Provincial Government.',
       searchPlaceholder: 'Search articles, keywords...',
