@@ -200,7 +200,7 @@ export const DICT = {
     corpus: {
       badge: '03 // REGISTRY DOKUMEN',
       title: 'Korpus Regulasi Bali',
-      subtitle: 'Telusuri 40 chunk pasal resmi dan 29 dokumen terverifikasi dari JDIH BPK dan Pemprov Bali.',
+      subtitle: 'Telusuri chunk pasal resmi dari dokumen terdaftar JDIH BPK dan Pemprov Bali.',
       searchPlaceholder: 'Cari pasal, kata kunci...',
       loading: 'Memuat indeks korpus regulasi...'
     }
@@ -387,7 +387,7 @@ export const DICT = {
     corpus: {
       badge: '03 // DOCUMENT REGISTRY',
       title: 'Bali Legal Corpus',
-      subtitle: 'Browse 40 verified statutory chunks and 29 audited legal documents from JDIH BPK and Bali Provincial Government.',
+      subtitle: 'Browse statutory chunks from registered legal documents of JDIH BPK and Bali Provincial Government.',
       searchPlaceholder: 'Search articles, keywords...',
       loading: 'Loading legal corpus index...'
     }

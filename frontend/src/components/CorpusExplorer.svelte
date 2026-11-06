@@ -193,6 +193,11 @@
     loadCorpus();
   });
 
+  let docCount = $derived(corpusData?.documents?.length ?? 29);
+  let activeCount = $derived(corpusData?.documents?.filter(d => d.retrieval_eligible !== false)?.length ?? 17);
+  let verbatimCount = $derived(corpusData?.documents?.filter(d => d.is_verbatim || (d.text_status && d.text_status.startsWith('verbatim')))?.length ?? 16);
+  let chunkCount = $derived(corpusData?.regulations?.length ?? 40);
+
   let filteredRegs = $derived.by(() => {
     if (!corpusData?.regulations) return [];
     return corpusData.regulations.filter((reg) => {
@@ -244,7 +249,13 @@
           {t.title}
         </h1>
         <p class="text-xs sm:text-[13px] mt-1 max-w-xl" style="color: #4a4740;">
-          {t.subtitle}
+          {#if corpusData}
+            {i18n.lang === 'en'
+              ? `Browse ${chunkCount} statutory chunks across ${docCount} registered documents (${activeCount} active in retrieval, ${verbatimCount} verbatim) from JDIH BPK and Bali Provincial Government.`
+              : `Telusuri ${chunkCount} chunk pasal resmi dari ${docCount} dokumen terdaftar (${activeCount} aktif dipakai, ${verbatimCount} verbatim) dari JDIH BPK dan Pemprov Bali.`}
+          {:else}
+            {t.subtitle}
+          {/if}
         </p>
       </div>
 
