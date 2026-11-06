@@ -25,7 +25,7 @@ from backend.models.schemas import (
     ZoneBriefResponse,
 )
 from backend.services.calendar_service import CALENDAR_COVERAGE
-from backend.services.rag_engine import StrictRAGEngine
+from backend.services.rag_engine import PUBLIC_BASE_URL, StrictRAGEngine
 from backend.services.corpus_loader import CorpusManager
 from backend.services.zone_registry import ZoneNotFoundError
 from backend.services import ai_metrics
@@ -235,7 +235,9 @@ def get_corpus():
 @app.get("/api/v1/zones", response_model=ZoneListResponse)
 def get_zones():
     """Return the Smart Gate zone directory."""
-    return rag_engine.list_zones()
+    data = rag_engine.list_zones()
+    data["public_base_url"] = PUBLIC_BASE_URL
+    return data
 
 
 @app.get("/api/v1/totem/{zone_id}", response_model=ZoneCardResponse)
@@ -245,7 +247,9 @@ def get_totem_card(
 ):
     """Return one deterministic Smart Gate card with verified citations."""
     try:
-        return rag_engine.get_zone_card(zone_id, lang)
+        card = rag_engine.get_zone_card(zone_id, lang)
+        card["public_base_url"] = PUBLIC_BASE_URL
+        return card
     except ZoneNotFoundError as exc:
         raise HTTPException(status_code=404, detail=str(exc)) from exc
     except ValueError as exc:

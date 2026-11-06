@@ -99,6 +99,7 @@ def test_zone_list_endpoint():
     data = response.json()
     assert data["metadata"]["version"] == "1.0.0"
     assert len(data["zones"]) == 3
+    assert "public_base_url" in data
     assert {zone["id"] for zone in data["zones"]} == {
         "bandara-ngurah-rai",
         "pura-besakih",
@@ -109,6 +110,16 @@ def test_zone_list_endpoint():
         assert zone["name"]["en"]
 
 
+def test_zone_endpoints_expose_configured_public_base_url(monkeypatch):
+    monkeypatch.setattr(
+        main_module, "PUBLIC_BASE_URL", "https://pramana.example.com"
+    )
+    zones = client.get("/api/v1/zones").json()
+    assert zones["public_base_url"] == "https://pramana.example.com"
+    card = client.get("/api/v1/totem/bandara-ngurah-rai").json()
+    assert card["public_base_url"] == "https://pramana.example.com"
+
+
 def test_totem_card_endpoint():
     response = client.get("/api/v1/totem/bandara-ngurah-rai?lang=en")
     assert response.status_code == 200
@@ -117,6 +128,7 @@ def test_totem_card_endpoint():
     assert data["zone"]["id"] == "bandara-ngurah-rai"
     assert data["zone"]["name"] == "I Gusti Ngurah Rai Airport"
     assert data["language"] == "en"
+    assert "public_base_url" in data
     assert len(data["citations"]) == 3
     assert data["historical_citations"] == []
     assert data["tts_text"]

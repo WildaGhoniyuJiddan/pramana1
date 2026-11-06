@@ -14,8 +14,9 @@
     if (!current) return;
 
     QRCode.toDataURL(current, {
-      margin: 1,
+      margin: 4,
       width: size,
+      errorCorrectionLevel: 'H',
       color: { dark: '#0a0a0a', light: '#ffffff' }
     })
       .then((url) => {

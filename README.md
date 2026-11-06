@@ -65,7 +65,8 @@ Aplikasi ini tidak menjawab pertanyaan hukum bebas. Ia mengambil kecocokan dari 
 - AI brief 2–3 kalimat dibuat dari sitasi terverifikasi; jika Gemini tidak tersedia atau menyebut pasal/angka di luar bukti, sistem memakai template deterministik.
 - Teks pasal asli tetap Bahasa Indonesia; terjemahan hanya untuk panduan praktis.
 - Audio memakai Web Speech API bawaan browser, bukan API TTS eksternal.
-- QR dibuat lokal di browser. NFC memakai URL record pada tag NTAG213; tidak memakai Web NFC API.
+- QR dibuat lokal di browser dengan margin quiet zone 4 modul dan error correction level H agar lebih tahan saat dipindai dari foto. NFC memakai URL record pada tag NTAG213; tidak memakai Web NFC API.
+- Jika `PRAMANA_PUBLIC_URL` diisi, QR mengarah ke URL publik tersebut; jika kosong, QR memakai origin browser. Saat origin masih `localhost`/`127.0.0.1`, UI menampilkan peringatan bahwa QR tidak dapat dibuka dari perangkat lain.
 - Tombol “Tandai Sudah Dibaca” hanya menyimpan status di `localStorage` perangkat, bukan check-in server dan bukan bukti hukum.
 - Rujukan yang sudah disempurnakan (SE Gubernur Bali No. 4 Tahun 2023) ditampilkan terpisah sebagai **rujukan historis**, bukan aturan aktif.
 - Mode ini belum memiliki cache offline/PWA.
@@ -271,7 +272,7 @@ npm run build
 pytest -q
 ```
 
-Status terakhir dijalankan (6 November 2026): **123 passed**. Build frontend dengan Vite 5.4.21 juga berhasil tanpa warning Svelte. Dua peringatan deprecation berasal dari kombinasi Starlette/HTTPX di lingkungan test, bukan kegagalan aplikasi.
+Status terakhir dijalankan (6 November 2026): **124 passed**. Build frontend dengan Vite 5.4.21 juga berhasil tanpa warning Svelte. Dua peringatan deprecation berasal dari kombinasi Starlette/HTTPX di lingkungan test, bukan kegagalan aplikasi.
 
 ---
 
@@ -283,7 +284,7 @@ Status terakhir dijalankan (6 November 2026): **123 passed**. Build frontend den
 | `GEMINI_API_KEY` | kosong | Wajib untuk AI. Jangan commit nilai asli. |
 | `GEMINI_MODEL` | `gemini-3.1-flash-lite` | Model generasi; dapat diganti via env. |
 | `GEMINI_EMBEDDING_MODEL` | `gemini-embedding-001` | Diverifikasi ulang sebelum membangun embedding. |
-| `PRAMANA_PUBLIC_URL` | kosong | Opsional. Ditambahkan ke teks WhatsApp sebagai tautan verifikasi. |
+| `PRAMANA_PUBLIC_URL` | kosong | Opsional. URL publik frontend untuk tautan QR dan teks WhatsApp, misalnya `https://pramana.example.com`. Jika kosong, tautan memakai origin browser. |
 | `CORS_ALLOW_ORIGINS` | `http://localhost:5173,http://127.0.0.1:5173` | Daftar origin yang diizinkan, dipisahkan koma. |
 | `RATE_LIMIT_WINDOW_SECONDS` | `60` | Jendela waktu rate limit. |
 | `RATE_LIMIT_MAX_REQUESTS` | `60` | Maksimum request POST per klien per jendela. |
@@ -344,6 +345,7 @@ Kode kesalahan yang relevan: `404` untuk zona tidak dikenal, `422` untuk input/l
 14. **Kalender hanya 2025–2028.** Di luar rentang itu, hasil tidak lengkap dan diberi peringatan.
 15. **Belum ada benchmark publik.** Eval internal 45 kasus bukan klaim akurasi universal.
 16. **Belum ada QR/NFC verifikasi dokumen fisik.** QR/NFC hanya membuka URL; tidak memverifikasi identitas atau pembayaran.
+17. **QR dari `localhost` tidak bisa dibuka di perangkat lain.** Untuk pengujian dari HP, set `PRAMANA_PUBLIC_URL` ke alamat LAN/publik frontend, misalnya `http://192.168.1.10:5173`.
 
 ---
 

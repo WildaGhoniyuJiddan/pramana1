@@ -147,6 +147,7 @@
   let ttsError = $state('');
   let acknowledged = $state(false);
   let copyStatus = $state('');
+  let publicBaseUrl = $state('');
   let requestSeq = 0;
   let briefSeq = 0;
 
@@ -183,9 +184,24 @@
     return value.length > length ? `${value.slice(0, length)}...` : value;
   }
 
+  function shareBase() {
+    if (publicBaseUrl) return publicBaseUrl.replace(/\/$/, '');
+    if (typeof window === 'undefined') return '';
+    return window.location.origin;
+  }
+
   function shareUrl(id) {
-    if (typeof window === 'undefined') return `/totem/${id}`;
-    return `${window.location.origin}/totem/${id}`;
+    const base = shareBase();
+    return base ? `${base}/totem/${id}` : `/totem/${id}`;
+  }
+
+  function isLocalShareUrl() {
+    const base = shareBase().toLowerCase();
+    return (
+      base.includes('://localhost') ||
+      base.includes('://127.0.0.1') ||
+      base.includes('://[::1]')
+    );
   }
 
   function ackStorageKey(zone) {
@@ -244,6 +260,7 @@
       const data = await fetchZones();
       if (seq !== requestSeq) return;
       zones = data.zones || [];
+      publicBaseUrl = data.public_base_url || publicBaseUrl;
     } catch (error) {
       if (seq !== requestSeq) return;
       console.error(error);
@@ -268,6 +285,7 @@
       const data = await fetchTotem(zoneId, lang);
       if (seq !== requestSeq) return;
       card = data;
+      publicBaseUrl = data.public_base_url || publicBaseUrl;
       updateAcknowledged();
       loadBrief();
     } catch (error) {
@@ -664,6 +682,13 @@
               <p class="font-mono text-[10px] break-all leading-snug" style="color: #5c5952;">
                 {shareUrl(card.zone.id)}
               </p>
+              {#if isLocalShareUrl()}
+                <p class="text-[11px] leading-snug p-2" style="background-color: #fff3cd; border: 1px solid #8a3b00; color: #5c2d00;">
+                  {lang === 'id'
+                    ? 'QR ini mengarah ke alamat lokal (localhost). Jika dipindai dari HP, halaman tidak akan terbuka. Set PRAMANA_PUBLIC_URL ke alamat publik/LAN frontend, misalnya http://192.168.1.10:5173, lalu muat ulang.'
+                    : 'This QR points to a local address (localhost). Scanning it from a phone will not open the page. Set PRAMANA_PUBLIC_URL to the public/LAN frontend address, for example http://192.168.1.10:5173, then reload.'}
+                </p>
+              {/if}
               <button
                 type="button"
                 onclick={() => copyShareLink(card.zone.id)}
@@ -782,7 +807,7 @@
               </p>
 
               <div class="flex items-center gap-4">
-                <QrCode value={shareUrl(zone.id)} size={120} alt={`QR ${zone.name.en}`} />
+                <QrCode value={shareUrl(zone.id)} size={150} alt={`QR ${zone.name.en}`} />
                 <div class="font-mono text-[10px] space-y-1" style="color: #5c5952;">
                   <p>{zone.regulation_ids.length} {t.activeChunks}</p>
                   {#if zone.historical_regulation_ids.length}

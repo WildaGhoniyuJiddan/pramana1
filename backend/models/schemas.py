@@ -256,6 +256,7 @@ class ZoneSummary(BaseModel):
 class ZoneListResponse(BaseModel):
     metadata: Dict[str, Any]
     zones: List[ZoneSummary]
+    public_base_url: str = ""
 
 
 class ZoneCard(BaseModel):
@@ -282,6 +283,7 @@ class ZoneCardResponse(BaseModel):
     tts_text: str
     disclaimer: str
     verification_scope: str = "corpus"
+    public_base_url: str = ""
 
 
 class ZoneBriefRequest(BaseModel):
