@@ -258,3 +258,23 @@ def test_pipeline_rejects_contradiction_phrase(citations, monkeypatch):
     assert result["ai_synthesis_status"] == "deterministic"
     assert result["guard_status"] == "FALLBACK_GUARD"
 
+
+
+def test_pipeline_rejects_fabricated_duration_unit():
+    """B1: Numbers with units must match exact values in citations, not stray digits."""
+    sample_citations = [{
+        "reg_id": "TEST_REG",
+        "official_doc_title": "Test Law",
+        "tier": "1A",
+        "tier_label": "UU",
+        "pasal": "Pasal 10 ayat (3)",
+        "quoted_text": "Sesuai Pasal 10 ayat (3), wisatawan wajib melapor dalam waktu 24 jam.",
+        "penalties": "Denda",
+        "source_url": "https://example.com/law",
+    }]
+
+    valid_text = "Wisatawan wajib melapor dalam waktu 24 jam sesuai ketentuan Pasal 10."
+    assert GroundedAIPipeline._guard_text(valid_text, sample_citations) is True
+
+    fabricated_text = "Wisatawan diberikan batas waktu 3 hari untuk melapor sesuai Pasal 10."
+    assert GroundedAIPipeline._guard_text(fabricated_text, sample_citations) is False

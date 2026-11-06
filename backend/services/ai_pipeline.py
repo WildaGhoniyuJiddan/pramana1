@@ -19,6 +19,7 @@ from backend.services.evidence_spans import (
 
 ARTICLE_PATTERN = re.compile(r"\bPasal\s+(\d+[A-Za-z]?)\b", re.IGNORECASE)
 RUPIAH_PATTERN = re.compile(r"\b(?:rp\.?|idr)\s*([\d.,]+)", re.IGNORECASE)
+UNIT_NUMBER_PATTERN = re.compile(r"\b(\d+)\s*(hari|jam|bulan|tahun|persen|%|ribu|juta|miliar|days?|hours?|months?|years?|percent)\b", re.IGNORECASE)
 URL_PATTERN = re.compile(r"https?://\S+|www\.\S+", re.IGNORECASE)
 
 CONTRADICTION_PATTERNS = [
@@ -80,11 +81,12 @@ class GroundedAIPipeline:
     @classmethod
     def _allowed_values(
         cls, citations: List[Dict[str, Any]]
-    ) -> Tuple[set, set, set, set]:
+    ) -> Tuple[set, set, set, set, set]:
         allowed_articles = set()
         allowed_rupiah = set()
         allowed_urls = set()
         allowed_numbers = set()
+        allowed_unit_numbers = set()
 
         for citation in citations:
             text = citation.get("quoted_text", "")
@@ -108,7 +110,13 @@ class GroundedAIPipeline:
                 if len(num) > 2 and num.endswith("00"):
                     allowed_numbers.add(num[:-2])
 
-        return allowed_articles, allowed_rupiah, allowed_urls, allowed_numbers
+            for match in UNIT_NUMBER_PATTERN.finditer(text):
+                val = match.group(1)
+                u = match.group(2).lower()
+                norm_u = {"day": "hari", "days": "hari", "hour": "jam", "hours": "jam", "month": "bulan", "months": "bulan", "year": "tahun", "years": "tahun", "%": "persen", "percent": "persen"}.get(u, u)
+                allowed_unit_numbers.add((val, norm_u))
+
+        return allowed_articles, allowed_rupiah, allowed_urls, allowed_numbers, allowed_unit_numbers
 
     @classmethod
     def _guard_text(
@@ -126,7 +134,7 @@ class GroundedAIPipeline:
             if pattern.search(text):
                 return False
 
-        allowed_articles, allowed_rupiah, allowed_urls, allowed_numbers = (
+        allowed_articles, allowed_rupiah, allowed_urls, allowed_numbers, allowed_unit_numbers = (
             cls._allowed_values(citations)
         )
 
@@ -148,6 +156,14 @@ class GroundedAIPipeline:
         for match in RUPIAH_PATTERN.finditer(text):
             digits = cls._clean_nominal(match.group(1))
             if digits and digits not in allowed_rupiah:
+                return False
+
+        # (4b) Numbers with units check (reject fabricated duration/amounts)
+        for match in UNIT_NUMBER_PATTERN.finditer(text):
+            val = match.group(1)
+            u = match.group(2).lower()
+            norm_u = {"day": "hari", "days": "hari", "hour": "jam", "hours": "jam", "month": "bulan", "months": "bulan", "year": "tahun", "years": "tahun", "%": "persen", "percent": "persen"}.get(u, u)
+            if (val, norm_u) not in allowed_unit_numbers:
                 return False
 
         # (5) Fabricated numbers check
