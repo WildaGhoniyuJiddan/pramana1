@@ -51,6 +51,7 @@ def test_ai_status_endpoint():
     assert data["embedding_vectors_loaded"] == 40
     assert data["ai_mode"] == "optional"
     assert data["model_name"] == "gemini-3.5-flash"
+    assert data["model_chain"][0] == "gemini-3.5-flash"
     assert data["api_key_configured"] is False
     assert data["active_chunks_count"] == 40
     assert data["registry_docs_count"] == 4

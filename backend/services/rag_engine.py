@@ -23,6 +23,7 @@ from backend.services.ai_config import (
     GEMINI_MODEL,
     get_ai_mode,
     get_gemini_api_key,
+    get_gemini_model_chain,
 )
 from backend.services.ai_pipeline import GroundedAIPipeline
 from backend.services.corpus_loader import (
@@ -47,10 +48,6 @@ from backend.services.zone_registry import ZoneRegistry
 
 load_dotenv()
 
-GEMINI_API_URL = (
-    f"https://generativelanguage.googleapis.com/v1beta/models/"
-    f"{GEMINI_MODEL}:generateContent"
-)
 PUBLIC_BASE_URL = os.getenv("PRAMANA_PUBLIC_URL", "").strip().rstrip("/")
 
 DISCLAIMER = (
@@ -158,98 +155,124 @@ class StrictRAGEngine:
                 "error": "AI_MODE=disabled",
                 "latency_ms": 0,
                 "model": GEMINI_MODEL,
+                "attempts": [],
             }
         if not api_key:
             return None, "ai-unavailable", {
                 "error": "GEMINI_API_KEY tidak tersedia",
                 "latency_ms": 0,
                 "model": GEMINI_MODEL,
+                "attempts": [],
             }
 
-        ai_metrics.record_call()
         started = time.monotonic()
-        payload = {
-            "system_instruction": {
-                "parts": [{"text": system_instruction}]
-            },
-            "contents": [
-                {"role": "user", "parts": [{"text": user_prompt}]}
-            ],
-            "generationConfig": {
-                "temperature": 0.1,
-                "maxOutputTokens": 1800,
-                "responseMimeType": "application/json",
-                "responseSchema": response_schema,
-            },
-        }
-        if GEMINI_MODEL.startswith(("gemini-3", "gemini-2.5")):
-            payload["generationConfig"]["thinkingConfig"] = {
-                "thinkingBudget": 0
+        models = get_gemini_model_chain()
+        if GEMINI_MODEL and GEMINI_MODEL not in models:
+            models.insert(0, GEMINI_MODEL)
+        primary_model = models[0] if models else GEMINI_MODEL
+        attempts: List[Dict[str, str]] = []
+        last_error = "AI unavailable"
+        last_kind = "http"
+
+        for model in models:
+            ai_metrics.record_call()
+            payload = {
+                "system_instruction": {
+                    "parts": [{"text": system_instruction}]
+                },
+                "contents": [
+                    {"role": "user", "parts": [{"text": user_prompt}]}
+                ],
+                "generationConfig": {
+                    "temperature": 0.1,
+                    "maxOutputTokens": 1800,
+                    "responseMimeType": "application/json",
+                    "responseSchema": response_schema,
+                },
             }
-
-        try:
-            with httpx.Client(timeout=45.0) as client:
-                response = None
-                for attempt in range(3):
-                    try:
-                        response = client.post(
-                            GEMINI_API_URL,
-                            json=payload,
-                            headers={
-                                "Content-Type": "application/json",
-                                "x-goog-api-key": api_key,
-                            },
-                        )
-                    except httpx.TimeoutException:
-                        if attempt < 2:
-                            time.sleep(1.0)
-                            continue
-                        raise
-                    if response.status_code not in {429, 503}:
-                        break
-                    if attempt < 2:
-                        time.sleep(1.5 * (attempt + 1))
-            latency_ms = int((time.monotonic() - started) * 1000)
-
-            if response is None or response.status_code != 200:
-                ai_metrics.record_failure(f"HTTP {response.status_code}")
-                return None, f"{GEMINI_MODEL} (http error)", {
-                    "error": f"HTTP {response.status_code}",
-                    "latency_ms": latency_ms,
-                    "model": GEMINI_MODEL,
+            if model.startswith(("gemini-3", "gemini-2.5")):
+                payload["generationConfig"]["thinkingConfig"] = {
+                    "thinkingBudget": 0
                 }
 
-            data = response.json()
-            candidates = data.get("candidates", [])
-            parts = (
-                candidates[0].get("content", {}).get("parts", [])
-                if candidates
-                else []
+            url = (
+                "https://generativelanguage.googleapis.com/v1beta/models/"
+                f"{model}:generateContent"
             )
-            text = parts[0].get("text", "") if parts else ""
-            parsed = self._parse_json_object(text)
-            if not parsed:
-                ai_metrics.record_failure("invalid_json")
-                return None, f"{GEMINI_MODEL} (invalid json)", {
-                    "error": "invalid_json",
-                    "latency_ms": latency_ms,
-                    "model": GEMINI_MODEL,
-                }
+            try:
+                with httpx.Client(timeout=45.0) as client:
+                    response = client.post(
+                        url,
+                        json=payload,
+                        headers={
+                            "Content-Type": "application/json",
+                            "x-goog-api-key": api_key,
+                        },
+                    )
+                if response.status_code != 200:
+                    error = f"HTTP {response.status_code}"
+                    attempts.append({"model": model, "error": error})
+                    ai_metrics.record_failure(error)
+                    last_error = error
+                    last_kind = "http"
+                    continue
 
-            ai_metrics.record_success(latency_ms)
-            return parsed, f"{GEMINI_MODEL} + span-verifier", {
-                "error": "",
-                "latency_ms": latency_ms,
-                "model": GEMINI_MODEL,
-            }
-        except Exception as exc:  # noqa: BLE001 - classified for telemetry
-            latency_ms = int((time.monotonic() - started) * 1000)
-            ai_metrics.record_failure(type(exc).__name__)
-            return None, f"{GEMINI_MODEL} (error fallback)", {
-                "error": type(exc).__name__,
-                "latency_ms": latency_ms,
-                "model": GEMINI_MODEL,
-            }
+                data = response.json()
+                candidates = data.get("candidates", [])
+                parts = (
+                    candidates[0].get("content", {}).get("parts", [])
+                    if candidates
+                    else []
+                )
+                text = parts[0].get("text", "") if parts else ""
+                parsed = self._parse_json_object(text)
+                if not parsed:
+                    attempts.append(
+                        {"model": model, "error": "invalid_json"}
+                    )
+                    ai_metrics.record_failure("invalid_json")
+                    last_error = "invalid_json"
+                    last_kind = "invalid"
+                    continue
+
+                latency_ms = int((time.monotonic() - started) * 1000)
+                ai_metrics.record_success(latency_ms, model)
+                return parsed, f"{model} + span-verifier", {
+                    "error": "",
+                    "latency_ms": latency_ms,
+                    "model": model,
+                    "attempts": attempts,
+                }
+            except httpx.TimeoutException:
+                error = "ReadTimeout"
+                attempts.append({"model": model, "error": error})
+                ai_metrics.record_failure(error)
+                last_error = error
+                last_kind = "exception"
+                continue
+            except Exception as exc:  # noqa: BLE001 - classified for telemetry
+                error = type(exc).__name__
+                attempts.append({"model": model, "error": error})
+                ai_metrics.record_failure(error)
+                last_error = error
+                last_kind = "exception"
+                continue
+
+        latency_ms = int((time.monotonic() - started) * 1000)
+        suffix = {
+            "http": "http error",
+            "invalid": "invalid json",
+            "exception": "error fallback",
+        }.get(last_kind, "error fallback")
+        combined_error = "; ".join(
+            f"{item['model']}: {item['error']}" for item in attempts
+        ) or last_error
+        return None, f"{primary_model} ({suffix})", {
+            "error": combined_error,
+            "latency_ms": latency_ms,
+            "model": primary_model,
+            "attempts": attempts,
+        }
 
     @staticmethod
     def _is_international(origin: str) -> bool:

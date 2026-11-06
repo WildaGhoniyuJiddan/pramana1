@@ -38,7 +38,7 @@ Sebagai destinasi pariwisata utama dunia, Bali menghadapi tantangan krusial pada
 
 ## 4. AI Implementation
 
-- **Metode & Model AI:** Arsitektur hibrida yang menggabungkan **Google Gemini API (`gemini-3.5-flash`, `temperature=0.1`)**, **Deterministic Legal Retriever**, **3-Tier Epistemic Router**, **Dual-Layer Verifier**, dan **Regex PII Masking**.
+- **Metode & Model AI:** Arsitektur hibrida yang menggabungkan **Google Gemini API (`gemini-3.5-flash` dengan rantai fallback otomatis ke `gemini-3.1-flash-lite`, `gemini-3.5-flash-lite`, dan `gemini-3.6-flash`, `temperature=0.1`)**, **Deterministic Legal Retriever**, **3-Tier Epistemic Router**, **Dual-Layer Verifier**, dan **Regex PII Masking**.
 - **Input:**
   - *Mode 1:* Teks rencana perjalanan/booking, tanggal mulai & selesai, status wisatawan (WNA/WNI).
   - *Mode 2:* Teks klaim insiden atau keterangan unggahan media sosial.

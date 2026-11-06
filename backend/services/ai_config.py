@@ -9,16 +9,40 @@ disabled for retrieval-only evaluation:
 """
 
 import os
+from typing import List
 
 from dotenv import load_dotenv
 
 load_dotenv()
 
 VALID_AI_MODES = {"required", "optional", "disabled"}
-GEMINI_MODEL = os.getenv("GEMINI_MODEL", "gemini-3.5-flash")
+GEMINI_MODEL = os.getenv("GEMINI_MODEL", "gemini-3.5-flash").strip()
 GEMINI_EMBEDDING_MODEL = os.getenv(
     "GEMINI_EMBEDDING_MODEL", "gemini-embedding-001"
+).strip()
+DEFAULT_GEMINI_FALLBACKS = (
+    "gemini-3.1-flash-lite,gemini-3.5-flash-lite,gemini-3.6-flash"
 )
+
+
+def get_gemini_model_chain() -> List[str]:
+    """Return the primary model followed by configured fallback models.
+
+    ``GEMINI_MODEL`` remains the primary model for backward compatibility.
+    ``GEMINI_MODEL_FALLBACKS`` is a comma-separated ordered chain. Duplicates
+    are removed while preserving order.
+    """
+    primary = os.getenv("GEMINI_MODEL", GEMINI_MODEL).strip() or GEMINI_MODEL
+    fallback_text = os.getenv(
+        "GEMINI_MODEL_FALLBACKS", DEFAULT_GEMINI_FALLBACKS
+    )
+    chain: List[str] = []
+    for model in [primary] + [
+        item.strip() for item in fallback_text.split(",")
+    ]:
+        if model and model not in chain:
+            chain.append(model)
+    return chain
 
 
 def get_ai_mode() -> str:

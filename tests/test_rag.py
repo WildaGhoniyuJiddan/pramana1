@@ -323,3 +323,61 @@ def test_gemini_3x_payload_disables_thinking(monkeypatch):
     generation = captured["payload"]["generationConfig"]
     assert generation["maxOutputTokens"] == 1800
     assert generation["thinkingConfig"] == {"thinkingBudget": 0}
+
+
+def test_gemini_falls_back_to_next_model_on_429(monkeypatch):
+    from backend.services import rag_engine
+
+    monkeypatch.setattr(
+        rag_engine,
+        "get_gemini_model_chain",
+        lambda: ["gemini-3.5-flash", "gemini-3.1-flash-lite"],
+    )
+    monkeypatch.setattr(
+        rag_engine, "get_gemini_api_key", lambda: "test-key"
+    )
+    monkeypatch.setattr(rag_engine, "get_ai_mode", lambda: "required")
+
+    calls = []
+
+    class FakeResponse:
+        def __init__(self, status_code, text):
+            self.status_code = status_code
+            self._text = text
+
+        def json(self):
+            return {
+                "candidates": [{
+                    "content": {"parts": [{"text": self._text}]}
+                }]
+            }
+
+    class FakeClient:
+        def __init__(self, *args, **kwargs):
+            pass
+
+        def __enter__(self):
+            return self
+
+        def __exit__(self, *args):
+            return False
+
+        def post(self, url, json=None, headers=None):
+            calls.append(url)
+            if "gemini-3.5-flash" in url:
+                return FakeResponse(429, "")
+            return FakeResponse(200, '{"abstain": true}')
+
+    monkeypatch.setattr(rag_engine.httpx, "Client", FakeClient)
+    engine = rag_engine.StrictRAGEngine()
+    parsed, label, meta = engine._call_gemini_structured(
+        "system", "user", {"type": "OBJECT"}
+    )
+
+    assert parsed == {"abstain": True}
+    assert "gemini-3.1-flash-lite" in label
+    assert meta["model"] == "gemini-3.1-flash-lite"
+    assert meta["attempts"] == [
+        {"model": "gemini-3.5-flash", "error": "HTTP 429"}
+    ]
+    assert len(calls) == 2

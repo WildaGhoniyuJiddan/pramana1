@@ -26,6 +26,7 @@ _needs_clarification = 0
 _out_of_scope = 0
 _latencies: List[int] = []
 _last_error = ""
+_last_success_model = ""
 
 
 def record_call() -> None:
@@ -34,10 +35,12 @@ def record_call() -> None:
         _calls += 1
 
 
-def record_success(latency_ms: int) -> None:
-    global _success
+def record_success(latency_ms: int, model: str = "") -> None:
+    global _success, _last_success_model
     with _lock:
         _success += 1
+        if model:
+            _last_success_model = model
         _latencies.append(max(0, int(latency_ms)))
         if len(_latencies) > 200:
             del _latencies[:-200]
@@ -100,4 +103,5 @@ def snapshot() -> Dict[str, Any]:
             "avg_latency_ms": average,
             "p95_latency_ms": p95,
             "last_error": _last_error,
+            "last_success_model": _last_success_model,
         }

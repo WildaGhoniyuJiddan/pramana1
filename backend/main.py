@@ -34,6 +34,7 @@ from backend.services.ai_config import (
     ai_enabled,
     get_ai_mode,
     get_gemini_api_key,
+    get_gemini_model_chain,
 )
 
 logger = logging.getLogger("pramana")
@@ -206,6 +207,7 @@ def ai_status():
     stats = corpus_manager.get_stats()
     data["ai_mode"] = get_ai_mode()
     data["model_name"] = GEMINI_MODEL
+    data["model_chain"] = get_gemini_model_chain()
     data["api_key_configured"] = bool(get_gemini_api_key())
     data["active_chunks_count"] = stats["total_regulations_indexed"]
     data["registry_docs_count"] = 4

@@ -123,6 +123,8 @@ Alur AI:
 5. Python memverifikasi setiap claim (citation_id valid, span_ids milik sitasi, tidak ada pasal/rupiah liar) dan menyensor nomor pasal/nominal tak terverifikasi di teks bebas Tier 2/3.
 6. Prompt injection dan permintaan pasal/nominal fiktif ditolak secara deterministik.
 
+Model generasi memakai rantai fallback otomatis: `GEMINI_MODEL` dicoba lebih dulu, lalu `GEMINI_MODEL_FALLBACKS` secara berurutan. Perpindahan terjadi saat model mengembalikan 404/429/503, timeout, atau JSON tidak valid. Untuk model Gemini 3.x/2.5, `thinkingBudget` diset `0` agar token tidak habis untuk proses thinking dan JSON tidak terpotong. Model yang benar-benar berhasil dipakai tercatat di field `ai_model`; `/api/v1/ai/status` juga menampilkan `model_chain` dan `last_success_model`.
+
 Telemetri tersedia di `GET /api/v1/ai/status` (tanpa prompt/PII), termasuk `total_requests`, `verified_grounded_count`, `needs_clarification_count`, `out_of_scope_count`, `guard_rejections_count`, `active_chunks_count`, `registry_docs_count`, dan `epistemic_routing_enabled`. Hybrid retrieval opsional memakai embedding korpus yang dihitung offline:
 
 ```bash
@@ -136,7 +138,7 @@ python eval/run_eval.py --mode fast   # deterministik, tanpa AI
 python eval/run_eval.py --mode live   # Gemini live + rate-limit-safe
 ```
 
-Baseline internal 45 kasus: 15 in-scope, 10 triage, 10 out-of-scope, 4 adversarial, 6 PII. Dengan `gemini-3.1-flash-lite`, `--mode live` mencapai 45/45, 75 sitasi terverifikasi, 45 klaim, epistemic routing 1.0, guidance completeness 1.0, PII leak 0, dan latensi P50/P95 sekitar 4,3/7,7 detik. Setelah default diganti ke `gemini-3.5-flash`, targeted test Tier 1/2/3 berhasil, tetapi full 45-case run pada key uji lokal menemui `HTTP 429` untuk sebagian besar panggilan AI; routing dan guidance deterministik tetap 45/45. Untuk eval AI penuh dengan 3.5-flash, gunakan key/kuota yang mencukupi. **Ini bukan benchmark publik** dan tidak mengklaim “nol halusinasi”. Hasil lengkap ada di [`eval/results/latest.md`](eval/results/latest.md).
+Baseline internal 45 kasus: 15 in-scope, 10 triage, 10 out-of-scope, 4 adversarial, 6 PII. `--mode live` dengan rantai fallback `gemini-3.5-flash → gemini-3.1-flash-lite → gemini-3.5-flash-lite → gemini-3.6-flash` mencapai 45/45, 75 sitasi terverifikasi, 47 klaim, epistemic routing 1.0, guidance completeness 1.0, PII leak 0, dan rewrite recovery 1.0. Primary 3.5-flash sering kena `HTTP 429` pada key uji, tetapi fallback otomatis mengambil alih; hasil akhirnya 29 `llm`, 16 `abstain`, 0 `unavailable`, dengan latensi P50/P95 sekitar 5,2/20,7 detik. **Ini bukan benchmark publik** dan tidak mengklaim “nol halusinasi”. Hasil lengkap ada di [`eval/results/latest.md`](eval/results/latest.md).
 
 ---
 
@@ -272,7 +274,7 @@ npm run build
 pytest -q
 ```
 
-Status terakhir dijalankan (6 November 2026): **125 passed**. Build frontend dengan Vite 5.4.21 juga berhasil tanpa warning Svelte. Dua peringatan deprecation berasal dari kombinasi Starlette/HTTPX di lingkungan test, bukan kegagalan aplikasi.
+Status terakhir dijalankan (6 November 2026): **126 passed**. Build frontend dengan Vite 5.4.21 juga berhasil tanpa warning Svelte. Dua peringatan deprecation berasal dari kombinasi Starlette/HTTPX di lingkungan test, bukan kegagalan aplikasi.
 
 ---
 
@@ -282,7 +284,8 @@ Status terakhir dijalankan (6 November 2026): **125 passed**. Build frontend den
 | :--- | :--- | :--- |
 | `AI_MODE` | `required` | `required` untuk submission; `optional` untuk dev; `disabled` untuk eval retrieval-only. |
 | `GEMINI_API_KEY` | kosong | Wajib untuk AI. Jangan commit nilai asli. |
-| `GEMINI_MODEL` | `gemini-3.5-flash` | Model generasi; dapat diganti via env. |
+| `GEMINI_MODEL` | `gemini-3.5-flash` | Model generasi utama. |
+| `GEMINI_MODEL_FALLBACKS` | `gemini-3.1-flash-lite,gemini-3.5-flash-lite,gemini-3.6-flash` | Rantai fallback berurutan saat model utama 404/429/503, timeout, atau JSON invalid. |
 | `GEMINI_EMBEDDING_MODEL` | `gemini-embedding-001` | Diverifikasi ulang sebelum membangun embedding. |
 | `PRAMANA_PUBLIC_URL` | kosong | Opsional. URL publik frontend untuk tautan QR dan teks WhatsApp, misalnya `https://pramana.example.com`. Jika kosong, tautan memakai origin browser. |
 | `CORS_ALLOW_ORIGINS` | `http://localhost:5173,http://127.0.0.1:5173` | Daftar origin yang diizinkan, dipisahkan koma. |
