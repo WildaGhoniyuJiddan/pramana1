@@ -280,7 +280,7 @@ Status terakhir dijalankan (5 November 2026): **106 passed**. Build frontend den
 | `RATE_LIMIT_WINDOW_SECONDS` | `60` | Jendela waktu rate limit. |
 | `RATE_LIMIT_MAX_REQUESTS` | `60` | Maksimum request POST per klien per jendela. |
 | `MAX_REQUEST_BODY_BYTES` | `65536` | Batas ukuran body berdasarkan header `Content-Length`. |
-| `TRUST_PROXY_HEADERS` | `false` | Aktifkan hanya di belakang reverse proxy tepercaya yang menimpa `X-Forwarded-For`. |
+| `TRUST_PROXY_HEADERS` | `true` | Menghormati header `X-Forwarded-For` dan `X-Session-ID` dari reverse proxy tepercaya (misal Render, Railway). Set `false` bila diekspos langsung tanpa proxy. |
 
 Jangan commit `.env` atau kunci API nyata.
 
@@ -310,7 +310,7 @@ Kode kesalahan yang relevan: `404` untuk zona tidak dikenal, `422` untuk input/l
 - CORS dibatasi lewat environment; tidak lagi wildcard.
 - Rate limit in-memory hanya berlaku per proses. Beberapa worker/Uvicorn dapat memiliki hitungan terpisah. Untuk produksi, gunakan limiter terpusat (misalnya Redis).
 - Batas ukuran body hanya memeriksa `Content-Length`; request chunked tanpa header tersebut tidak tertangkap oleh pemeriksaan ini.
-- `TRUST_PROXY_HEADERS=false` secara default agar klien tidak bisa memalsukan IP lewat `X-Forwarded-For`.
+- `TRUST_PROXY_HEADERS=true` secara default pada backend untuk menghormati `X-Forwarded-For` dan `X-Session-ID` dari reverse proxy cloud produksi (Render/Railway), sehingga rate limiter tidak menggabungkan seluruh pengunjung ke satu IP proxy. Ubah ke `false` jika server menerima koneksi langsung dari publik tanpa proxy.
 - Header keamanan dasar dikirim (`X-Content-Type-Options`, `X-Frame-Options`, `Referrer-Policy`, `Permissions-Policy`, `Cache-Control`, CSP untuk `/api/`).
 - Belum ada autentikasi. Jangan mengekspos instance ini untuk data sensitif tanpa lapisan tambahan.
 - PII masking berbasis regex dan bersifat best-effort. Pola yang tidak dikenal bisa lolos.

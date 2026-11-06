@@ -359,3 +359,36 @@ def test_client_key_prefers_session_id_header():
     )
     assert main_module._client_key(req) == "session:session-abc-123"
 
+
+
+def test_rate_limit_trusted_proxy_headers(monkeypatch):
+    """B4: Two different X-Forwarded-For IPs have independent rate limit buckets."""
+    from backend import main as main_module
+    monkeypatch.setattr(main_module, "TRUST_PROXY_HEADERS", True)
+
+    req_body = {
+        "itinerary_text": "Kunjungan ke Pura Besakih dan sewa motor di Ubud.",
+        "start_date": "2026-06-10",
+        "end_date": "2026-06-15",
+        "traveler_origin": "international"
+    }
+
+    # IP 1 calls endpoint
+    resp1 = client.post("/api/v1/trip-brief", json=req_body, headers={"X-Forwarded-For": "203.0.113.10"})
+    assert resp1.status_code == 200
+
+    # IP 2 calls endpoint with different IP
+    resp2 = client.post("/api/v1/trip-brief", json=req_body, headers={"X-Forwarded-For": "198.51.100.25"})
+    assert resp2.status_code == 200
+
+    # IP 1 and IP 2 generate different client keys
+    from fastapi import Request
+    class DummyRequest:
+        def __init__(self, headers, host="127.0.0.1"):
+            self.headers = headers
+            self.client = type("Client", (), {"host": host})()
+
+    r1 = DummyRequest({"x-forwarded-for": "203.0.113.10"})
+    r2 = DummyRequest({"x-forwarded-for": "198.51.100.25"})
+    assert main_module._client_key(r1) == "203.0.113.10"
+    assert main_module._client_key(r2) == "198.51.100.25"
