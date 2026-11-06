@@ -157,7 +157,7 @@
             ? 'background-color: #0c249c; color: #ffffff;'
             : 'background-color: #f3f1eb; color: #0a0a0a;'}
         >
-          📷 Kamera / Scan QR
+          Kamera / Scan QR
         </button>
         <button
           type="button"
@@ -167,7 +167,7 @@
             ? 'background-color: #0c249c; color: #ffffff;'
             : 'background-color: #f3f1eb; color: #0a0a0a;'}
         >
-          📡 Simulasi NFC (Tanpa Tag Fisik)
+          Simulasi NFC (Virtual)
         </button>
       </div>
 
@@ -234,7 +234,7 @@
                     <p class="text-xs font-bold text-[#0a0a0a] group-hover:text-[#0c249c]">{zone.name}</p>
                     <p class="font-mono text-[10px] text-[#5c5952]">Tag UID: {zone.tagUid}</p>
                   </div>
-                  <span class="font-mono text-[11px] font-bold text-[#0c249c]">TAP HP 📱 ➔</span>
+                  <span class="font-mono text-[11px] font-bold text-[#0c249c]">TAP [NFC] ➔</span>
                 </button>
               {/each}
             </div>

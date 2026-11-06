@@ -272,7 +272,7 @@
 
             {#if apiState.isWakingUp}
           <div class="brutal-card p-4 flex items-center gap-3" style="background-color: #fff3cd; border-color: #8a3b00; color: #8a3b00;">
-            <span class="animate-spin text-lg">⏳</span>
+            <span class="inline-block w-4 h-4 border-2 border-white border-t-transparent animate-spin rounded-full"></span>
             <span class="font-mono text-xs font-bold">{apiState.message || common.serverWakingUp}</span>
           </div>
         {/if}
@@ -552,7 +552,7 @@
                     class="p-3 text-xs font-semibold flex items-center gap-2"
                     style="background-color: #fff3cd; border: 1.5px solid #8a3b00; color: #8a3b00;"
                   >
-                    <span>⚠️</span>
+                    <span class="font-mono text-[10px] font-bold px-1.5 py-0.5 bg-[#8a3b00] text-white mr-1.5">SUPERSEDED</span>
                     <span>{common.supersededBanner}</span>
                   </div>
                 {/if}
@@ -604,7 +604,7 @@
                   {#if i18n.lang === 'en'}
                     <!-- Translation notice & English display text -->
                     <div class="p-2.5 bg-[#fbfaf8] border border-[#dcd7cb] text-[11px] text-[#8a3b00] font-mono">
-                      ℹ️ {common.translationNotice}
+                      <span class="font-mono text-[10px] font-bold px-1 py-0.2 mr-1 border border-[#8a3b00]">NOTE</span> {common.translationNotice}
                     </div>
                     <p class="text-xs sm:text-[13px] leading-relaxed font-sans" style="color: #2b2b29;">
                       {activeItem.display_text || activeItem.summary}

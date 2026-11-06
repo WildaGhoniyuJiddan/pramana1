@@ -143,7 +143,7 @@
 
             {#if apiState.isWakingUp}
           <div class="brutal-card p-4 flex items-center gap-3" style="background-color: #fff3cd; border-color: #8a3b00; color: #8a3b00;">
-            <span class="animate-spin text-lg">⏳</span>
+            <span class="inline-block w-4 h-4 border-2 border-white border-t-transparent animate-spin rounded-full"></span>
             <span class="font-mono text-xs font-bold">{apiState.message || common.serverWakingUp}</span>
           </div>
         {/if}
@@ -368,7 +368,7 @@
                       class="p-3 text-xs font-semibold flex items-center gap-2"
                       style="background-color: #fff3cd; border: 1.5px solid #8a3b00; color: #8a3b00;"
                     >
-                      <span>⚠️</span>
+                      <span class="font-mono text-[10px] font-bold px-1.5 py-0.5 bg-[#8a3b00] text-white">SUPERSEDED</span>
                       <span>{common.supersededBanner}</span>
                     </div>
                   {/if}

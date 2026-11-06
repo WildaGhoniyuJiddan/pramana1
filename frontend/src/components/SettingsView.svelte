@@ -121,7 +121,7 @@
               : 'background-color: #f3f1eb; color: #0a0a0a; border: 1.5px solid #cdc9be;'}
           >
             <div class="space-y-0.5">
-              <span class="font-bold text-xs block">🇮🇩 {t.idLabel}</span>
+              <span class="font-bold text-xs block"><span class="font-mono text-[10px] font-bold px-1.5 py-0.5 bg-[#0c249c] text-white mr-1">ID</span> {t.idLabel}</span>
               <span class="text-[11px] opacity-80 block">{t.idDesc}</span>
             </div>
             {#if i18n.lang === 'id'}
@@ -138,7 +138,7 @@
               : 'background-color: #f3f1eb; color: #0a0a0a; border: 1.5px solid #cdc9be;'}
           >
             <div class="space-y-0.5">
-              <span class="font-bold text-xs block">🇬🇧 {t.enLabel}</span>
+              <span class="font-bold text-xs block"><span class="font-mono text-[10px] font-bold px-1.5 py-0.5 bg-[#0c249c] text-white mr-1">EN</span> {t.enLabel}</span>
               <span class="text-[11px] opacity-80 block">{t.enDesc}</span>
             </div>
             {#if i18n.lang === 'en'}

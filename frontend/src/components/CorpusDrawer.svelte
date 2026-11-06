@@ -130,7 +130,7 @@
           {/if}
           {#if item.superseded_by || item.status === 'Disempurnakan'}
             <div class="p-3 border text-xs" style="background-color: #fff3cd; border-color: #8a3b00; color: #5c2d00;">
-              <span class="font-bold">⚠️ {i18n.t('supersededBanner')}</span>
+              <span class="font-bold"><span class="font-mono text-[10px] font-bold px-1.5 py-0.5 bg-[#8a3b00] text-white mr-1.5">SUPERSEDED</span>{i18n.t('supersededBanner')}</span>
               {#if item.superseded_by_url}
                 <div class="mt-1">
                   <a href={item.superseded_by_url} target="_blank" rel="noopener noreferrer" class="underline font-mono text-[11px]" style="color: #0c249c;">
@@ -160,14 +160,14 @@
                 {item.text_en || item.display_text}
               </div>
               <p class="mt-1.5 text-[11px] leading-snug" style="color: #5c5952;">
-                ℹ️ {i18n.t('translationNotice')}
+                <span class="font-mono text-[10px] font-bold px-1 py-0.2 mr-1 border border-[#5c5952]">NOTE</span> {i18n.t('translationNotice')}
               </p>
             </div>
 
             <!-- Authoritative Indonesian Text (Collapsible, open by default) -->
             <details open class="border p-3" style="background-color: #f2f0ea; border-color: #c8c4ba;">
               <summary class="font-mono text-[11px] font-bold cursor-pointer select-none" style="color: #0c249c;">
-                🇮🇩 {i18n.t('originalAuthoritativeLabel')} · {i18n.t('verbatimNotice')}
+                <span class="font-mono text-[10px] font-bold px-1.5 py-0.5 bg-[#0c249c] text-white mr-1.5">ID</span>{i18n.t('originalAuthoritativeLabel')} · {i18n.t('verbatimNotice')}
               </summary>
               <div
                 class="mt-3 p-3 border text-xs leading-relaxed font-mono whitespace-pre-line"

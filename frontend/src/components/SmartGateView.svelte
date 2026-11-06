@@ -395,7 +395,6 @@
           style="background-color: #0c249c; color: #ffffff; border: 1.5px solid #0a0a0a; box-shadow: 2px 2px 0px #0a0a0a;"
           class="brutal-press px-3 py-1.5 font-mono text-[11px] font-bold cursor-pointer inline-flex items-center gap-1.5"
         >
-          <span>📷</span>
           <span>{lang === 'id' ? 'Pindai QR / Tap NFC' : 'Scan QR / Tap NFC'}</span>
         </button>
         {#if zoneId}
@@ -756,7 +755,6 @@
             class="brutal-press px-4 py-2.5 font-mono text-xs font-bold cursor-pointer inline-flex items-center gap-2"
             style="background-color: #0c249c; color: #ffffff; border: 1.5px solid #0a0a0a; box-shadow: 2px 2px 0px #0a0a0a;"
           >
-            <span>📷</span>
             <span>{lang === 'id' ? 'Buka Kamera / Simulasi Tap NFC' : 'Open Camera / Tap NFC Sim'}</span>
           </button>
         </div>
