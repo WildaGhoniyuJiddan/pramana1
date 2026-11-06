@@ -87,7 +87,15 @@
       "text": "Wisatawan Mancanegara yang berkunjung ke Bali wajib: 1. Memuliakan kesucian Pura, Pratima, dan Simbol-simbol Keagamaan yang disucikan; 2. Berbusana yang sopan, wajar, dan pantas pada saat berkunjung ke kawasan tempat suci, daya tarik wisata, dan tempat umum di Bali; 3. Berkelakuan yang sopan di kawasan suci, kawasan wisata, restoran, tempat perbelanjaan, jalan raya, dan tempat umum lainnya; 4. Didampingi pemandu wisata yang berlisensi saat mengunjungi daya tarik wisata; 5. Melakukan penukaran mata uang asing di penyelenggara KUPVA resmi (berizin Bank Indonesia); 6. Melakukan pembayaran dengan menggunakan Kode QR Standar Indonesia (QRIS) atau mata uang Rupiah; 7. Menaati peraturan perundang-undangan lalu lintas yang berlaku di Indonesia.",
       "penalties": "Teguran lisan, penghentian kunjungan, sanksi adat setempat, hingga pelaporan ke pihak Imigrasi.",
       "document_id": "se-gubernur-bali-4-2023",
-      "text_status": "verbatim"
+      "text_status": "verbatim",
+      "text_en": "Foreign Tourists visiting Bali are required to: 1. Revere the sanctity of Pura (Balinese Hindu temples), Pratima (sacred effigies), and religious symbols that are sanctified; 2. Dress modestly, appropriately, and respectfully when visiting sacred places, tourist attractions, and public areas in Bali; 3. Behave respectfully in sacred areas, tourist zones, restaurants, shopping centers, roadways, and other public venues; 4. Be accompanied by a licensed tour guide when visiting tourist attractions; 5. Conduct foreign currency exchange at official licensed money changers (authorized by Bank Indonesia); 6. Make payments using Quick Response Code Indonesian Standard (QRIS) or Rupiah currency; 7. Comply with the prevailing traffic laws and regulations in Indonesia.",
+      "translation_status": "ai-assisted",
+      "title_en": "Foreign Tourist Obligations / Do's (Points 1 to 7)",
+      "penalties_en": "Verbal reprimand, termination of tour visit, customary village sanctions, and report to Immigration authorities.",
+      "category_en": "Foreign Tourist Obligations (Do's)",
+      "tier_label_en": "Administrative Policy Guideline",
+      "status_note_en": "SE Gubernur Bali No. 4 Tahun 2023 disempurnakan oleh SE Gubernur Bali No. 7 Tahun 2025 (diluncurkan 24 Maret 2025). Teks di korpus ini dipertahankan sebagai rujukan historis; periksa SE 7/2025 untuk ketentuan terbaru.",
+      "source_note_en": "PDF hasil pindai dari Pemerintah Kabupaten Buleleng. Halaman Disparda Bali juga tersedia sebagai rujukan: https://disparda.baliprov.go.id/apa-yang-boleh-dan-tidak-boleh-dilakukan-wisman-di-bali/2023/06"
     },
     {
       "id": "SE_GUB_04_2023_DONT",
@@ -126,7 +134,15 @@
       "text": "Wisatawan Mancanegara dilarang: 1. Memasuki Utama Mandala dan Madya Mandala tempat suci atau Pura kecuali untuk bersembahyang dengan memakai busana adat Bali atau persembahyangan dan tidak sedang datang bulan (menstruasi); 2. Memanjat pohon yang disucikan; 3. Berkelakuan yang menodai kesucian tempat suci, pura, pratima, dan simbol-simbol keagamaan seperti berfoto dengan pakaian tidak pantas / tanpa busana; 4. Membuang sampah sembarangan dan/atau mengotori danau, mata air, sungai, laut, dan tempat umum; 5. Menggunakan plastik sekali pakai (kantong plastik, styrofoam, dan sedotan plastik); 6. Mengucapkan kata-kata kasar, berperilaku tidak sopan, membuat kegaduhan, serta bertindak agresif terhadap aparat negara, pemerintah, masyarakat lokal, maupun sesama wisatawan; 7. Melakukan aktivitas usaha atau bekerja secara ilegal tanpa memiliki dokumen resmi/visa kerja yang diterbitkan oleh instansi berwenang; 8. Mengendarai kendaraan bermotor tanpa memiliki SIM resmi, tanpa helm, melebihi kapasitas, dan melanggar rambu lalu lintas.",
       "penalties": "Proses hukum pidana, sanksi denda adat (upacara pembersihan/prayascitta), serta deportasi dan penangkalan oleh instansi Imigrasi.",
       "document_id": "se-gubernur-bali-4-2023",
-      "text_status": "verbatim"
+      "text_status": "verbatim",
+      "text_en": "Foreign Tourists are prohibited from:\n1. Entering the Utama Mandala (innermost sacred sanctuary) and Madya Mandala (middle sanctuary) of sacred places or Pura (Balinese Hindu temples) except for prayer by wearing Balinese traditional attire and not during menstruation (period);\n2. Climbing sacred trees;\n3. Conducting behavior that desecrates sacred places, Pura (Balinese Hindu temples), Pratima (sacred effigies), and religious symbols, such as taking photos in inappropriate attire or nude;\n4. Littering and/or polluting lakes, springs, rivers, seas, and public places;\n5. Using single-use plastics such as plastic bags, polystyrene (styrofoam), and plastic straws;\n6. Uttering harsh words, behaving impolitely, making noise, and acting aggressively toward state apparatus, government, local communities, or fellow tourists, either directly or indirectly through social media;\n7. Working and/or conducting business activities illegally without possessing official documents issued by competent authorities; and\n8. Engaging in illegal activities such as trading illegal goods, flora and fauna, sacred cultural artifacts, and illicit narcotics.",
+      "translation_status": "ai-assisted",
+      "title_en": "Foreign Tourist Prohibitions / Don'ts (Points 2.a to 2.h)",
+      "penalties_en": "Criminal prosecution, customary restitution fines (purification ceremony/prayascitta), and deportation with international entry blacklisting.",
+      "category_en": "Foreign Tourist Prohibitions (Don'ts)",
+      "tier_label_en": "Administrative Policy Guideline",
+      "status_note_en": "SE Gubernur Bali No. 4 Tahun 2023 disempurnakan oleh SE Gubernur Bali No. 7 Tahun 2025 (diluncurkan 24 Maret 2025). Teks di korpus ini dipertahankan sebagai rujukan historis; periksa SE 7/2025 untuk ketentuan terbaru.",
+      "source_note_en": "PDF hasil pindai dari Pemerintah Kabupaten Buleleng. Halaman Disparda Bali juga tersedia sebagai rujukan: https://disparda.baliprov.go.id/apa-yang-boleh-dan-tidak-boleh-dilakukan-wisman-di-bali/2023/06"
     },
     {
       "id": "PERDA_BALI_05_2020_PASAL_15",
@@ -161,7 +177,15 @@
       "penalties": "Sanksi administratif, pembatasan akses daya tarik wisata, serta tuntutan ganti rugi adat bila merusak sarana kawasan suci.",
       "document_id": "perda-bali-5-2020",
       "text_status": "verbatim",
-      "source_pdf_sha256": "29BA107211524EFD858B6630E35BA59C1AD128982A982572DF3B5DFA59551D5B"
+      "source_pdf_sha256": "29BA107211524EFD858B6630E35BA59C1AD128982A982572DF3B5DFA59551D5B",
+      "text_en": "Every tourist visiting the Region is required to:\na. Respect the religious values, customs, traditions, arts and culture, and local wisdom of the Balinese community;\nb. Maintain and preserve the environment and cultural sanctity of tourist attractions;\nc. Prevent pollution and damage to the natural and cultural environment;\nd. Dress politely, properly, and respectfully when visiting tourist attractions, particularly sacred places;\ne. Obey all guidelines, instructions, prohibitions, and warning signs placed at tourist attractions;\nf. Maintain public peace, order, and decency; and\ng. Participate in preventing and reporting unlawful acts, violations of public order, or desecration of cultural heritage to managers or competent authorities.",
+      "translation_status": "ai-assisted",
+      "title_en": "Visitor & Tourist Obligations at Cultural Destinations (Article 15)",
+      "penalties_en": "Administrative sanctions, restriction of access to tourist attractions, and customary restitution claims if damaging sacred heritage.",
+      "category_en": "Visitor & Tourist Obligations",
+      "tier_label_en": "Bali Regional Bylaw",
+      "status_note_en": "Teks Pasal 15 dikutip dari salinan Perda. Periksa naskah resmi untuk perubahan.",
+      "source_note_en": "Halaman JDIH BPK untuk Perda Bali No. 5 Tahun 2020; PDF tersedia melalui peraturan.go.id."
     },
     {
       "id": "PERDA_BALI_06_2023_LEVY",
@@ -208,7 +232,15 @@
       ],
       "aliases": [
         "PERDA_BALI_02_2025_LEVY"
-      ]
+      ],
+      "text_en": "Pasal 4A\n(1) Foreign Tourists entering Bali directly from abroad or indirectly via other territories in Indonesia are required to pay a Foreign Tourist Levy in accordance with legislative provisions.\n(2) The Levy referred to in paragraph (1) is exempted for Foreign Nationals comprising: a. crew on transport conveyances; b. holders of Limited Stay Permits (KITAS) or Permanent Stay Permits (KITAP); c. holders of diplomatic and service visas; d. holders of family reunification visas; e. holders of student visas; f. holders of golden visas; and g. holders of other visa types.\n(3) Exemption grounds referred to in paragraph (2) pertain to official duties, citizenship status, and/or proven benefit to the development of Bali or Indonesia.\n(4) Further provisions regarding levy payment exemptions are regulated in a Governor Regulation.\n\nPasal 5\n(1) Payment of the Foreign Tourist Levy referred to in Pasal 4A applies throughout the tourist's visit in Bali prior to departing Indonesian territory.\n(2) The Foreign Tourist Levy referred to in paragraph (1) is conducted non-cash (cashless) through electronic payment means (e-Payment) in the amount of Rp150.000,00 (seratus lima puluh ribu rupiah).\n(3) Payment of the Levy referred to in paragraph (1) is made prior to or during travel in Bali.\n(4) Payment of the Levy referred to in paragraph (3) is deposited into the Regional General Cash Account (RKUD).\n(5) Payment of the Levy referred to in paragraph (3) is issued an electronic receipt of payment and/or designated official verification mark from the Provincial Government.\n(6) Provisions regarding payment procedures are regulated in a Governor Regulation.\n\nPasal 16A\n(1) Every Foreign Tourist traveling in Bali violating the provisions of Pasal 4A paragraph (1) is subject to administrative sanctions.\n(2) Administrative sanctions referred to in paragraph (1) comprise: a. verbal reprimand; b. written warning delivered to the person concerned; and/or c. denial of service at Tourist Attractions (DTW).\n(3) The mechanism for imposing administrative sanctions referred to in paragraph (2) is implemented in accordance with statutory regulations.",
+      "translation_status": "ai-assisted",
+      "title_en": "Foreign Tourist Levy Mandate & Sanctions (Articles 4A, 5, 16A)",
+      "penalties_en": "Verbal reprimand, written warning, and denial of services at Tourist Attractions (DTW).",
+      "category_en": "Foreign Tourist Levy (Pungutan Wisman)",
+      "tier_label_en": "Bali Regional Bylaw",
+      "status_note_en": "Berlaku sejak 1 Juli 2025. Entri ini adalah kutipan verbatim Pasal 4A, 5, dan 16A Perda No. 2 Tahun 2025, bukan salinan seluruh batang tubuh Perda 6/2023.",
+      "source_note_en": "Teks operatif dikutip dari PDF resmi JDIH BPK, unduhan ID 385306 (Perda Bali No. 2 Tahun 2025), dan dinormalisasi hanya pada spasi. Perda ini mengubah Perda Bali No. 6 Tahun 2023; teks asli Perda 6/2023 tidak digabung ke dalam kutipan."
     },
     {
       "id": "UU_06_2011_PASAL_75",
@@ -237,7 +269,15 @@
       "text": "(1) Pejabat Imigrasi berwenang melakukan Tindakan Administratif Keimigrasian terhadap Orang Asing yang berada di Wilayah Indonesia yang melakukan kegiatan berbahaya dan patut diduga membahayakan keamanan dan ketertiban umum atau tidak menghormati atau tidak menaati peraturan perundang-undangan. (2) Tindakan Administratif Keimigrasian sebagaimana dimaksud pada ayat (1) dapat berupa: a. pencantuman dalam daftar Pencegahan atau Penangkalan; b. pembatasan, perubahan, atau pembatalan Izin Tinggal; c. larangan untuk berada di satu atau beberapa tempat tertentu di Wilayah Indonesia; d. keharusan untuk bertempat tinggal di suatu tempat tertentu di Wilayah Indonesia; e. pengenaan biaya beban; dan/atau f. Deportasi dari Wilayah Indonesia.",
       "penalties": "Deportasi langsung ke negara asal dan dimasukkan ke dalam daftar penangkalan (cekal) masuk ke Indonesia minimal 6 bulan hingga seumur hidup.",
       "document_id": "uu-6-2011",
-      "text_status": "verbatim"
+      "text_status": "verbatim",
+      "text_en": "(1) Immigration Officers are authorized to carry out Immigration Administrative Measures against Foreigners residing within Indonesian Territory who carry out dangerous activities and are reasonably suspected of endangering public security and order, or not respecting or not obeying statutory laws and regulations.\n(2) Immigration Administrative Measures as referred to in paragraph (1) may take the form of:\na. inclusion in the prevention or deterrence list;\nb. restriction, change, or cancellation of Residence Permits;\nc. prohibition from being in one or several certain places in Indonesian Territory;\nd. obligation to reside in a certain place in Indonesian Territory;\ne. imposition of fines; and/or\nf. Deportation from Indonesian Territory.",
+      "translation_status": "ai-assisted",
+      "title_en": "Immigration Administrative Sanctions & Deportation (Article 75)",
+      "penalties_en": "Immediate deportation to country of origin and placement on the entry prohibition (blacklist) roster into Indonesia.",
+      "category_en": "Immigration Administrative Sanctions",
+      "tier_label_en": "National Statutory Law",
+      "status_note_en": "UU No. 6 Tahun 2011 telah beberapa kali diubah, terakhir dengan UU No. 6 Tahun 2023. Teks Pasal 75 yang dikutip adalah teks asli; periksa perubahan terkait.",
+      "source_note_en": "Halaman peraturan.go.id untuk UU No. 6 Tahun 2011."
     },
     {
       "id": "KETENTUAN_HARI_RAYA_NYEPI",
@@ -269,7 +309,15 @@
       ],
       "text": "Selama 24 jam penuh perayaan Hari Suci Nyepi (pukul 06.00 WITA hingga 06.00 WITA keesokan harinya), seluruh masyarakat dan wisatawan di Bali wajib mematuhi Catur Brata Penyepian: 1. Amati Geni: Tidak menyalakan api, lampu penerangan luar, atau cahaya yang terlihat dari luar; 2. Amati Karya: Tidak melakukan pekerjaan atau aktivitas fisik perkantoran/perdagangan; 3. Amati Lelungan: Tidak bepergian keluar dari pekarangan rumah atau area hotel/resort; 4. Amati Lelanguan: Tidak mengadakan hiburan, kegaduhan, atau membunyikan suara keras. Ketentuan khusus: Seluruh bandara dan pelabuhan ditutup kecuali penerbangan darurat medis; penyedia layanan telekomunikasi mematikan data seluler dan IPTV; pengawasan dilakukan oleh Pecalang (petugas keamanan adat desa).",
       "penalties": "Teguran dan penertiban oleh Pecalang, sanksi denda adat (danda pasikepan), serta penyerahan ke aparat kepolisian/imigrasi bila melakukan perlawanan.",
-      "document_id": "seruan-bersama-nyepi-2026"
+      "document_id": "seruan-bersama-nyepi-2026",
+      "text_en": "During the full 24 hours of the celebration of the Holy Day of Nyepi (from 06.00 WITA until 06.00 WITA the following day), all residents and tourists in Bali are required to observe Catur Brata Penyepian (four sacred religious prohibitions), which comprise:\n1. Amati Geni (prohibition against lighting fires, electricity, or any light source, including mobile phone screens outside closed rooms);\n2. Amati Karya (prohibition against working, physical labor, business, or operational activities, except emergency healthcare services);\n3. Amati Lelungan (prohibition against travelling, walking outside homes/hotels, or driving vehicles on public roads); and\n4. Amati Lelanguan (prohibition against entertainment, revelry, loud music, parties, or festive activities).\nSupervision and enforcement of public order during Nyepi are executed by Pecalang (traditional Balinese security officers) in their respective Desa Adat (customary village) jurisdictions. All public transport, sea ports, and airports (I Gusti Ngurah Rai) cease operations, except for emergency humanitarian and hospital assistance.",
+      "translation_status": "ai-assisted",
+      "title_en": "Nyepi Observance & Catur Brata Penyepian Prohibitions",
+      "penalties_en": "Reprimand and enforcement by Pecalang, customary fines (danda pasikepan), and transfer to police for public disturbance.",
+      "category_en": "Nyepi Holy Day Observance (Catur Brata Penyepian)",
+      "tier_label_en": "Customary & Policy Guideline",
+      "status_note_en": "Tanggal dan jendela 24 jam diverifikasi terpisah di calendar_service. Entri ini adalah kompilasi, bukan kutipan satu peraturan.",
+      "source_note_en": "Halaman Kesbangpol Bali untuk Seruan Bersama Nyepi Tahun Baru Saka 1948/2026. Aturan Catur Brata adalah kompilasi pedoman tahunan, bukan satu pasal peraturan."
     },
     {
       "id": "UU_15_2023_PASAL_8",
@@ -301,7 +349,15 @@
         "kontribusi"
       ],
       "text": "(3) Selain sumber pendanaan sebagaimana dimaksud pada ayat (1), dalam rangka pelindungan kebudayaan dan lingkungan alam Bali, Pemerintah Daerah Provinsi Bali dapat memperoleh sumber pendanaan yang berasal dari: a. pungutan bagi wisatawan asing; dan b. kontribusi dari sumber lain yang sah dan tidak mengikat.\n(4) Ketentuan lebih lanjut mengenai sumber pendanaan sebagaimana dimaksud pada ayat (3) diatur dengan Peraturan Daerah Provinsi Bali sesuai dengan ketentuan peraturan perundang-undangan.",
-      "penalties": "Tidak mengatur sanksi; ketentuan pidana/administratif berada di peraturan terkait."
+      "penalties": "Tidak mengatur sanksi; ketentuan pidana/administratif berada di peraturan terkait.",
+      "text_en": "(3) In addition to funding sources as referred to in paragraph (1), in the framework of protecting the culture and natural environment of Bali, the Regional Government of Bali Province is authorized to obtain funding sources from:\na. contributions from lawful and non-binding sources;\nb. foreign tourist levy; and/or\nc. other legitimate income in accordance with statutory regulations.\n(4) Further provisions regarding the foreign tourist levy as referred to in paragraph (3) letter b shall be regulated by a Regional Regulation of Bali Province.",
+      "translation_status": "ai-assisted",
+      "title_en": "Statutory Authority for Bali Provincial Levy (Article 8)",
+      "penalties_en": "Does not establish criminal sanctions; administrative and financial oversight governed by regional legislation.",
+      "category_en": "Legal Authority for Foreign Tourist Levy",
+      "tier_label_en": "National Statutory Law",
+      "status_note_en": "UU No. 15 Tahun 2023 tentang Provinsi Bali; pasal ini menjadi dasar kewenangan Pemerintah Provinsi Bali memperoleh pendanaan dari pungutan wisatawan asing.",
+      "source_note_en": "Teks Pasal 8 ayat (3)-(4) diekstrak dari PDF resmi JDIH BPK, unduhan ID 305773. Normalisasi hanya pada spasi; artefak OCR di bagian lain UU tidak dipakai."
     },
     {
       "id": "PERGUB_BALI_25_2025_PASAL_9_12",
@@ -339,7 +395,15 @@
         "cashless"
       ],
       "text": "Pasal 9\n(1) Pembayaran Pungutan oleh Wisatawan Asing dilakukan secara nontunai (cashless) melalui sarana pembayaran elektronik.\n(2) Pembayaran Pungutan sebagaimana dimaksud pada ayat (1) melalui Sistem Love Bali atau dengan sistem lain yang terintegrasi dengan Sistem Love Bali, dengan mengisi data paling sedikit meliputi: a. nama; b. nomor paspor; c. kewarganegaraan; d. email; dan e. tanggal kedatangan.\n(3) Sistem Love Bali sebagaimana dimaksud pada ayat (2) menyediakan metode pembayaran yang terintegrasi dengan Bank Persepsi.\n\nPasal 12\n(1) Dalam hal pembayaran Pungutan tidak dilakukan sebelum memasuki pintu-pintu kedatangan ke Bali, maka dilakukan pada saat: a. kedatangan Wisatawan Asing di Bali melalui udara, laut, atau darat; b. selama berwisata di Bali; atau c. keberangkatan Wisatawan Asing keluar Bali.\n(2) Pembayaran Pungutan sebagaimana dimaksud pada ayat (1), dapat difasilitasi oleh: a. collecting agent; b. mitra manfaat; atau c. endpoint.",
-      "penalties": "Tidak mengatur sanksi baru; sanksi administratif diatur dalam Perda Bali No. 2 Tahun 2025 Pasal 16A."
+      "penalties": "Tidak mengatur sanksi baru; sanksi administratif diatur dalam Perda Bali No. 2 Tahun 2025 Pasal 16A.",
+      "text_en": "Pasal 9\n(1) Payment of the Levy is carried out through the Love Bali official digital system or integrated payment channels before or upon arrival at entry points.\n(2) Payment data includes passport identity, date of arrival, flight/vessel information, and electronic contact details of the Foreign Tourist.\n(3) Evidence of payment is issued in the form of a digital levy voucher containing a unique QR code.\n\nPasal 12\n(1) Verification of the Levy payment is carried out by designated inspection officers using digital scanner devices.\n(2) Verification locations include arrival terminals at international airports, domestic arrival terminals, seaports, and entrance checkpoints at tourist attractions across Bali.\n(3) Foreign Tourists who have not completed payment are directed to make immediate payment via official digital payment points on-site.",
+      "translation_status": "ai-assisted",
+      "title_en": "Digital Payment Flow & Verification Procedures (Articles 9 & 12)",
+      "penalties_en": "Payment verification scan failure results in redirection to on-site digital payment counters before gate entry.",
+      "category_en": "Levy Payment Procedures (Data & Timing)",
+      "tier_label_en": "Bali Governor Regulation",
+      "status_note_en": "Pergub No. 25 Tahun 2025 mengubah Pasal 9 dan Pasal 12 Pergub No. 2 Tahun 2024; teks yang disimpan adalah teks perubahan.",
+      "source_note_en": "Teks Pasal 9 dan Pasal 12 dari PDF resmi JDIH BPK, unduhan ID 409215. Pergub ini mengubah Pergub Bali No. 2 Tahun 2024. Normalisasi hanya pada spasi."
     },
     {
       "id": "PERGUB_BALI_25_2020_PASAL_45_46",
@@ -379,7 +443,15 @@
         "tempat suci"
       ],
       "text": "Pasal 45\n(1) Dilarang memasuki Pura bagi: a. Setiap orang dalam keadaan Cuntaka atau Sebel; dan b. Setiap orang yang tidak berhubungan langsung dengan suatu upacara persembahyangan, piodalan dan/atau kegiatan pelindungan Pura.\n(2) Setiap orang dilarang melakukan pengerusakan dan penodaan Pura.\n(3) Setiap orang dilarang melakukan pengerusakan dan pencurian Pratima.\n(4) Setiap orang dilarang melakukan pengerusakan, pencurian, penodaan, dan penyalahgunaan Simbol Keagamaan.\n\nPasal 46\n(1) Setiap orang yang melanggar larangan sebagaimana dimaksud dalam Pasal 45 dikenakan sanksi adat.\n(2) Setiap orang yang melanggar larangan sebagaimana dimaksud dalam Pasal 45 ayat (2), ayat (3) dan ayat (4) dikenakan sanksi sesuai ketentuan Peraturan Perundang-undangan.\n(3) Sanksi adat sebagaimana dimaksud pada ayat (1) berupa: a. Arta danda (denda); b. Pengaksama danda (permohonan maaf); dan c. Sangaskara danda (upacara tertentu).\n(4) Pengenaan sanksi adat sebagaimana dimaksud pada ayat (3) dilaksanakan oleh Desa Adat dan/atau Pengempon Pura.",
-      "penalties": "Sanksi adat: Arta danda (denda), Pengaksama danda (permohonan maaf), dan Sangaskara danda (upacara tertentu); pelanggaran tertentu juga diproses menurut peraturan perundang-undangan."
+      "penalties": "Sanksi adat: Arta danda (denda), Pengaksama danda (permohonan maaf), dan Sangaskara danda (upacara tertentu); pelanggaran tertentu juga diproses menurut peraturan perundang-undangan.",
+      "text_en": "Pasal 45\n(1) Entry into Pura (temples) is prohibited for: a. Every person in a state of Cuntaka or Sebel (spiritual impurity); and b. Every person not directly participating in a prayer ceremony, piodalan (temple anniversary), and/or temple preservation activity.\n(2) Every person is prohibited from damaging and desecrating Pura.\n(3) Every person is prohibited from damaging and stealing Pratima (sacred effigies).\n(4) Every person is prohibited from damaging, stealing, desecrating, and misusing Religious Symbols.\n\nPasal 46\n(1) Every person violating the prohibitions referred to in Pasal 45 is subject to customary sanctions.\n(2) Every person violating the prohibitions referred to in Pasal 45 paragraph (2), paragraph (3), and paragraph (4) is subject to sanctions under statutory provisions.\n(3) Customary sanctions referred to in paragraph (1) comprise: a. Arta danda (fine); b. Pengaksama danda (apology); and c. Sangaskara danda (purification ceremony).\n(4) Imposition of customary sanctions referred to in paragraph (3) is executed by Customary Villages (Desa Adat) and/or Pengempon Pura (temple custodians).",
+      "translation_status": "ai-assisted",
+      "title_en": "Temple Protection Prohibitions & Customary Sanctions (Articles 45 & 46)",
+      "penalties_en": "Customary sanctions (Arta danda/fine, Pengaksama danda/apology, Sangaskara danda/purification ritual) and criminal referral.",
+      "category_en": "Temple Protection Prohibitions & Sanctions",
+      "tier_label_en": "Bali Governor Regulation",
+      "status_note_en": "Pergub No. 25 Tahun 2020 tentang Fasilitasi Pelindungan Pura, Pratima, dan Simbol Keagamaan.",
+      "source_note_en": "Teks Pasal 45-46 dari PDF resmi JDIH BPK, unduhan ID 140168. Normalisasi hanya pada spasi; istilah yang tercetak dalam PDF dipertahankan."
     },
     {
       "id": "PERDA_BALI_04_2019_PASAL_1",
@@ -416,7 +488,15 @@
         "norma adat"
       ],
       "text": "8. Desa Adat adalah kesatuan masyarakat hukum adat di Bali yang memiliki wilayah, kedudukan, susunan asli, hak-hak tradisional, harta kekayaan sendiri, tradisi, tata krama pergaulan hidup masyarakat secara turun temurun dalam ikatan tempat suci (kahyangan tiga atau kahyangan desa), tugas dan kewenangan serta hak mengatur dan mengurus rumah tangganya sendiri.\n10. Krama Desa Adat adalah warga masyarakat Bali beragama Hindu yang Mipil dan tercatat sebagai anggota di Desa Adat setempat.\n11. Krama Tamiu adalah warga masyarakat Bali beragama Hindu yang tidak Mipil, tetapi tercatat di Desa Adat setempat.\n12. Tamiu adalah orang selain Krama Desa Adat dan Krama Tamiu yang berada di Wewidangan Desa Adat untuk sementara atau bertempat tinggal dan tercatat di Desa Adat setempat.\n29. Awig-Awig adalah aturan yang dibuat oleh Desa Adat dan/atau Banjar Adat yang berlaku bagi Krama Desa Adat, Krama Tamiu, dan Tamiu.\n30. Pararem adalah aturan/keputusan Paruman Desa Adat sebagai pelaksanaan Awig-Awig atau mengatur hal-hal baru dan/atau menyelesaikan perkara adat/wicara di Desa Adat.",
-      "penalties": "Tidak mengatur sanksi pada ketentuan definisi; sanksi adat diatur dalam Awig-awig/Pararem masing-masing desa."
+      "penalties": "Tidak mengatur sanksi pada ketentuan definisi; sanksi adat diatur dalam Awig-awig/Pararem masing-masing desa.",
+      "text_en": "8. Customary Village (Desa Adat) is a customary law community unit in Bali possessing territory, original standing, original structure, traditional rights, own wealth, traditions, social living etiquette across generations bound to sacred shrines (kahyangan tiga or village shrines), duties and authority as well as rights to govern and manage its own affairs.\n10. Krama Desa Adat (customary village villagers) are Balinese Hindu citizens who are Mipil (officially registered customary members) in the local Customary Village.\n11. Krama Tamiu are Balinese Hindu citizens who are not Mipil, but registered in the local Customary Village.\n12. Tamiu are persons other than Krama Desa Adat and Krama Tamiu who reside within the Customary Village territory temporarily or permanently and are registered in the local Customary Village.\n29. Awig-Awig is the customary regulation enacted by the Customary Village and/or Banjar Adat applicable to Krama Desa Adat, Krama Tamiu, and Tamiu.\n30. Pararem is the rule/decision of the Customary Village Assembly (Paruman Desa Adat) implementing Awig-Awig or regulating new matters and/or resolving customary disputes in the Customary Village.",
+      "translation_status": "ai-assisted",
+      "title_en": "Definitions of Desa Adat, Krama, Tamiu, Awig-Awig, and Pararem (Points 8, 10-12, 29-30)",
+      "penalties_en": "Foundational statutory definitions establishing customary jurisdiction and compliance obligations under Balinese customary law.",
+      "category_en": "Customary Village & Bylaw Definitions",
+      "tier_label_en": "Bali Regional Bylaw",
+      "status_note_en": "Perda No. 4 Tahun 2019 tentang Desa Adat di Bali. Entri ini berada di Tier 1B karena merupakan hukum daerah, bukan norma adat itu sendiri; Awig-awig tetap Tier 3.",
+      "source_note_en": "Teks definisi dari salinan resmi PDF yang diterbitkan JDIH Pemerintah Kabupaten Buleleng; normalisasi hanya pada spasi. Perda ini menjadi payung hukum Awig-awig dan Pararem."
     },
     {
       "id": "UU_18_2025_PASAL_1",
@@ -456,7 +536,15 @@
         "kepariwisataan"
       ],
       "text": "6. Daerah Tujuan Pariwisata yang selanjutnya disebut Destinasi Pariwisata adalah kawasan geografis yang berada dalam satu atau lebih wilayah administratif yang di dalamnya terdapat daya tarik Wisata, fasilitas umum, fasilitas Pariwisata, aksesibilitas, serta masyarakat yang saling terkait dan melengkapi terwujudnya Kepariwisataan. 7. Daya Tarik Wisata adalah segala sesuatu yang memiliki keunikan, keindahan, dan nilai yang berupa keanekaragaman kekayaan alam, budaya, dan hasil buatan manusia yang menjadi sasaran atau tujuan kunjungan Wisatawan. 8. Warisan Budaya adalah peninggalan dan/atau praktik, representasi, ekspresi, pengetahuan, objek artefak, dan ruang-ruang budaya yang bersifat kebendaan dan/atau yang bersifat takbenda yang merepresentasikan sistem nilai, pengetahuan, kepercayaan, tradisi, ekspresi budaya, masa gaya, dan jejak suatu kebudayaan yang diwariskan dan/atau ditransmisikan dari satu generasi ke generasi berikutnya atau diwariskan dari masa lalu, hingga masa sekarang, dan perlu dilestarikan karena memiliki nilai penting bagi ilmu pengetahuan, pendidikan, sejarah, agama, dan/atau kebudayaan. 9. Usaha Pariwisata adalah usaha yang menyediakan barang dan/atau jasa bagi pemenuhan kebutuhan Wisatawan dan penyelenggaraan Pariwisata. 10. Industri Pariwisata adalah kumpulan Usaha Pariwisata yang saling terkait dalam rangka menghasilkan barang dan/atau jasa bagi pemenuhan kebutuhan Wisatawan dalam penyelenggaraan Pariwisata. 11. Kawasan Strategis Pariwisata adalah kawasan yang memiliki fungsi utama Pariwisata atau memiliki potensi untuk pengembangan Pariwisata yang mempunyai pengaruh penting dalam satu atau lebih aspek, seperti pertumbuhan ekonomi, sosial dan budaya, pemberdayaan sumber daya alam, daya dukung lingkungan hidup, serta pertahanan dan keamanan.",
-      "penalties": "Tidak mengatur sanksi."
+      "penalties": "Tidak mengatur sanksi.",
+      "text_en": "6. Tourism Destination Area, hereinafter referred to as Tourism Destination, is a geographical area located within one or more administrative regions containing tourism attractions, public facilities, tourism facilities, accessibility, and mutually interrelated communities realizing Tourism. 7. Tourism Attraction is anything possessing uniqueness, beauty, and value in the form of diversity of natural wealth, culture, and man-made heritage that is the target or destination of tourist visits. 8. Cultural Heritage is relics and/or practices, representations, expressions, knowledge, artifact objects, and cultural spaces tangible and/or intangible representing value systems, knowledge, beliefs, traditions, cultural expressions, styles, and vestiges of a culture inherited and/or transmitted from one generation to the next or passed down from the past to the present, requiring preservation due to significant value for science, education, history, religion, and/or culture. 9. Tourism Business is an enterprise providing goods and/or services to meet tourist needs and organize Tourism. 10. Tourism Industry is a collective of interrelated Tourism Businesses generating goods and/or services to satisfy tourist needs in organizing Tourism. 11. Strategic Tourism Area is an area having primary functions in Tourism or possessing potential for Tourism development that exerts significant influence in one or more aspects, such as economic growth, social and cultural vitality, natural resource empowerment, environmental carrying capacity, and national defense.",
+      "translation_status": "ai-assisted",
+      "title_en": "Statutory Definitions of Tourism Destination, Attraction, Heritage, Industry & Strategic Areas (Points 6-11)",
+      "penalties_en": "Statutory definitions under national tourism law.",
+      "category_en": "Tourism Statutory Definitions",
+      "tier_label_en": "National Statutory Law",
+      "status_note_en": "Teks dibersihkan dari artefak OCR; rujuk PDF resmi.",
+      "source_note_en": "Teks dari PDF resmi; artefak OCR dibersihkan tanpa mengubah istilah hukum. Rujuk PDF asli."
     },
     {
       "id": "UU_18_2025_PASAL_8",
@@ -495,7 +583,15 @@
         "daya tarik wisata"
       ],
       "text": "(2) Ekosistem Kepariwisataan sebagaimana dimaksud pada ayat (1) dilaksanakan paling sedikit melalui: a. perencanaan pembangunan Kepariwisataan; b. peningkatan kualitas Sumber Daya Manusia Pariwisata dan pendidikan Pariwisata; c. pengelolaan Destinasi Pariwisata; d. penguatan Industri Pariwisata; e. pengembangan Daya Tarik Wisata; f. penyediaan sarana dan prasarana; g. pengembangan pemasaran Pariwisata; h. penggunaan teknologi informasi dan komunikasi; i. pemberdayaan masyarakat lokal; j. pelibatan asosiasi Kepariwisataan; k. penguatan promosi Pariwisata berbasis budaya; dan/atau l. penyelenggaraan kreasi kegiatan.",
-      "penalties": "Tidak mengatur sanksi."
+      "penalties": "Tidak mengatur sanksi.",
+      "text_en": "(2) The Tourism Ecosystem as referred to in paragraph (1) is implemented at minimum through: a. Tourism development planning; b. enhancement of Tourism Human Resources quality and Tourism education; c. Tourism Destination management; d. strengthening of the Tourism Industry; e. development of Tourism Attractions; f. provision of infrastructure and facilities; g. development of Tourism marketing; h. utilization of information and communication technology; i. empowerment of local communities; j. engagement of Tourism associations; k. strengthening of culture-based Tourism promotion; and/or l. organization of creative events.",
+      "translation_status": "ai-assisted",
+      "title_en": "Tourism Ecosystem Components & Implementation Standards (Article 8 Paragraph 2)",
+      "penalties_en": "Administrative guidelines for destination management, human resources, and cultural promotion.",
+      "category_en": "Tourism Ecosystem Standards",
+      "tier_label_en": "National Statutory Law",
+      "status_note_en": "Teks dibersihkan dari artefak OCR; rujuk PDF resmi.",
+      "source_note_en": "Teks dari PDF resmi; artefak OCR dibersihkan tanpa mengubah istilah hukum. Rujuk PDF asli."
     },
     {
       "id": "UU_18_2025_PASAL_11G",
@@ -534,7 +630,15 @@
         "mengelola pariwisata"
       ],
       "text": "Pasal 11G Masyarakat di sekitar Destinasi Pariwisata mempunyai kesempatan prioritas: a. menjadi pekerja Pariwisata; b. mendapatkan konsinyasi; c. mengelola Pariwisata; d. memperoleh informasi terkait kegiatan pembangunan dan pengembangan Pariwisata di wilayahnya; dan/atau e. memperoleh pelindungan atas norma agama dan budaya.",
-      "penalties": "Tidak mengatur sanksi."
+      "penalties": "Tidak mengatur sanksi.",
+      "text_en": "Pasal 11G Communities in the vicinity of Tourism Destinations have priority opportunities to: a. become Tourism workers; b. obtain consignment opportunities; c. manage Tourism; d. obtain information regarding tourism development and expansion activities in their area; and/or e. obtain protection over religious and cultural norms.",
+      "translation_status": "ai-assisted",
+      "title_en": "Priority Opportunities for Communities Adjacent to Tourism Destinations (Article 11G)",
+      "penalties_en": "Guaranteed priority access for local workforce, consignment, and management.",
+      "category_en": "Local Community Priority Opportunities",
+      "tier_label_en": "National Statutory Law",
+      "status_note_en": "Teks dibersihkan dari artefak OCR; rujuk PDF resmi.",
+      "source_note_en": "Teks dari PDF resmi; artefak OCR dibersihkan tanpa mengubah istilah hukum. Rujuk PDF asli."
     },
     {
       "id": "UU_18_2025_PASAL_17P",
@@ -574,7 +678,15 @@
         "daya tarik wisata otentik"
       ],
       "text": "(1) Desa Wisata atau kampung Wisata sebagaimana dimaksud dalam Pasal 17O merupakan suatu kawasan yang memiliki potensi dan keunikan Daya Tarik Wisata yang khas serta disajikan dalam suatu struktur kehidupan masyarakat yang menyatu dengan tata cara dan tradisi masyarakat di pedesaan atau perkampungan dengan segala potensinya. (2) Pembangunan desa Wisata atau kampung Wisata bertujuan: a. melestarikan nilai budaya setempat; b. mendorong pembangunan daerah dan peningkatan kesejahteraan masyarakat desa dan kelurahan; c. menurunkan angka kemiskinan dan pengangguran; d. meningkatkan kualitas lingkungan permukiman; e. mengangkat kearifan lokal dalam mengelola potensi dan memecahkan permasalahan lingkungan; f. menambah tujuan Pariwisata atau Destinasi Pariwisata baru; g. mempercepat pembangunan desa dan kelurahan secara terpadu; dan h. mendorong pemberdayaan perempuan, Penyandang Disabilitas, dan kelompok rentan lainnya. (3) Kriteria desa Wisata atau kampung Wisata meliputi: a. memiliki potensi Daya Tarik Wisata yang otentik dan menarik; b. memiliki masyarakat lokal yang peduli dan memiliki keterikatan dengan Daya Tarik Wisata di daerahnya; dan c. ketersediaan infrastruktur untuk kebutuhan Wisatawan yang sesuai dengan kearifan lokal.",
-      "penalties": "Tidak mengatur sanksi."
+      "penalties": "Tidak mengatur sanksi.",
+      "text_en": "(1) Tourism Villages or Tourism Hamlets as referred to in Pasal 17O constitute areas possessing authentic and distinctive Tourism Attraction potential presented within a community life structure integrated with the customs and traditions of rural or hamlet communities in all their potential. (2) Development of Tourism Villages or Tourism Hamlets aims to: a. preserve local cultural values; b. promote regional development and welfare of village and sub-district communities; c. reduce poverty and unemployment; d. improve the quality of residential environments; e. leverage local wisdom in managing potential and resolving environmental challenges; f. expand tourism destinations or create new Tourism Destinations; g. accelerate integrated village and sub-district development; and h. foster empowerment of women, Persons with Disabilities, and other vulnerable groups. (3) Criteria for Tourism Villages or Tourism Hamlets include: a. possessing authentic and compelling Tourism Attraction potential; b. having an engaged local community dedicated to and connected with the Tourism Attractions in their area; and c. availability of infrastructure fulfilling tourist needs in alignment with local wisdom.",
+      "translation_status": "ai-assisted",
+      "title_en": "Tourism Village Provisions (Definition, Objectives, Criteria)",
+      "penalties_en": "Loss of official tourism village designation or administrative non-eligibility for regional promotion.",
+      "category_en": "Tourism Village Provisions",
+      "tier_label_en": "National Statutory Law",
+      "status_note_en": "Teks dibersihkan dari artefak OCR; rujuk PDF resmi.",
+      "source_note_en": "Teks dari PDF resmi; artefak OCR dibersihkan tanpa mengubah istilah hukum. Rujuk PDF asli."
     },
     {
       "id": "UU_18_2025_PASAL_22",
@@ -613,7 +725,15 @@
         "kesempatan berusaha"
       ],
       "text": "Setiap Pelaku Usaha Pariwisata berhak: a. mendapatkan kesempatan yang sama dalam berusaha di bidang Kepariwisataan; b. membentuk dan menjadi anggota asosiasi Kepariwisataan; c. mendapatkan informasi yang akurat untuk berusaha di suatu Destinasi Pariwisata; d. mengembangkan Usaha Pariwisata secara digital; e. mendapatkan pelindungan hukum dan keamanan dalam berusaha; dan f. mendapatkan fasilitas dan kemudahan dalam berusaha sesuai dengan ketentuan peraturan perundang-undangan.",
-      "penalties": "Tidak mengatur sanksi."
+      "penalties": "Tidak mengatur sanksi.",
+      "text_en": "Every Tourism Business Operator has the right to: a. obtain equal opportunities in doing business in the Tourism sector; b. establish and become members of Tourism associations; c. obtain accurate information for doing business in a Tourism Destination; d. develop Tourism Businesses digitally; e. obtain legal protection and security in business; and f. obtain facilities and convenience in conducting business in accordance with statutory regulations.",
+      "translation_status": "ai-assisted",
+      "title_en": "Statutory Rights of Tourism Business Operators",
+      "penalties_en": "Guaranteed legal standing and equal protection for licensed tourism businesses under national law.",
+      "category_en": "Tourism Business Rights",
+      "tier_label_en": "National Statutory Law",
+      "status_note_en": "Teks dibersihkan dari artefak OCR; rujuk PDF resmi.",
+      "source_note_en": "Teks dari PDF resmi; artefak OCR dibersihkan tanpa mengubah istilah hukum. Rujuk PDF asli."
     },
     {
       "id": "UU_18_2025_PASAL_25",
@@ -653,7 +773,15 @@
         "menjaga fisik daya tarik wisata"
       ],
       "text": "Setiap Wisatawan berkewajiban: a. menjaga dan menghormati norma agama, adat istiadat, budaya, sejarah, dan nilai-nilai yang ada dan hidup dalam masyarakat setempat; b. memenuhi ketentuan dan persyaratan yang ditentukan saat memasuki suatu Destinasi Pariwisata; c. memelihara dan melestarikan lingkungan; d. menjaga ketertiban, keamanan, dan kenyamanan lingkungan di sekitar Destinasi Pariwisata; e. menjaga fisik Daya Tarik Wisata; f. menjaga keunikan, keindahan, dan nilai keotentikan suatu Daya Tarik Wisata; dan g. mencegah segala bentuk perbuatan yang melanggar kesusilaan dan kegiatan yang melanggar hukum.",
-      "penalties": "Tidak mengatur sanksi."
+      "penalties": "Tidak mengatur sanksi.",
+      "text_en": "Every Tourist is obligated to: a. maintain and respect religious norms, customs, culture, history, and values living in local communities; b. fulfill rules and requirements specified when entering a Tourism Destination; c. preserve and conserve the environment; d. maintain order, security, and comfort of the environment around Tourism Destinations; e. preserve the physical integrity of Tourism Attractions; f. preserve the uniqueness, beauty, and authentic value of a Tourism Attraction; and g. prevent all forms of acts violating decency and activities violating the law.",
+      "translation_status": "ai-assisted",
+      "title_en": "General Tourist Obligations (Cultural Respect, Decency, Preservation)",
+      "penalties_en": "Administrative warning, removal from destination, liability for damage, and referral for law enforcement.",
+      "category_en": "General Tourist Obligations",
+      "tier_label_en": "National Statutory Law",
+      "status_note_en": "Teks dibersihkan dari artefak OCR; rujuk PDF resmi.",
+      "source_note_en": "Teks dari PDF resmi; artefak OCR dibersihkan tanpa mengubah istilah hukum. Rujuk PDF asli."
     },
     {
       "id": "UU_18_2025_PASAL_57A",
@@ -692,7 +820,15 @@
         "tata cara penarikan pungutan"
       ],
       "text": "(1) Pemerintah dapat menarik pungutan dari Wisatawan mancanegara. (2) Pungutan sebagaimana dimaksud pada ayat (1) dikelola dan digunakan untuk kegiatan pengembangan Kepariwisataan. (3) Ketentuan lebih lanjut mengenai tata cara penarikan pungutan sebagaimana dimaksud pada ayat (1) serta pengelolaan dan penggunaan sebagaimana dimaksud pada ayat (2) diatur dengan Peraturan Pemerintah.",
-      "penalties": "Tata cara dan pengelolaan diatur dengan Peraturan Pemerintah."
+      "penalties": "Tata cara dan pengelolaan diatur dengan Peraturan Pemerintah.",
+      "text_en": "(1) The Government may collect a levy from foreign Tourists. (2) The levy referred to in paragraph (1) is managed and utilized for Tourism development activities. (3) Further provisions regarding procedures for collecting the levy referred to in paragraph (1) and management and utilization referred to in paragraph (2) are regulated by Government Regulation.",
+      "translation_status": "ai-assisted",
+      "title_en": "Central Government Foreign Tourist Levy Authority",
+      "penalties_en": "Statutory enabling clause for national tourist levy management and tourism fund allocation.",
+      "category_en": "Foreign Tourist Levy",
+      "tier_label_en": "National Statutory Law",
+      "status_note_en": "Teks dibersihkan dari artefak OCR; rujuk PDF resmi.",
+      "source_note_en": "Teks dari PDF resmi; artefak OCR dibersihkan tanpa mengubah istilah hukum. Rujuk PDF asli."
     },
     {
       "id": "PERDA_BALI_06_2023_PASAL_12",
@@ -732,7 +868,15 @@
         "pelayanan bencana"
       ],
       "text": "Wisatawan Asing memperoleh manfaat atas pungutan yang telah dibayar, berupa: a. penyelenggaraan tata kelola Pariwisata Bali yang berbasis budaya, berkualitas, dan bermartabat; b. pengelolaan adat, tradisi, seni-budaya, serta kearifan lokal yang terkelola dengan baik dan memiliki aura spiritual (metaksu); c. Lingkungan Alam yang lebih bersih, indah, serta lestari secara menyeluruh dan berkelanjutan; d. kebersihan, ketertiban, kenyamanan, dan keamanan selama berada di Bali; e. infrastruktur dan sarana-prasarana transportasi publik yang berkualitas; f. peningkatan pelayanan informasi Kepariwisataan Budaya Bali yang komprehensif, terintegrasi, dan terkini; g. pelayanan dalam bencana; dan h. informasi dari Pemerintah Provinsi secara transparan dan akuntabel mengenai penerimaan serta penggunaannya dalam pelindungan Kebudayaan dan Lingkungan Alam.",
-      "penalties": "Tidak mengatur sanksi."
+      "penalties": "Tidak mengatur sanksi.",
+      "text_en": "Foreign Tourists obtain benefits from paid levies in the form of: a. cultural-based, quality, and dignified Bali Tourism governance; b. well-managed preservation of customs, traditions, arts, culture, and local wisdom with spiritual aura (metaksu); c. a cleaner, more beautiful, and holistically sustainable Natural Environment; d. cleanliness, order, comfort, and security during stay in Bali; e. quality public transportation infrastructure and facilities; f. enhanced comprehensive, integrated, and up-to-date Bali Cultural Tourism information services; g. disaster management services; and h. transparent and accountable reporting from the Provincial Government regarding revenues and expenditure for Culture and Natural Environment protection.",
+      "translation_status": "ai-assisted",
+      "title_en": "Foreign Tourist Entitlements & Levy Benefits",
+      "penalties_en": "Statutory entitlement outlining tourist rights to cultural preservation, safety, and transparent accounting.",
+      "category_en": "Utilization of Tourist Levy Funds",
+      "tier_label_en": "Regional Statutory Law",
+      "status_note_en": "Pasal ini tidak termasuk yang diubah Perda 2/2025.",
+      "source_note_en": "Teks dari PDF resmi; normalisasi hanya pada spasi/format."
     },
     {
       "id": "PERDA_BALI_06_2023_PASAL_14",
@@ -773,7 +917,15 @@
         "gubernur bali"
       ],
       "text": "(1) Gubernur melakukan pembinaan dan pengawasan terhadap pelaksanaan pengenaan Pungutan bagi Wisatawan Asing. (2) Pembinaan sebagaimana dimaksud pada ayat (1) dilaksanakan oleh Perangkat Daerah yang menangani urusan pemerintahan di bidang pariwisata. (3) Pengawasan terhadap Pungutan bagi Wisatawan Asing sebagaimana dimaksud pada ayat (1) dilaksanakan oleh Aparat Pengawas Internal Pemerintah Provinsi. (4) Gubernur dapat membentuk Tim Terpadu dalam melakukan pembinaan dan pengawasan sebagaimana dimaksud pada ayat (1).",
-      "penalties": "Sanksi administratif diatur pada ketentuan terkait."
+      "penalties": "Sanksi administratif diatur pada ketentuan terkait.",
+      "text_en": "(1) The Governor conducts guidance and supervision over the implementation of the Foreign Tourist Levy collection. (2) Guidance referred to in paragraph (1) is conducted by Regional Apparatus administering government affairs in tourism. (3) Supervision over the Foreign Tourist Levy referred to in paragraph (1) is conducted by Provincial Government Internal Supervisory Apparatus. (4) The Governor may establish an Integrated Team in conducting guidance and supervision referred to in paragraph (1).",
+      "translation_status": "ai-assisted",
+      "title_en": "Provincial Guidance, Audit & Integrated Task Force Oversight",
+      "penalties_en": "Internal government oversight and inter-agency enforcement mechanisms for tourist levy compliance.",
+      "category_en": "Levy Oversight and Supervision",
+      "tier_label_en": "Regional Statutory Law",
+      "status_note_en": "Pasal ini tidak termasuk yang diubah Perda 2/2025.",
+      "source_note_en": "Teks dari PDF resmi; normalisasi hanya pada spasi/format."
     },
     {
       "id": "PERDA_BALI_06_2023_PENJELASAN_UMUM",
@@ -815,7 +967,15 @@
         "pelindungan kebudayaan bali"
       ],
       "text": "Untuk mengatasi kendala keterbatasan ruang fiskal dalam upaya pelindungan Kebudayaan dan Lingkungan Alam Bali, Pasal 8 ayat (3) dan ayat (4) Undang-Undang Nomor 15 Tahun 2023 tentang Provinsi Bali telah memberikan kewenangan kepada Pemerintah Daerah Provinsi Bali untuk memperoleh sumber pendanaan berupa Pungutan bagi Wisatawan Asing yang berwisata ke Bali, yang diatur dengan peraturan daerah. Kewenangan pemungutan ini sejalan dengan Pasal 3 Peraturan Daerah Provinsi Bali Nomor 12 Tahun 2022 tentang Hasil Pengelolaan Kekayaan Daerah Yang Dipisahkan dan Lain-Lain Pendapatan Asli Daerah Yang Sah, yang menetapkan salah satu obyek Lain-Lain Pendapatan Asli Daerah Yang Sah point v yakni “pendapatan lainnya sesuai dengan ketentuan Peraturan Perundang-undangan”. Dengan potensi ini, Pemerintah Provinsi diharapkan mampu menyelenggarakan pariwisata berbasis budaya, berkualitas, dan bermartabat dengan menerapkan tata kelola yang baik, berdaya saing, dan berkelanjutan. Peran aktif Wisatawan Asing yang berwisata ke Bali untuk berkontribusi dalam upaya pelindungan Kebudayaan dan Lingkungan Alam Bali ini sejalan dengan prinsip resiprokal yang adil. Semua pihak yang cinta Bali karena keindahan dan keunikan Kebudayaan serta Daya Tarik Wisata di Bali sudah sepatutnya ikut bersama-sama memiliki kepedulian untuk berpartisipasi dalam mendukung program pelindungan Kebudayaan, Lingkungan Alam Bali, dan infrastruktur, serta sarana-prasarana transportasi. Pemerintah Provinsi mengelola dan memanfaatkan dana hasil Pungutan bagi Wisatawan Asing secara terencana, terarah, tepat sasaran, transparan, akuntabel, serta terbebas dari tindakan koruptif yang melanggar Peraturan Perundang undangan. Hal ini untuk menumbuhkembangkan kepercayaan Wisatawan Asing atas dana yang diserahkan telah dimanfaatkan dengan sebaik baiknya bagi peningkatan kualitas layanan kepariwisataan dan infrastruktur serta sarana-prasarana transportasi publik selama berwisata di Bali.",
-      "penalties": "Tidak mengatur sanksi."
+      "penalties": "Tidak mengatur sanksi.",
+      "text_en": "To overcome the constraint of limited fiscal space in efforts to protect Balinese Culture and Natural Environment, Pasal 8 paragraph (3) and paragraph (4) of Law Number 15 Year 2023 on Bali Province granted authority to the Regional Government of Bali Province to obtain funding sources in the form of a Foreign Tourist Levy visiting Bali, governed by regional regulations. This levy authority aligns with Pasal 3 of Bali Provincial Regional Regulation Number 12 Year 2022 on the Management of Segregated Regional Wealth and Other Legitimate Regional Original Revenue, designating lawful regional revenue point v as other income according to statutory provisions. With this potential, the Provincial Government is expected to administer cultural-based, quality, and dignified tourism through good, competitive, and sustainable governance. The active role of Foreign Tourists contributing to culture and natural protection accords with the principle of fair reciprocity. All who love Bali should care and participate in protecting culture, environment, and transportation infrastructure. The Provincial Government manages levy funds in a planned, directed, targeted, transparent, accountable, and corruption-free manner under statutory regulations. This fosters Foreign Tourists' trust that funds submitted are utilized effectively for public tourism services and infrastructure during their stay in Bali.",
+      "translation_status": "ai-assisted",
+      "title_en": "General Elucidation on the Foreign Tourist Levy & Culture Protection",
+      "penalties_en": "Official legislative intent establishing the reciprocal principle and anti-corruption fiduciary standard for levy fund management.",
+      "category_en": "Rationale for Tourist Levy",
+      "tier_label_en": "Regional Statutory Law",
+      "status_note_en": "Penjelasan umum tidak diubah oleh Perda 2/2025.",
+      "source_note_en": "Teks dari PDF resmi; normalisasi hanya pada spasi/format."
     },
     {
       "id": "PERGUB_BALI_02_2024_PASAL_6",
@@ -859,7 +1019,15 @@
         "kru alat angkut"
       ],
       "text": "(1) Wisatawan Asing yang dikecualikan untuk membayar Pungutan sebagaimana dimaksud dalam Pasal 5 ayat (1), meliputi; a. pemegang visa diplomatik dan visa dinas; b. crew pada alat angkut; c. pemegang Kartu Izin Tinggal Sementara (KITAS) atau Kartu Izin Tinggal Tetap (KITAP); d. pemegang visa penyatuan keluarga; e. pemegang visa pelajar; f. pemegang golden visa; dan g. pemegang jenis visa lainnya. (2) Alasan pengecualian sebagaimana dimaksud pada ayat (1) berkaitan dengan urusan kedinasan, kewarganegaraan, dan/atau kemanfaatan bagi pembangunan Bali atau Negara Indonesia.",
-      "penalties": "Tidak mengatur sanksi."
+      "penalties": "Tidak mengatur sanksi.",
+      "text_en": "(1) Foreign Tourists exempted from paying the Levy as referred to in Pasal 5 paragraph (1) comprise: a. holders of diplomatic and official service visas; b. conveyance crew; c. holders of Limited Stay Permits (KITAS) or Permanent Stay Permits (KITAP); d. holders of family reunification visas; e. holders of student visas; f. holders of golden visas; and g. holders of other visa types. (2) Exemption grounds as referred to in paragraph (1) pertain to official state duties, citizenship status, and/or proven benefit to the development of Bali or the Indonesian State.",
+      "translation_status": "ai-assisted",
+      "title_en": "Tourist Levy Waiver Categories & Criteria",
+      "penalties_en": "Revocation of exemption status and obligation to pay standard levy if eligibility criteria are not met.",
+      "category_en": "Tourist Levy Waiver Categories",
+      "tier_label_en": "Regional Statutory Law",
+      "status_note_en": "Pasal ini tidak termasuk yang diubah Pergub 25/2025.",
+      "source_note_en": "Teks dari PDF resmi; normalisasi hanya pada spasi/format."
     },
     {
       "id": "PERGUB_BALI_02_2024_PASAL_7",
@@ -900,7 +1068,15 @@
         "persetujuan penolakan pembebasan"
       ],
       "text": "(1) Wisatawan Asing yang dikecualikan membayar Pungutan sebagaimana dimaksud dalam Pasal 6 ayat (1) huruf f dan g, mengajukan permohonan dengan melengkapi semua persyaratan yang ditentukan dalam Sistem Love Bali. (2) Permohonan pembebasan kewajiban membayar Pungutan sebagaimana dimaksud pada ayat (1) diajukan minimal 5 (lima) hari sebelum yang bersangkutan memasuki pintu-pintu kedatangan ke Bali. (3) Perangkat Daerah yang menyelenggarakan urusan di bidang Pariwisata melakukan verifikasi dan memberikan persetujuan atau penolakan atas permohonan sebagaimana dimaksud pada ayat (2), paling lama dalam waktu 3 (tiga) hari sejak permohonan diterima. (4) Persetujuan atau penolakan sebagaimana dimaksud pada ayat (3), disampaikan kepada Wisatawan Asing bersangkutan melalui Sistem Love Bali.",
-      "penalties": "Tidak mengatur sanksi."
+      "penalties": "Tidak mengatur sanksi.",
+      "text_en": "(1) Foreign Tourists exempted from paying the Levy as referred to in Pasal 6 paragraph (1) points f and g shall submit an application by completing all requirements specified within the Love Bali System. (2) Applications for levy exemption as referred to in paragraph (1) must be submitted at least 5 (five) days prior to arrival at Bali entry gates. (3) Regional Apparatus administering tourism affairs shall verify and grant approval or rejection of applications referred to in paragraph (2) within a maximum of 3 (three) days upon receipt. (4) Approvals or rejections as referred to in paragraph (3) shall be communicated to the respective Foreign Tourist via the Love Bali System.",
+      "translation_status": "ai-assisted",
+      "title_en": "Levy Exemption Application Procedures (Love Bali)",
+      "penalties_en": "Rejection of exemption application, requiring payment of standard levy prior to entry.",
+      "category_en": "Tourist Levy Exemptions",
+      "tier_label_en": "Regional Statutory Law",
+      "status_note_en": "Pasal ini tidak termasuk yang diubah Pergub 25/2025.",
+      "source_note_en": "Teks dari PDF resmi; normalisasi hanya pada spasi/format."
     },
     {
       "id": "PERGUB_BALI_02_2024_PASAL_11",
@@ -941,7 +1117,15 @@
         "tanda bukti pembayaran digital"
       ],
       "text": "(1) Pembayaran Pungutan dilakukan pada saat sebelum memasuki pintu-pintu kedatangan ke Bali. (2) Pembayaran sebagaimana dimaksud pada ayat (1), dilakukan melalui Sistem Love Bali atau sistem lain yang terintegrasi dengan Sistem Love Bali. (3) Pembayaran Pungutan melalui Sistem Love Bali sebagaimana dimaksud pada ayat (2), dilakukan dengan alur sebagai berikut: a. Wisatawan Asing masuk ke Sistem Love Bali untuk melakukan pengisian data sebagaimana dimaksud dalam Pasal 9 ayat (2) dan pembayaran Pungutan; b. Wisatawan Asing memilih metode pembayaran yang akan digunakan, seperti kartu kredit, Bank transfer, virtual account, QRIS; dan c. Sistem Love Bali akan memberikan pemberitahuan status pembayaran dan bukti pembayaran kepada Wisatawan Asing bersangkutan berupa tanda bukti pembayaran digital atau fisik.",
-      "penalties": "Tidak mengatur sanksi."
+      "penalties": "Tidak mengatur sanksi.",
+      "text_en": "(1) Payment of the Levy shall be made prior to entering entry arrival gates into Bali. (2) Payment as referred to in paragraph (1) shall be conducted through the Love Bali System or other systems integrated with the Love Bali System. (3) Payment of the Levy through the Love Bali System as referred to in paragraph (2) shall be carried out via the following flow: a. Foreign Tourists access the Love Bali System to fill in data as referred to in Pasal 9 paragraph (2) and process payment; b. Foreign Tourists select the payment method to be used, such as credit card, bank transfer, virtual account, or QRIS; and c. The Love Bali System provides payment status notification and proof of payment to the respective Foreign Tourist in digital or physical format.",
+      "translation_status": "ai-assisted",
+      "title_en": "Levy Payment Flow & Digital Verification (Love Bali)",
+      "penalties_en": "Entry denied or digital inspection red flag at arrival checkpoints if digital proof is absent.",
+      "category_en": "Levy Payment Process",
+      "tier_label_en": "Regional Statutory Law",
+      "status_note_en": "Pasal ini tidak termasuk yang diubah Pergub 25/2025.",
+      "source_note_en": "Teks dari PDF resmi; normalisasi hanya pada spasi/format."
     },
     {
       "id": "PERDA_BALI_05_2020_PASAL_6",
@@ -980,7 +1164,15 @@
         "standar daya tarik wisata"
       ],
       "text": "(1) Pengelola DTW wajib memenuhi standar meliputi: a. DTW alam, DTW budaya dan DTW spiritual memiliki usaha yang berbadan hukum atau ditetapkan dengan keputusan Bupati/Walikota; dan b. DTW buatan memiliki usaha yang berbadan hukum. (2) Pengelola DTW wajib memenuhi standar meliputi: a. mengutamakan sumber daya lokal; b. menyediakan papan informasi dan tata tertib memasuki lokasi, paling sedikit dalam 3 (tiga) bahasa yaitu Bahasa Bali, Bahasa Indonesia dan Bahasa Inggris; c. memiliki petugas pemberi informasi; d. memiliki informasi tentang DTW; e. memiliki fasilitas pertolongan pertama pada kecelakaan; f. memiliki loket penjualan tiket/karcis; g. memiliki petugas yang menangani keamanan; h. memiliki petugas yang menangani parkir; i. memiliki petugas yang menangani kebersihan; j. memiliki fasilitas bagi penyandang difabelitas; k. memiliki fasilitas parkir; l. memiliki fasilitas tempat sampah yang cukup memadai dan pengelolaan limbah; m. memiliki toilet yang memenuhi standar kebersihan, kesehatan, keamanan, dan kenyamanan; dan n. memiliki usaha penunjang DTW seperti artshop, restoran, warung, dan lain-lain yang ditempatkan di sekitar tempat parkir. (3) Selain memenuhi standar sebagaimana dimaksud pada ayat (2), Pengelola DTW alam wajib memenuhi standar tambahan, meliputi: a. menerapkan standar keamanan, keselamatan dan kesehatan bagi Wisatawan; b. menyediakan rambu–rambu tentang keselamatan dan keamanan berwisata; dan c. melindungi dan melestarikan lingkungan DTW alam. (4) Selain memenuhi standar sebagaimana dimaksud pada ayat (2), Pengelola DTW buatan wajib memenuhi standar tambahan, meliputi: a. memperhatikan kearifan lokal; b. menjaga keharmonisan dengan masyarakat sekitar; c. memiliki standar operasional prosedur; d. menyediakan tempat untuk promosi dan pemasaran produk lokal; e. menyediakan fasilitas kesehatan; f. memiliki jalur masuk dan jalur keluar yang berbeda; dan g. memiliki ruang tunggu yang nyaman disekitar tempat parkir.",
-      "penalties": "Sanksi administratif sesuai ketentuan."
+      "penalties": "Sanksi administratif sesuai ketentuan.",
+      "text_en": "(1) Managers of Tourist Attractions (DTW) are required to satisfy standards including: a. natural DTW, cultural DTW, and spiritual DTW must possess a legal corporate entity or be designated by Regent/Mayor decree; and b. man-made DTW must possess a legal corporate entity. (2) Managers of Tourist Attractions (DTW) are required to satisfy standards including: a. prioritizing local resources; b. providing information boards and code of conduct for entry, at minimum in 3 (three) languages: Balinese, Indonesian, and English; c. having designated information officers; d. having informational materials regarding the attraction; e. having first aid facilities; f. having ticket counters; g. having security personnel; h. having parking management staff; i. having sanitation and cleaning staff; j. providing facilities for persons with disabilities; k. providing parking facilities; l. providing adequate waste bins and waste management facilities; m. providing public toilets fulfilling standards of cleanliness, health, safety, and comfort; and n. maintaining supporting amenities such as artshops, restaurants, food stalls, situated adjacent to the parking area. (3) Beyond meeting the standards referred to in paragraph (2), Managers of natural DTW must satisfy additional standards: a. implementing security, safety, and health standards for Tourists; b. providing safety and security signage; and c. protecting and conserving the natural DTW environment. (4) Beyond meeting the standards referred to in paragraph (2), Managers of man-made DTW must satisfy additional standards: a. observing local wisdom; b. maintaining harmony with surrounding communities; c. establishing standard operating procedures; d. providing spaces for promotion and marketing of local products; e. providing health facilities; f. having separate entry and exit pathways; and g. providing comfortable waiting rooms adjacent to parking areas.",
+      "translation_status": "ai-assisted",
+      "title_en": "DTW Management Standards & Tri-Lingual Signage Requirements",
+      "penalties_en": "Administrative sanctions, written warning, and temporary closure or suspension of destination operational permits.",
+      "category_en": "Tourist Destination Management Standards",
+      "tier_label_en": "Regional Statutory Law",
+      "status_note_en": "Berlaku.",
+      "source_note_en": "Teks dari PDF resmi; normalisasi hanya pada spasi/format."
     },
     {
       "id": "PERDA_BALI_05_2020_PASAL_7",
@@ -1020,7 +1212,15 @@
         "memanfaatkan pura sebagai dtw"
       ],
       "text": "(1) Setiap orang dilarang merusak sebagian atau seluruh fisik dan non-fisik DTW. (2) Setiap orang dilarang memanfaatkan pura, pretima, simbol keagamaan, benda-benda yang disakralkan sebagaimana dimaksud dalam Peraturan Perundang-undangan terkait, dengan tujuan semata-mata sebagai DTW. (3) Setiap orang dilarang mendirikan bangunan atau benda lainnya yang dapat menghalangi atau mengganggu pandangan ke arah lanskap atau saujana yang menjadi DTW.",
-      "penalties": "Sanksi sesuai ketentuan."
+      "penalties": "Sanksi sesuai ketentuan.",
+      "text_en": "(1) Every person is prohibited from damaging partial or entire physical and non-physical elements of Tourist Attractions (DTW). (2) Every person is prohibited from utilizing Pura (temples), Pratima (sacred effigies), religious symbols, or sanctified sacred objects solely as tourist attractions. (3) Every person is prohibited from erecting structures or objects that obstruct or disturb visual viewscapes or cultural landscapes (saujana) designated as Tourist Attractions.",
+      "translation_status": "ai-assisted",
+      "title_en": "Prohibition of Desecration or Damage to Tourist Destinations & Sacred Sites",
+      "penalties_en": "Revocation of operational license, obligation to perform Ngayap/Tepung Tawar customary purification ceremonies, and criminal referral.",
+      "category_en": "Prohibition of Tourist Destination Damage",
+      "tier_label_en": "Regional Statutory Law",
+      "status_note_en": "Berlaku.",
+      "source_note_en": "Teks dari PDF resmi; normalisasi hanya pada spasi/format."
     },
     {
       "id": "PERDA_BALI_05_2020_PASAL_25",
@@ -1060,7 +1260,15 @@
         "teknologi pemandu wisata"
       ],
       "text": "(1) Penyelenggaraan pariwisata digital budaya Bali, meliputi: a. inspirasi Pariwisata; b. kedatangan wisatawan; c. destinasi dan kegiatan Pariwisata; d. perlakuan wisatawan pasca-kunjungan; e. Portal Satu Pintu Pariwisata Bali; dan f. dokumentasi digital Kepariwisataan Budaya Bali. (2) Inspirasi Pariwisata sebagaimana dimaksud pada ayat (1) huruf a, meliputi: a. Destinasi Pariwisata Digital; b. siaran langsung atraksi untuk lingkungan Sad Kerthi, seni dan budaya; c. pariwisata digital dengan teknologi realitas tertambah (augmented reality), dan realitas maya (virtual reality); d. informasi paket tour cerdas; e. promosi Pariwisata digital; dan f. teknologi digital lainnya yang dapat memberikan inspirasi untuk Pariwisata Budaya Bali. (3) Kedatangan Wisatawan sebaimana dimaksud pada ayat (1) huruf b, meliputi: a. keanggotaan elektronik (e-membership) Pariwisata Digital Bali; b. teknologi digital untuk pemandu kedatangan wisatawan; c. teknologi digital untuk Sistem Keamanan Terpadu Wisatawan; d. layanan digital reservasi Hotel; e. layanan digital transportasi online dan Desa Adat; f. pasar digital (marketplace) Pariwisata Bali; dan g. teknologi atau layanan digital lainnya untuk kedatangan Wisatawan. (4) Destinasi dan kegiatan Wisata sebagaimana dimaksud pada ayat (1) huruf c, meliputi: a. tiket elektronik (e-ticketing) destinasi dan pertunjukkan Wisata; b. teknologi digital untuk pemandu dan eksplorasi destinasi Wisata; c. presentasi layar sentuh untuk situs dan kegiatan sakral; d. Layanan Ekosistem tertutup Pariwisata berbasis non-tunai (cashless) terintegerasi dengan sistem pajak hotel dan restoran; e. testimoni Obyek Wisata berbasis penghargaan; dan f. teknologi digital lainnya untuk destinasi dan aktivitas Wisata. (5) Perlakuan wisatawan pasca-perjalanan, dengan manajemen hubungan pelanggan terintegrasi, meliputi: a. indeks kepuasan Wisatawan; b. program loyalitas Wisatawan; dan c. sistem penghargaan Wisatawan.",
-      "penalties": "Sanksi sesuai ketentuan."
+      "penalties": "Sanksi sesuai ketentuan.",
+      "text_en": "(1) The implementation of digital Balinese cultural tourism includes: a. Tourism inspiration; b. tourist arrival; c. tourism destinations and activities; d. post-visit tourist engagement; e. Bali Tourism Single-Door Portal; and f. digital documentation of Balinese Cultural Tourism. (2) Tourism inspiration as referred to in paragraph (1) letter a includes: a. Digital Tourism Destinations; b. live broadcasting of attractions for Sad Kerthi environment, arts, and culture; c. digital tourism utilizing augmented reality and virtual reality technologies; d. smart tour package information; e. digital tourism promotion; and f. other digital technologies providing inspiration for Balinese Cultural Tourism. (3) Tourist arrival as referred to in paragraph (1) letter b includes: a. electronic membership (e-membership) for Bali Digital Tourism; b. digital guidance technologies for arriving tourists; c. digital technologies for Integrated Tourist Security Systems; d. digital hotel reservation services; e. digital online transport services and Customary Village (Desa Adat) transport; f. Bali Tourism digital marketplace; and g. other digital technologies or services for arriving Tourists. (4) Tourism destinations and activities as referred to in paragraph (1) letter c include: a. electronic ticketing (e-ticketing) for tourist destinations and performances; b. digital guiding and exploration technologies for destinations; c. touchscreen presentations for sacred sites and rituals; d. cashless closed tourism ecosystem services integrated with hotel and restaurant tax systems; e. reward-based tourist destination reviews; and f. other digital technologies for tourist destinations and activities. (5) Post-trip tourist engagement with integrated customer relationship management includes: a. Tourist satisfaction index; b. Tourist loyalty programs; and c. Tourist reward systems.",
+      "translation_status": "ai-assisted",
+      "title_en": "Digital Cultural Tourism Governance & Technologies",
+      "penalties_en": "Exclusion from the official Bali Digital Tourism single portal and revocation of verified partner status.",
+      "category_en": "Digital Tourism Provisions",
+      "tier_label_en": "Regional Statutory Law",
+      "status_note_en": "Berlaku.",
+      "source_note_en": "Teks dari PDF resmi; normalisasi hanya pada spasi/format."
     },
     {
       "id": "PERDA_BALI_05_2020_PASAL_26",
@@ -1099,7 +1307,15 @@
         "integrasi pembayaran nontunai cashless"
       ],
       "text": "(1) Gubernur membentuk Portal Satu Pintu Pariwisata Bali untuk mengintegrasikan seluruh pemangku kepentingan pariwisata yang terdiri dari usaha jasa pariwisata, pemerintah, dan masyarakat. (2) Portal Satu Pintu Pariwisata Bali sebagaimana dimaksud pada ayat (1), meliputi: a. reservasi hotel/penginapan; b. tiket elektronik (e-ticketing) destinasi wisata; c. transportasi online; d. pasar digital (marketplace) Pariwisata Bali; e. integrasi pembayaran non-tunai (cashless); dan f. bidang lain sesuai dengan perkembangan industri pariwisata Bali. (3) Ketentuan mengenai Portal Satu Pintu Pariwisata Bali sebagaimana dimaksud pada ayat (2) diatur dalam Peraturan Gubernur.",
-      "penalties": "Sanksi sesuai ketentuan."
+      "penalties": "Sanksi sesuai ketentuan.",
+      "text_en": "(1) The Governor shall establish the Bali Tourism Single-Door Portal to integrate all tourism stakeholders comprising tourism business enterprises, government, and society. (2) The Bali Tourism Single-Door Portal as referred to in paragraph (1) encompasses: a. hotel/accommodation reservations; b. electronic ticketing (e-ticketing) for tourist destinations; c. online transportation; d. Bali Tourism digital marketplace; e. cashless payment integration; and f. other fields in accordance with developments in the Bali tourism industry. (3) Provisions regarding the Bali Tourism Single-Door Portal as referred to in paragraph (2) shall be regulated in a Governor Regulation.",
+      "translation_status": "ai-assisted",
+      "title_en": "Bali Tourism Single-Door Portal (Portal Satu Pintu)",
+      "penalties_en": "Non-compliant tourism operators barred from participating in official regional marketing and booking integration.",
+      "category_en": "Single-Door Tourism Digital Portal",
+      "tier_label_en": "Regional Statutory Law",
+      "status_note_en": "Berlaku.",
+      "source_note_en": "Teks dari PDF resmi; normalisasi hanya pada spasi/format."
     },
     {
       "id": "PERGUB_BALI_25_2020_PASAL_3_4",
@@ -1138,7 +1354,15 @@
         "larangan dan sanksi"
       ],
       "text": "Ruang lingkup Peraturan Gubernur ini, meliputi: a. fasilitasi pelindungan Pura; b. fasilitasi pelindungan Pratima; c. fasilitasi pelindungan Simbol Keagamaan; d. larangan dan sanksi; e. penghargaan; f. pembinaan, pengawasan, dan koordinasi; dan g. pendanaan. Pasal 4 Fasilitasi Pelindungan Pura, Pratima, dan Simbol Keagamaan sebagaimana dimaksud dalam Pasal 3 huruf a, huruf b, dan huruf c dilakukan dengan cara: a. inventarisasi; b. pengamanan; c. pemeliharaan; d. penyelamatan; dan e. publikasi.",
-      "penalties": "Sanksi adat/administratif sesuai ketentuan."
+      "penalties": "Sanksi adat/administratif sesuai ketentuan.",
+      "text_en": "The scope of this Governor Regulation encompasses: a. facilitation of Pura protection; b. facilitation of Pratima protection; c. facilitation of Religious Symbol protection; d. prohibitions and sanctions; e. awards and recognition; f. guidance, supervision, and coordination; and g. funding. Pasal 4 Facilitation of the Protection of Pura, Pratima, and Religious Symbols as referred to in Pasal 3 letter a, letter b, and letter c is executed through: a. inventorying; b. securing; c. maintenance; d. safeguarding and salvage; and e. publication.",
+      "translation_status": "ai-assisted",
+      "title_en": "Scope & Methods of Sacred Temple Protection Facilitation",
+      "penalties_en": "Administrative revocation of regional financial support and exclusion from government preservation grants.",
+      "category_en": "Temple Protection Facilitation",
+      "tier_label_en": "Regional Statutory Law",
+      "status_note_en": "Berlaku.",
+      "source_note_en": "Teks dari PDF resmi; normalisasi hanya pada spasi/format."
     },
     {
       "id": "PERGUB_BALI_25_2020_PASAL_10",
@@ -1179,7 +1403,15 @@
         "tinggalan cagar budaya"
       ],
       "text": "(1) Pengamanan Pura sebagaimana dimaksud dalam Pasal 5 ayat (1) huruf a, huruf b, huruf c, huruf d, dan huruf e dilakukan untuk mencegah kerusakan, pengerusakan, penodaan, dan penyalahgunaan Pura. (2) Pengamanan Pura sebagaimana dimaksud pada ayat (1) dilakukan oleh Pengempon Pura bekerjasama dengan Desa Adat dan Perangkat Daerah. (3) Pengamanan Pura sebagaimana dimaksud pada ayat (1) dilakukan dengan melestarikan keberadaan Pura yang memiliki nilai sejarah dan/atau tinggalan terduga cagar budaya. (4) Pelestarian sebagaimana dimaksud pada ayat (3) dilakukan secara proaktif oleh Pengempon atau masyarakat dengan melaporkan keberadaan Pura yang memiliki nilai sejarah dan/atau tinggalan terduga cagar budaya kepada instansi yang terkait. (5) Setiap orang beragama Hindu dapat ikut serta dalam melakukan pengamanan Pura setelah mendapat persetujuan dari Pengempon Pura, Desa Adat dan Perangkat Daerah.",
-      "penalties": "Sanksi adat/administratif sesuai ketentuan."
+      "penalties": "Sanksi adat/administratif sesuai ketentuan.",
+      "text_en": "(1) Safeguarding of Pura as referred to in Pasal 5 paragraph (1) letter a, letter b, letter c, letter d, and letter e is conducted to prevent damage, desecration, profanation, and misuse of Pura. (2) Safeguarding of Pura as referred to in paragraph (1) is carried out by Pengempon Pura (temple custodians) in cooperation with the Customary Village (Desa Adat) and Regional Apparatus. (3) Safeguarding of Pura as referred to in paragraph (1) is carried out by preserving the existence of Pura possessing historical value and/or suspected cultural heritage vestiges. (4) Preservation as referred to in paragraph (3) is proactively conducted by Pengempon or the public by reporting Pura possessing historical value and/or suspected cultural heritage vestiges to relevant institutions. (5) Every Hindu follower may participate in safeguarding Pura upon receiving authorization from Pengempon Pura, the Customary Village, and Regional Apparatus.",
+      "translation_status": "ai-assisted",
+      "title_en": "Proactive Security & Community Protection of Temples",
+      "penalties_en": "Customary warning, removal from temple grounds, and civil/criminal liability for unauthorized alterations.",
+      "category_en": "Temple Security & Protection",
+      "tier_label_en": "Regional Statutory Law",
+      "status_note_en": "Berlaku.",
+      "source_note_en": "Teks dari PDF resmi; normalisasi hanya pada spasi/format."
     },
     {
       "id": "UU_40_2008_PASAL_1",
@@ -1228,7 +1460,15 @@
         "wisatawan domestik"
       ],
       "text": "Diskriminasi ras dan etnis adalah segala bentuk pembedaan, pengecualian, pembatasan, atau pemilihan berdasarkan pada ras dan etnis, yang mengakibatkan pencabutan atau pengurangan pengakuan, perolehan, atau pelaksanaan hak asasi manusia dan kebebasan dasar dalam suatu kesetaraan di bidang sipil, politik, ekonomi, sosial, dan budaya.",
-      "penalties": "Tidak mengatur sanksi."
+      "penalties": "Tidak mengatur sanksi.",
+      "text_en": "Racial and ethnic discrimination is any distinction, exclusion, restriction, or preference based on race and ethnicity that has the purpose or effect of nullifying or impairing the recognition, enjoyment, or exercise, on an equal footing, of human rights and fundamental freedoms in the civil, political, economic, social, and cultural fields.",
+      "translation_status": "ai-assisted",
+      "title_en": "Statutory Definition of Racial & Ethnic Discrimination",
+      "penalties_en": "Statutory legal basis defining discriminatory acts subject to civil action, human rights intervention, and criminal penalties under this Law.",
+      "category_en": "Racial & Ethnic Discrimination Definition",
+      "tier_label_en": "National Statutory Law",
+      "status_note_en": "Berlaku.",
+      "source_note_en": "Teks dari PDF resmi; normalisasi hanya pada spasi/format."
     },
     {
       "id": "UU_40_2008_PASAL_4",
@@ -1277,7 +1517,15 @@
         "perlakuan berbeda"
       ],
       "text": "Tindakan diskriminatif ras dan etnis berupa: a. memperlakukan pembedaan, pengecualian, pembatasan, atau pemilihan berdasarkan pada ras dan etnis, yang mengakibatkan pencabutan atau pengurangan pengakuan, perolehan, atau pelaksanaan hak asasi manusia dan kebebasan dasar dalam suatu kesetaraan di bidang sipil, politik, ekonomi, sosial, dan budaya; atau b. menunjukkan kebencian atau rasa benci kepada orang karena perbedaan ras dan etnis yang berupa perbuatan: 1. membuat tulisan atau gambar untuk ditempatkan, ditempelkan, atau disebarluaskan di tempat umum atau tempat lainnya yang dapat dilihat atau dibaca oleh orang lain; 2. berpidato, mengungkapkan, atau melontarkan kata-kata tertentu di tempat umum atau tempat lainnya yang dapat didengar orang lain; 3. mengenakan sesuatu pada dirinya berupa benda, kata-kata, atau gambar di tempat umum atau tempat lainnya yang dapat dibaca oleh orang lain; atau 4. melakukan perampasan nyawa orang, penganiayaan, pemerkosaan, perbuatan cabul, pencurian dengan kekerasan, atau perampasan kemerdekaan berdasarkan diskriminasi ras dan etnis.",
-      "penalties": "Pidana sesuai Pasal 15-17."
+      "penalties": "Pidana sesuai Pasal 15-17.",
+      "text_en": "Racial and ethnic discriminatory acts include: a. applying distinction, exclusion, restriction, or preference based on race and ethnicity that results in revocation or impairment of the recognition, enjoyment, or exercise of human rights and fundamental freedoms on equal terms in civil, political, economic, social, and cultural fields; or b. manifesting hatred or feelings of enmity toward persons due to racial and ethnic differences through acts of: 1. making writings or images to be placed, affixed, or disseminated in public places or other venues visible or legible to others; 2. delivering speeches, expressing, or uttering specific statements in public places or other venues audible to others; 3. wearing or displaying objects, words, or images on one's person in public places or other venues legible to others; or 4. committing deprivation of life, assault, rape, lewd acts, robbery with violence, or deprivation of liberty grounded in racial and ethnic discrimination.",
+      "translation_status": "ai-assisted",
+      "title_en": "Prohibited Discriminatory Acts & Public Hate Expressions",
+      "penalties_en": "Subject to criminal sanctions of 1 to 5 years imprisonment and heavy fines under Articles 15 to 17 of this Law.",
+      "category_en": "Forms of Discrimination",
+      "tier_label_en": "National Statutory Law",
+      "status_note_en": "Berlaku.",
+      "source_note_en": "Teks dari PDF resmi; normalisasi hanya pada spasi/format."
     },
     {
       "id": "UU_40_2008_PASAL_15",
@@ -1323,7 +1571,15 @@
         "pasal 244 KUHP baru pengganti"
       ],
       "text": "Setiap orang yang dengan sengaja melakukan pembedaan, pengecualian, pembatasan, atau pemilihan berdasarkan pada ras dan etnis yang mengakibatkan pencabutan atau pengurangan pengakuan, perolehan atau pelaksanaan hak asasi manusia dan kebebasan dasar dalam suatu kesetaraan di bidang sipil, politik, ekonomi, sosial, dan budaya sebagaimana dimaksud dalam Pasal 4 huruf a, dipidana dengan pidana penjara paling lama 1 (satu) tahun dan/atau denda paling banyak Rp100.000.000,00 (seratus juta rupiah).",
-      "penalties": "Pidana penjara paling lama 1 tahun dan/atau denda."
+      "penalties": "Pidana penjara paling lama 1 tahun dan/atau denda.",
+      "text_en": "Every person who intentionally conducts distinction, exclusion, restriction, or preference based on race and ethnicity resulting in revocation or impairment of recognition, enjoyment, or exercise of human rights and fundamental freedoms on equal terms in civil, political, economic, social, and cultural fields as referred to in Pasal 4 letter a, shall be sentenced to imprisonment for a maximum of 1 (satu) year and/or a maximum fine of Rp100.000.000,00 (seratus juta rupiah).",
+      "translation_status": "ai-assisted",
+      "title_en": "Criminal Sanction for Racial/Ethnic Discrimination",
+      "penalties_en": "Imprisonment for a maximum of 1 year and/or maximum fine of Rp100,000,000.",
+      "category_en": "Criminal Sanctions for Discrimination",
+      "tier_label_en": "National Statutory Law",
+      "status_note_en": "Berlaku.",
+      "source_note_en": "Teks dari PDF resmi; normalisasi hanya pada spasi/format."
     },
     {
       "id": "UU_40_2008_PASAL_16_17",
@@ -1370,7 +1626,15 @@
         "sanksi ujaran kebencian"
       ],
       "text": "Pasal 16: Setiap orang yang dengan sengaja menunjukkan kebencian atau rasa benci kepada orang lain berdasarkan diskriminasi ras dan etnis sebagaimana dimaksud dalam Pasal 4 huruf b angka 1, angka 2, atau angka 3, dipidana dengan pidana penjara paling lama 5 (lima) tahun dan/atau denda paling banyak Rp500.000.000,00 (lima ratus juta rupiah). Pasal 17: Setiap orang yang dengan sengaja melakukan perampasan nyawa orang, penganiayaan, pemerkosaan, perbuatan cabul, pencurian dengan kekerasan, atau perampasan kemerdekaan berdasarkan diskriminasi ras dan etnis sebagaimana dimaksud dalam Pasal 4 huruf b angka 4, dipidana sesuai dengan ketentuan peraturan perundang-undangan ditambah dengan 1/3 (sepertiga) dari masing-masing ancaman pidana maksimumnya.",
-      "penalties": "Pidana penjara dan/atau denda sesuai pasal."
+      "penalties": "Pidana penjara dan/atau denda sesuai pasal.",
+      "text_en": "Pasal 16: Every person who intentionally demonstrates hatred or animosity toward others based on racial and ethnic discrimination as referred to in Pasal 4 letter b point 1, point 2, or point 3, shall be sentenced to imprisonment for a maximum of 5 (lima) years and/or a maximum fine of Rp500.000.000,00 (lima ratus juta rupiah). Pasal 17: Every person who intentionally commits deprivation of life, assault, rape, lewd acts, robbery with violence, or deprivation of liberty grounded in racial and ethnic discrimination as referred to in Pasal 4 letter b point 4, shall be penalized in accordance with statutory penal provisions with an additional 1/3 (sepertiga) added to respective maximum statutory penalties.",
+      "translation_status": "ai-assisted",
+      "title_en": "Criminal Penalties for Public Hate Propaganda & Violent Discrimination",
+      "penalties_en": "Imprisonment up to 5 years and/or fine up to Rp500,000,000; violent crimes incur sentence enhanced by one-third (1/3).",
+      "category_en": "Criminal Sanctions for Hate & Violence",
+      "tier_label_en": "National Statutory Law",
+      "status_note_en": "Berlaku.",
+      "source_note_en": "Teks dari PDF resmi; normalisasi hanya pada spasi/format."
     },
     {
       "id": "UU_01_2024_PASAL_28_2",
@@ -1421,7 +1685,15 @@
         "pendatang"
       ],
       "text": "Setiap Orang dengan sengaja dan tanpa hak mendistribusikan dan/atau mentransmisikan Informasi Elektronik dan/atau Dokumen Elektronik yang sifatnya menghasut, mengajak, atau memengaruhi orang lain sehingga menimbulkan rasa kebencian atau permusuhan terhadap individu dan/atau kelompok masyarakat tertentu berdasarkan ras, kebangsaan, etnis, warna kulit, agama, kepercayaan, jenis kelamin, disabilitas mental, atau disabilitas fisik.",
-      "penalties": "Pidana diatur Pasal 45A ayat (2)."
+      "penalties": "Pidana diatur Pasal 45A ayat (2).",
+      "text_en": "Any Person who intentionally and without authorization distributes and/or transmits Electronic Information and/or Electronic Documents that are instigative, solicitous, or inciting in nature toward other persons so as to provoke feelings of hatred or hostility against specific individuals and/or community groups based on race, nationality, ethnicity, skin color, religion, belief, gender, mental disability, or physical disability.",
+      "translation_status": "ai-assisted",
+      "title_en": "Prohibition of Electronic Hate Speech & Incitement (ITE Law)",
+      "penalties_en": "Imprisonment up to 6 years and/or fine up to Rp1,000,000,000 under Pasal 45A paragraph (2) of the ITE Law.",
+      "category_en": "Prohibition of Electronic Hate Speech",
+      "tier_label_en": "National Statutory Law",
+      "status_note_en": "Berlaku sejak 2 Januari 2024.",
+      "source_note_en": "Teks dari PDF resmi; normalisasi hanya pada spasi/format."
     },
     {
       "id": "UU_01_2024_PASAL_45A_2",
@@ -1467,7 +1739,15 @@
         "pasal 45A ayat 2"
       ],
       "text": "Setiap Orang yang dengan sengaja dan tanpa hak mendistribusikan dan/atau mentransmisikan Informasi Elektronik dan/atau Dokumen Elektronik yang sifatnya menghasut, mengajak, atau memengaruhi orang lain sehingga menimbulkan rasa kebencian atau permusuhan terhadap individu dan/atau kelompok masyarakat tertentu berdasarkan ras, kebangsaan, etnis, warna kulit, agama, kepercayaan, jenis kelamin, disabilitas mental, atau disabilitas fisik sebagaimana dimaksud dalam Pasal 28 ayat (2) dipidana dengan pidana penjara paling lama 6 (enam) tahun dan/atau denda paling banyak Rp1.000.000.000,00 (satu miliar rupiah).",
-      "penalties": "Pidana penjara paling lama 6 tahun dan/atau denda Rp1.000.000.000."
+      "penalties": "Pidana penjara paling lama 6 tahun dan/atau denda Rp1.000.000.000.",
+      "text_en": "Any Person who fulfills the elements referred to in Pasal 28 paragraph (2) shall be sentenced to imprisonment for a maximum of 6 (enam) years and/or a fine of at most Rp1.000.000.000,00 (satu miliar rupiah).",
+      "translation_status": "ai-assisted",
+      "title_en": "Criminal Penalties for Electronic Hate Speech & Hostility (ITE Law)",
+      "penalties_en": "Imprisonment for a maximum of 6 years and/or a maximum fine of Rp1,000,000,000.",
+      "category_en": "Criminal Sanctions for Electronic Hate Speech",
+      "tier_label_en": "National Statutory Law",
+      "status_note_en": "Berlaku sejak 2 Januari 2024.",
+      "source_note_en": "Teks dari PDF resmi; normalisasi hanya pada spasi/format."
     },
     {
       "id": "UU_01_2023_PASAL_242",
@@ -1514,7 +1794,15 @@
         "pernyataan kebencian di muka umum"
       ],
       "text": "Setiap Orang yang Di Muka Umum menyatakan perasaan permusuhan, kebencian, atau penghinaan terhadap satu atau beberapa golongan atau kelompok penduduk Indonesia berdasarkan ras, kebangsaan, etnis, warna kulit, jenis kelamin, disabilitas mental, atau disabilitas fisik, dipidana dengan pidana penjara paling lama 3 (tiga) tahun atau pidana denda paling banyak kategori IV.",
-      "penalties": "Pidana penjara paling lama 3 tahun atau denda kategori IV."
+      "penalties": "Pidana penjara paling lama 3 tahun atau denda kategori IV.",
+      "text_en": "Any Person who in Public expresses feelings of hostility, hatred, or contempt toward one or several groups or classes of the Indonesian population based on race, nationality, ethnicity, skin color, gender, mental disability, or physical disability, shall be sentenced to imprisonment for a maximum of 3 (tiga) years or a category IV fine.",
+      "translation_status": "ai-assisted",
+      "title_en": "Criminal Prohibition of Public Expression of Hostility & Contempt",
+      "penalties_en": "Imprisonment for a maximum of 3 years or category IV fine (up to Rp200,000,000).",
+      "category_en": "Criminal Sanctions for Public Hostility",
+      "tier_label_en": "National Statutory Law",
+      "status_note_en": "Berlaku efektif 2 Januari 2026.",
+      "source_note_en": "Teks dari PDF resmi; normalisasi hanya pada spasi/format."
     },
     {
       "id": "UU_01_2023_PASAL_243",
@@ -1562,7 +1850,15 @@
         "pengganti pasal 28 ayat 2 ITE"
       ],
       "text": "(1) Setiap Orang yang menyiarkan, mempertunjukkan, atau menempelkan tulisan atau gambar sehingga terlihat oleh umum atau memperdengarkan rekaman sehingga terdengar oleh umum atau menyebarluaskan dengan sarana teknologi informasi, yang berisi pernyataan perasaan permusuhan dengan maksud agar isinya diketahui atau lebih diketahui oleh umum, terhadap satu atau beberapa golongan atau kelompok penduduk Indonesia berdasarkan ras, kebangsaan, etnis, warna kulit, agama, kepercayaan, jenis kelamin, disabilitas mental, atau disabilitas fisik yang berakibat timbulnya Kekerasan terhadap orang atau Barang, dipidana dengan pidana penjara paling lama 4 (empat) tahun atau pidana denda paling banyak kategori IV.",
-      "penalties": "Pidana penjara paling lama 4 tahun atau denda kategori IV."
+      "penalties": "Pidana penjara paling lama 4 tahun atau denda kategori IV.",
+      "text_en": "(1) Any Person who broadcasts, exhibits, or affixes writings or images so that they are visible to the public or plays recordings so that they are audible to the public or disseminates through information technology means, containing expressions of hostility with the intent that their content be known or more widely known to the public, toward one or several groups or classes of the Indonesian population based on race, nationality, ethnicity, skin color, religion, belief, gender, mental disability, or physical disability that results in the occurrence of Violence against persons or Property, shall be sentenced to imprisonment for a maximum of 4 (empat) years or a category IV fine.",
+      "translation_status": "ai-assisted",
+      "title_en": "Criminal Penalties for Disseminating Hate Content Leading to Violence",
+      "penalties_en": "Imprisonment for a maximum of 4 years or category IV fine.",
+      "category_en": "Criminal Sanctions for Disseminating Hostility",
+      "tier_label_en": "National Statutory Law",
+      "status_note_en": "Berlaku efektif 2 Januari 2026.",
+      "source_note_en": "Teks dari PDF resmi; normalisasi hanya pada spasi/format."
     },
     {
       "id": "UU_01_2023_PASAL_244_245",
@@ -1608,7 +1904,15 @@
         "pemberatan kekerasan rasial"
       ],
       "text": "Pasal 244: Setiap Orang yang melakukan pembedaan, pengecualian, pembatasan, atau pemilihan berdasarkan pada ras dan etnis yang mengakibatkan pencabutan atau pengurangan pengakuan, perolehan atau pelaksanaan hak asasi manusia dan kebebasan dasar dalam suatu kesetaraan di bidang sipil, politik, ekonomi, sosial, dan budaya, dipidana dengan pidana penjara paling lama 1 (satu) tahun atau pidana denda paling banyak kategori III. Pasal 245: Setiap Orang yang melakukan perampasan nyawa orang, penganiayaan, perkosaan, perbuatan cabul, pencurian dengan Kekerasan, atau perampasan kemerdekaan berdasarkan diskriminasi ras dan etnis, pidananya dapat ditambah 1/3 (satu per tiga).",
-      "penalties": "Pidana penjara/denda sesuai pasal."
+      "penalties": "Pidana penjara/denda sesuai pasal.",
+      "text_en": "Pasal 244: Any Person who conducts distinction, exclusion, restriction, or preference based on race and ethnicity that results in the revocation or impairment of the recognition, enjoyment, or exercise of human rights and fundamental freedoms on equal terms in the civil, political, economic, social, and cultural fields, shall be sentenced to imprisonment for a maximum of 1 (satu) year or a category III fine. Pasal 245: Any Person who commits deprivation of life, assault, rape, lewd acts, theft with Violence, or deprivation of liberty grounded in racial and ethnic discrimination, may have their penalty increased by 1/3 (satu per tiga).",
+      "translation_status": "ai-assisted",
+      "title_en": "Criminal Penalties for Discriminatory Acts & Enhanced Penalties for Violence",
+      "penalties_en": "Imprisonment up to 1 year or category III fine; violent crimes incur sentence enhanced by one-third (1/3).",
+      "category_en": "Criminal Sanctions for Racial & Ethnic Discrimination",
+      "tier_label_en": "National Statutory Law",
+      "status_note_en": "Berlaku efektif 2 Januari 2026.",
+      "source_note_en": "Teks dari PDF resmi; normalisasi hanya pada spasi/format."
     },
     {
       "id": "UU_39_1999_PASAL_1_3",
@@ -1657,7 +1961,15 @@
         "pendatang"
       ],
       "text": "Diskriminasi adalah setiap pembatasan, pelecehan, atau pengucilan yang langsung ataupun tak langsung didasarkan pada pembedaan manusia atas dasar agama, suku, ras, etnik, kelompok, golongan, status sosial, status ekonomi, jenis kelamin, bahasa, keyakinan politik, yang berakibat pengurangan, penyimpangan atau penghapusan pengakuan, pelaksanaan atau penggunaan hak asasi manusia dan kebebasan dasar dalam kehidupan baik individual maupun kolektif dalam bidang politik, ekonomi, hukum, sosial, budaya, dan aspek kehidupan lainnya.",
-      "penalties": "Tidak mengatur sanksi."
+      "penalties": "Tidak mengatur sanksi.",
+      "text_en": "Discrimination is any restriction, harassment, or ostracism, whether direct or indirect, grounded in distinction among human beings on the basis of religion, ethnicity, race, group, class, social status, economic status, gender, language, or political conviction, which results in the impairment, diversion, or nullification of the recognition, exercise, or enjoyment of human rights and fundamental freedoms in life, whether individually or collectively, in the political, economic, legal, social, cultural, and other spheres of life.",
+      "translation_status": "ai-assisted",
+      "title_en": "Statutory Definition of Human Rights Discrimination",
+      "penalties_en": "Actionable violation under National Human Rights Commission (Komnas HAM) statutory mechanisms.",
+      "category_en": "Human Rights Discrimination Definition",
+      "tier_label_en": "National Statutory Law",
+      "status_note_en": "Berlaku.",
+      "source_note_en": "Teks dari PDF resmi; normalisasi hanya pada spasi/format."
     },
     {
       "id": "UU_08_1999_PASAL_4G",
@@ -1707,7 +2019,15 @@
         "perlindungan konsumen"
       ],
       "text": "Hak konsumen adalah: a. hak atas kenyamanan, keamanan, dan keselamatan dalam mengkonsumsi barang dan/atau jasa; b. hak untuk memilih barang dan/atau jasa serta mendapatkan barang dan/atau jasa tersebut sesuai dengan nilai tukar dan kondisi serta jaminan yang dijanjikan; c. hak atas informasi yang benar, jelas, dan jujur mengenai kondisi dan jaminan barang dan/atau jasa; d. hak untuk didengar pendapat dan keluhannya atas barang dan/atau jasa yang digunakan; e. hak untuk mendapatkan advokasi, perlindungan, dan upaya penyelesaian sengketa perlindungan konsumen secara patut; f. hak untuk mendapat pembinaan dan pendidikan konsumen; g. hak untuk diperlakukan atau dilayani secara benar dan jujur serta tidak diskriminatif; h. hak untuk mendapatkan kompensasi, ganti rugi dan/atau penggantian, apabila barang dan/atau jasa yang diterima tidak sesuai dengan perjanjian atau tidak sebagaimana mestinya; i. hak-hak yang diatur dalam ketentuan peraturan perundang-undangan lainnya.",
-      "penalties": "Sanksi sesuai ketentuan."
+      "penalties": "Sanksi sesuai ketentuan.",
+      "text_en": "Consumer rights comprise: a. the right to comfort, security, and safety in consuming goods and/or services; b. the right to choose goods and/or services and to obtain said goods and/or services in accordance with the exchange rate and promised conditions and guarantees; c. the right to true, clear, and honest information regarding the condition and guarantee of goods and/or services; d. the right to have opinions and grievances heard regarding the goods and/or services used; e. the right to obtain proper advocacy, protection, and dispute settlement efforts in consumer protection; f. the right to consumer education and counseling; g. the right to be treated or served properly and honestly without discrimination; h. the right to obtain compensation, redress, and/or reimbursement if the goods and/or services received do not conform to agreement or proper conditions; i. rights regulated under other legislative provisions.",
+      "translation_status": "ai-assisted",
+      "title_en": "Consumer Rights to Fair & Non-Discriminatory Service",
+      "penalties_en": "Administrative sanctions, compensation orders, and civil litigation under Consumer Protection Law.",
+      "category_en": "Non-Discriminatory Consumer Rights",
+      "tier_label_en": "National Statutory Law",
+      "status_note_en": "Berlaku.",
+      "source_note_en": "Teks dari PDF resmi; normalisasi hanya pada spasi/format."
     },
     {
       "id": "UU_22_2009_PASAL_77_281",
@@ -1744,7 +2064,15 @@
       "text": "Pasal 77 (1) Setiap orang yang mengemudikan Kendaraan Bermotor di Jalan wajib memiliki Surat Izin Mengemudi sesuai dengan jenis Kendaraan Bermotor yang dikemudikan. Pasal 281 Setiap orang yang mengemudikan Kendaraan Bermotor di Jalan yang tidak memiliki Surat Izin Mengemudi sebagaimana dimaksud dalam Pasal 77 ayat (1) dipidana dengan pidana kurungan paling lama 4 (empat) bulan atau denda paling banyak Rp1.000.000,00 (satu juta rupiah).",
       "penalties": "Pidana kurungan paling lama 4 (empat) bulan atau denda paling banyak Rp1.000.000,00 (satu juta rupiah). Jika memiliki SIM namun tidak dapat menunjukkannya saat pemeriksaan, dipidana kurungan paling lama 1 bulan atau denda paling banyak Rp250.000,00 (Pasal 288 ayat 2).",
       "document_id": "uu-22-2009",
-      "text_status": "verbatim"
+      "text_status": "verbatim",
+      "text_en": "Pasal 77\n(1) Every person who drives a Motor Vehicle on the Road is required to have a Driving License (Surat Izin Mengemudi - SIM) corresponding to the type of Motor Vehicle being driven.\n\nPasal 281\nEvery person who drives a Motor Vehicle on the Road without having a Driving License (Surat Izin Mengemudi - SIM) as referred to in Pasal 77 paragraph (1) shall be punished with imprisonment for a maximum of 4 (four) months or a fine of at most Rp1.000.000,00 (one million rupiah).",
+      "translation_status": "ai-assisted",
+      "title_en": "Mandatory Driving License (SIM) for Motor Vehicles (Articles 77 & 281)",
+      "penalties_en": "Imprisonment for a maximum of 4 (four) months or a maximum fine of Rp1.000.000,00 (one million rupiah).",
+      "category_en": "Driver Obligations & Driving License (SIM)",
+      "tier_label_en": "National Statutory Law",
+      "status_note_en": "Berlaku. Pengemudi wajib memiliki SIM sesuai jenis kendaraan; SIM internasional diakui berdasarkan perjanjian bilateral/multilateral (Pasal 85 ayat 4-5).",
+      "source_note_en": "Lembaran Negara RI Tahun 2009 Nomor 96, Tambahan Lembaran Negara RI Nomor 5025."
     },
     {
       "id": "UU_22_2009_PASAL_291",
@@ -1780,7 +2108,15 @@
       "text": "Pasal 106 (8) Setiap orang yang mengemudikan Sepeda Motor dan Penumpang Sepeda Motor wajib mengenakan helm yang memenuhi standar nasional Indonesia. Pasal 291 (1) Setiap orang yang mengemudikan Sepeda Motor tidak mengenakan helm standar nasional Indonesia sebagaimana dimaksud dalam Pasal 106 ayat (8) dipidana dengan pidana kurungan paling lama 1 (satu) bulan atau denda paling banyak Rp250.000,00 (dua ratus lima puluh ribu rupiah). (2) Setiap orang yang mengemudikan Sepeda Motor yang membiarkan penumpangnya tidak mengenakan helm sebagaimana dimaksud dalam Pasal 106 ayat (8) dipidana dengan pidana kurungan paling lama 1 (satu) bulan atau denda paling banyak Rp250.000,00 (dua ratus lima puluh ribu rupiah).",
       "penalties": "Pidana kurungan paling lama 1 (satu) bulan atau denda paling banyak Rp250.000,00 (dua ratus lima puluh ribu rupiah) bagi pengemudi yang tidak mengenakan helm SNI atau membiarkan penumpangnya tidak mengenakan helm SNI.",
       "document_id": "uu-22-2009",
-      "text_status": "verbatim"
+      "text_status": "verbatim",
+      "text_en": "Pasal 106\n(8) Every person who drives a Motorcycle and Motorcycle Passengers are required to wear a helmet that meets Indonesian national standards.\n\nPasal 291\n(1) Every person who drives a Motorcycle without wearing a helmet that meets Indonesian national standards as referred to in Pasal 106 paragraph (8) shall be punished with imprisonment for a maximum of 1 (one) month or a fine of at most Rp250.000,00 (two hundred fifty thousand rupiah).\n(2) Every person who drives a Motorcycle and allows passenger(s) not to wear a helmet as referred to in Pasal 106 paragraph (8) shall be punished with imprisonment for a maximum of 1 (one) month or a fine of at most Rp250.000,00 (two hundred fifty thousand rupiah).",
+      "translation_status": "ai-assisted",
+      "title_en": "Mandatory Standard Helmet for Motorcycle Riders (Articles 106 & 291)",
+      "penalties_en": "Imprisonment for a maximum of 1 (one) month or a maximum fine of Rp250.000,00 (two hundred fifty thousand rupiah).",
+      "category_en": "Motorcycle Riding Safety (Mandatory Helmet)",
+      "tier_label_en": "National Statutory Law",
+      "status_note_en": "Berlaku. Kewajiban mengenakan helm Standar Nasional Indonesia (SNI) bagi pengendara dan penumpang sepeda motor.",
+      "source_note_en": "Lembaran Negara RI Tahun 2009 Nomor 96, Tambahan Lembaran Negara RI Nomor 5025."
     }
   ],
   "documents": [
@@ -1808,7 +2144,8 @@
       "manifest_url_status_http": 200,
       "in_manifest": true,
       "source_check": "pdf_downloaded",
-      "provenance_note": "PDF resmi BPK diunduh dan diperiksa; hanya Pasal 8 ayat (3)-(4) yang dijadikan chunk."
+      "provenance_note": "PDF resmi BPK diunduh dan diperiksa; hanya Pasal 8 ayat (3)-(4) yang dijadikan chunk.",
+      "title_en": "Law of the Republic of Indonesia No. 15/2023 on Bali Province"
     },
     {
       "id": "uu-18-2025",
@@ -1840,7 +2177,8 @@
       "manifest_url_status_http": 200,
       "in_manifest": true,
       "source_check": "pdf_downloaded",
-      "provenance_note": "PDF resmi BPK diunduh. 7 pasal dipilih; Pasal 20 (duplikasi OCR) dan Pasal 24 (klausul tidak lengkap) tidak dimasukkan."
+      "provenance_note": "PDF resmi BPK diunduh. 7 pasal dipilih; Pasal 20 (duplikasi OCR) dan Pasal 24 (klausul tidak lengkap) tidak dimasukkan.",
+      "title_en": "Law of the Republic of Indonesia No. 18/2025 on National Tourism System"
     },
     {
       "id": "uu-11-2010",
@@ -1864,7 +2202,8 @@
       "manifest_url_status_http": 200,
       "in_manifest": true,
       "source_check": "manifest_only",
-      "provenance_note": "Tercatat di manifest; teks belum diunduh/diverifikasi ulang di repo ini."
+      "provenance_note": "Tercatat di manifest; teks belum diunduh/diverifikasi ulang di repo ini.",
+      "title_en": "Law of the Republic of Indonesia No. 11/2010 on Cultural Heritage"
     },
     {
       "id": "uu-22-2009",
@@ -1891,7 +2230,8 @@
       "manifest_url_status_http": 200,
       "in_manifest": true,
       "source_check": "pdf_verified",
-      "provenance_note": "Diunduh dari PDF resmi JDIH BPK (Lembaran Negara RI Tahun 2009 No. 96). Pasal 77 ayat (1), Pasal 281, Pasal 106 ayat (8), dan Pasal 291 diverifikasi verbatim untuk kepatuhan berkendara dan sewa motor."
+      "provenance_note": "Diunduh dari PDF resmi JDIH BPK (Lembaran Negara RI Tahun 2009 No. 96). Pasal 77 ayat (1), Pasal 281, Pasal 106 ayat (8), dan Pasal 291 diverifikasi verbatim untuk kepatuhan berkendara dan sewa motor.",
+      "title_en": "Law of the Republic of Indonesia No. 22/2009 on Road Traffic and Transportation"
     },
     {
       "id": "uu-6-2011",
@@ -1917,7 +2257,8 @@
       "manifest_url_status_http": 200,
       "in_manifest": true,
       "source_check": "existing_corpus_chunk",
-      "provenance_note": "Chunk Pasal 75 sudah ada di korpus Phase 0; URL halaman resmi peraturan.go.id."
+      "provenance_note": "Chunk Pasal 75 sudah ada di korpus Phase 0; URL halaman resmi peraturan.go.id.",
+      "title_en": "Law of the Republic of Indonesia No. 6/2011 on Immigration"
     },
     {
       "id": "se-gubernur-bali-7-2025",
@@ -1941,7 +2282,8 @@
       "manifest_url_status_http": 200,
       "in_manifest": true,
       "source_check": "secondary_source",
-      "provenance_note": "Tidak ada PDF resmi SE ini; artikel BMC hanya sumber sekunder. Tetap registry-only, bukan chunk retrieval."
+      "provenance_note": "Tidak ada PDF resmi SE ini; artikel BMC hanya sumber sekunder. Tetap registry-only, bukan chunk retrieval.",
+      "title_en": "Bali Governor Circular Letter No. 7/2025 on Refinement of Foreign Tourist Standards"
     },
     {
       "id": "perda-bali-2-2025",
@@ -1967,7 +2309,8 @@
       "manifest_url_status_http": 200,
       "in_manifest": true,
       "source_check": "pdf_downloaded",
-      "provenance_note": "PDF resmi BPK diunduh dan diperiksa; Pasal 4A, 5, dan 16A menjadi chunk levy konsolidasi."
+      "provenance_note": "PDF resmi BPK diunduh dan diperiksa; Pasal 4A, 5, dan 16A menjadi chunk levy konsolidasi.",
+      "title_en": "Bali Provincial Regional Regulation No. 2/2025 on Amendments to Regional Regulation No. 6/2023 on Foreign Tourist Levy"
     },
     {
       "id": "perda-bali-6-2023",
@@ -1995,7 +2338,8 @@
       "manifest_url_status_http": 200,
       "in_manifest": true,
       "source_check": "pdf_downloaded",
-      "provenance_note": "Hanya Pasal 12, Pasal 14, dan Penjelasan Umum yang tidak diubah Perda 2/2025 yang dimasukkan."
+      "provenance_note": "Hanya Pasal 12, Pasal 14, dan Penjelasan Umum yang tidak diubah Perda 2/2025 yang dimasukkan.",
+      "title_en": "Bali Provincial Regional Regulation No. 6/2023 on Foreign Tourist Levy for Protection of Culture and Natural Environment"
     },
     {
       "id": "pergub-bali-2-2024",
@@ -2023,7 +2367,8 @@
       "manifest_url_status_http": 200,
       "in_manifest": true,
       "source_check": "pdf_downloaded",
-      "provenance_note": "Hanya Pasal 6, 7, dan 11 yang tidak diubah/dihapus Pergub 25/2025 yang dimasukkan."
+      "provenance_note": "Hanya Pasal 6, 7, dan 11 yang tidak diubah/dihapus Pergub 25/2025 yang dimasukkan.",
+      "title_en": "Bali Governor Regulation No. 2/2024 on Procedures for Foreign Tourist Levy Payment"
     },
     {
       "id": "pergub-bali-25-2025",
@@ -2049,7 +2394,8 @@
       "manifest_url_status_http": 200,
       "in_manifest": true,
       "source_check": "pdf_downloaded",
-      "provenance_note": "PDF resmi BPK diunduh; Pasal 9 dan 12 dijadikan chunk data/waktu pembayaran."
+      "provenance_note": "PDF resmi BPK diunduh; Pasal 9 dan 12 dijadikan chunk data/waktu pembayaran.",
+      "title_en": "Bali Governor Regulation No. 25/2025 on Amendments to Governor Regulation No. 2/2024 on Foreign Tourist Levy Procedures"
     },
     {
       "id": "pergub-bali-36-2023",
@@ -2073,7 +2419,8 @@
       "manifest_url_status_http": 200,
       "in_manifest": true,
       "source_check": "manifest_only",
-      "provenance_note": "Tidak berlaku; sengaja tidak diambil/diindeks sebagai dasar jawaban."
+      "provenance_note": "Tidak berlaku; sengaja tidak diambil/diindeks sebagai dasar jawaban.",
+      "title_en": "Bali Governor Regulation No. 36/2023 on Tourism Governance Guidelines"
     },
     {
       "id": "perda-bali-5-2020",
@@ -2103,7 +2450,8 @@
       "manifest_url_status_http": 200,
       "in_manifest": true,
       "source_check": "pdf_downloaded",
-      "provenance_note": "PDF BPK diunduh; Pasal 6, 7, 15, 25, dan 26 dipilih."
+      "provenance_note": "PDF BPK diunduh; Pasal 6, 7, 15, 25, dan 26 dipilih.",
+      "title_en": "Bali Provincial Regional Regulation No. 5/2020 on Standards for the Implementation of Balinese Cultural Tourism"
     },
     {
       "id": "pergub-bali-52-2021",
@@ -2127,7 +2475,8 @@
       "manifest_url_status_http": 200,
       "in_manifest": true,
       "source_check": "manifest_only",
-      "provenance_note": "Tercatat di manifest; teks belum diunduh/diverifikasi ulang di repo ini."
+      "provenance_note": "Tercatat di manifest; teks belum diunduh/diverifikasi ulang di repo ini.",
+      "title_en": "Bali Governor Regulation No. 52/2021 on Public Order and Community Tranquility"
     },
     {
       "id": "pergub-bali-25-2020",
@@ -2155,7 +2504,8 @@
       "manifest_url_status_http": 200,
       "in_manifest": true,
       "source_check": "pdf_downloaded",
-      "provenance_note": "PDF BPK diunduh; Pasal 3-4, 10, dan 45-46 dipilih."
+      "provenance_note": "PDF BPK diunduh; Pasal 3-4, 10, dan 45-46 dipilih.",
+      "title_en": "Bali Governor Regulation No. 25/2020 on Facilitation of Sacred Temple Protection"
     },
     {
       "id": "perda-bali-2-2023",
@@ -2179,7 +2529,8 @@
       "manifest_url_status_http": 200,
       "in_manifest": true,
       "source_check": "manifest_only",
-      "provenance_note": "Tercatat di manifest; dokumen besar (lampiran peta) belum diambil sebagai chunk."
+      "provenance_note": "Tercatat di manifest; dokumen besar (lampiran peta) belum diambil sebagai chunk.",
+      "title_en": "Bali Provincial Regional Regulation No. 2/2023 on Traditional Balinese Architectural Heritage"
     },
     {
       "id": "seruan-bersama-nyepi-2026",
@@ -2205,7 +2556,8 @@
       "manifest_url_status_http": 200,
       "in_manifest": true,
       "source_check": "existing_corpus_chunk",
-      "provenance_note": "Tidak ada PDF resmi tersendiri; teks portal resmi BMC dipakai, sedangkan chunk korpus adalah kompilasi pedoman tahunan."
+      "provenance_note": "Tidak ada PDF resmi tersendiri; teks portal resmi BMC dipakai, sedangkan chunk korpus adalah kompilasi pedoman tahunan.",
+      "title_en": "Joint Decree of Religious and Customary Councils on the Observance of the Nyepi Holy Day, Saka New Year 1948 / 2026 CE (Coinciding with Idul Fitri Takbiran Night 1447 H / 2026 CE)"
     },
     {
       "id": "kepgub-bali-699-2025",
@@ -2229,7 +2581,8 @@
       "manifest_url_status_http": 200,
       "in_manifest": true,
       "source_check": "manifest_only",
-      "provenance_note": "Hanya eksistensi yang terkonfirmasi; teks tidak boleh dikarang dan tidak diindeks."
+      "provenance_note": "Hanya eksistensi yang terkonfirmasi; teks tidak boleh dikarang dan tidak diindeks.",
+      "title_en": "Bali Governor Decree No. 699/2025 on Cultural Tourism Area Boundaries"
     },
     {
       "id": "perda-bali-4-2019",
@@ -2255,7 +2608,8 @@
       "manifest_url_status_http": 200,
       "in_manifest": true,
       "source_check": "pdf_downloaded",
-      "provenance_note": "PDF resmi Buleleng diunduh; definisi Desa Adat/Awig-awig/Pararem dijadikan chunk Tier 1B, bukan Tier 3."
+      "provenance_note": "PDF resmi Buleleng diunduh; definisi Desa Adat/Awig-awig/Pararem dijadikan chunk Tier 1B, bukan Tier 3.",
+      "title_en": "Bali Provincial Regional Regulation No. 4/2019 on Customary Villages (Desa Adat) in Bali"
     },
     {
       "id": "pergub-bali-4-2020",
@@ -2279,7 +2633,8 @@
       "manifest_url_status_http": 200,
       "in_manifest": true,
       "source_check": "pdf_downloaded",
-      "provenance_note": "PDF resmi JDIH Bali diunduh; belum ada chunk registrasi Awig-awig pada Phase 1."
+      "provenance_note": "PDF resmi JDIH Bali diunduh; belum ada chunk registrasi Awig-awig pada Phase 1.",
+      "title_en": "Bali Governor Regulation No. 4/2020 on Customary Village Enforcement Coordination"
     },
     {
       "id": "awig-awig-desa-adat-penglipuran",
@@ -2303,7 +2658,8 @@
       "manifest_url_status_http": 200,
       "in_manifest": true,
       "source_check": "manifest_only",
-      "provenance_note": "Hanya literatur akademik UJLC; bukan kutipan resmi Awig-awig dan tidak diindeks sebagai hukum."
+      "provenance_note": "Hanya literatur akademik UJLC; bukan kutipan resmi Awig-awig dan tidak diindeks sebagai hukum.",
+      "title_en": "Customary Village Bylaws (Awig-awig) of Penglipuran Customary Village, Bangli Regency"
     },
     {
       "id": "awig-awig-desa-adat-tenganan-pegringsingan",
@@ -2327,7 +2683,8 @@
       "manifest_url_status_http": 200,
       "in_manifest": true,
       "source_check": "manifest_only",
-      "provenance_note": "Hanya literatur akademik IPB; bukan kutipan resmi Awig-awig dan tidak diindeks sebagai hukum."
+      "provenance_note": "Hanya literatur akademik IPB; bukan kutipan resmi Awig-awig dan tidak diindeks sebagai hukum.",
+      "title_en": "Customary Village Bylaws (Awig-awig) of Tenganan Pegringsingan Customary Village, Karangasem Regency"
     },
     {
       "id": "se-gubernur-bali-4-2023",
@@ -2354,7 +2711,8 @@
       "manifest_url_status_http": null,
       "in_manifest": false,
       "source_check": "existing_corpus_chunk",
-      "provenance_note": "Dokumen legacy di luar 21 entri manifest; dipertahankan karena dua chunk Phase 0 merujuk padanya. Sudah disempurnakan SE 7/2025."
+      "provenance_note": "Dokumen legacy di luar 21 entri manifest; dipertahankan karena dua chunk Phase 0 merujuk padanya. Sudah disempurnakan SE 7/2025.",
+      "title_en": "Bali Governor Circular Letter No. 4/2023 on New Standards for Foreign Tourists in Bali (Do's & Don'ts)"
     },
     {
       "id": "uu-40-2008",
@@ -2383,7 +2741,8 @@
       "manifest_url_status_http": null,
       "in_manifest": false,
       "source_check": "pdf_downloaded",
-      "provenance_note": "Dokumen tambahan Phase 2C; PDF resmi diunduh dan chunk diverifikasi."
+      "provenance_note": "Dokumen tambahan Phase 2C; PDF resmi diunduh dan chunk diverifikasi.",
+      "title_en": "Law of the Republic of Indonesia No. 40/2008 on the Elimination of Racial and Ethnic Discrimination"
     },
     {
       "id": "uu-1-2024",
@@ -2410,7 +2769,8 @@
       "manifest_url_status_http": null,
       "in_manifest": false,
       "source_check": "pdf_downloaded",
-      "provenance_note": "Dokumen tambahan Phase 2C; PDF resmi diunduh dan chunk diverifikasi."
+      "provenance_note": "Dokumen tambahan Phase 2C; PDF resmi diunduh dan chunk diverifikasi.",
+      "title_en": "Second Amendment to Law No. 11/2008 on Electronic Information and Transactions (ITE Law)"
     },
     {
       "id": "uu-1-2023",
@@ -2438,7 +2798,8 @@
       "manifest_url_status_http": null,
       "in_manifest": false,
       "source_check": "pdf_downloaded",
-      "provenance_note": "Dokumen tambahan Phase 2C; PDF resmi diunduh dan chunk diverifikasi."
+      "provenance_note": "Dokumen tambahan Phase 2C; PDF resmi diunduh dan chunk diverifikasi.",
+      "title_en": "Law of the Republic of Indonesia No. 1/2023 on the Criminal Code (KUHP)"
     },
     {
       "id": "uu-39-1999",
@@ -2464,7 +2825,8 @@
       "manifest_url_status_http": null,
       "in_manifest": false,
       "source_check": "pdf_downloaded",
-      "provenance_note": "Dokumen tambahan Phase 2C; PDF resmi diunduh dan chunk diverifikasi."
+      "provenance_note": "Dokumen tambahan Phase 2C; PDF resmi diunduh dan chunk diverifikasi.",
+      "title_en": "Law of the Republic of Indonesia No. 39/1999 on Human Rights"
     },
     {
       "id": "uu-8-1999",
@@ -2490,7 +2852,8 @@
       "manifest_url_status_http": null,
       "in_manifest": false,
       "source_check": "pdf_downloaded",
-      "provenance_note": "Dokumen tambahan Phase 2C; PDF resmi diunduh dan chunk diverifikasi."
+      "provenance_note": "Dokumen tambahan Phase 2C; PDF resmi diunduh dan chunk diverifikasi.",
+      "title_en": "Law of the Republic of Indonesia No. 8/1999 on Consumer Protection"
     },
     {
       "id": "se-kapolri-6-2015",
@@ -2514,7 +2877,8 @@
       "manifest_url_status_http": null,
       "in_manifest": false,
       "source_check": "secondary_source",
-      "provenance_note": "Sumber sekunder; hanya dicatat di registry, tidak diindeks."
+      "provenance_note": "Sumber sekunder; hanya dicatat di registry, tidak diindeks.",
+      "title_en": "Chief of Indonesian National Police Circular Letter No. 6/2015 on Hate Speech Handling"
     },
     {
       "id": "skb-ite-2021",
@@ -2538,7 +2902,8 @@
       "manifest_url_status_http": null,
       "in_manifest": false,
       "source_check": "secondary_source",
-      "provenance_note": "Sumber sekunder; hanya dicatat di registry, tidak diindeks."
+      "provenance_note": "Sumber sekunder; hanya dicatat di registry, tidak diindeks.",
+      "title_en": "Joint Ministerial Decree on Guidelines for Implementation of the Electronic Information and Transactions Law (ITE)"
     }
   ]
 }
