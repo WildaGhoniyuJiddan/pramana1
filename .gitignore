@@ -4,12 +4,14 @@
 *.env
 
 # Python
+.venv/
 venv/
 backend/venv/
 __pycache__/
 *.pyc
 *.pyo
 .pytest_cache/
+scratch/
 
 # Node
 node_modules/

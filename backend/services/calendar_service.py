@@ -20,6 +20,8 @@ NYEPI_CALENDAR: Dict[int, Dict[str, Any]] = {
         "end_time": "2025-03-30T06:00:00+08:00",
         "ogoh_ogoh_date": "2025-03-28",  # Pengerupukan
         "ngembak_geni": "2025-03-30",
+        "confidence": "resmi",
+        "source_url": "https://www.kemenkopmk.go.id",
     },
     2026: {
         "date": "2026-03-19",
@@ -28,6 +30,8 @@ NYEPI_CALENDAR: Dict[int, Dict[str, Any]] = {
         "end_time": "2026-03-20T06:00:00+08:00",
         "ogoh_ogoh_date": "2026-03-18",  # Pengerupukan
         "ngembak_geni": "2026-03-20",
+        "confidence": "resmi",
+        "source_url": "https://www.kemenkopmk.go.id",
     },
     2027: {
         "date": "2027-03-08",
@@ -36,6 +40,8 @@ NYEPI_CALENDAR: Dict[int, Dict[str, Any]] = {
         "end_time": "2027-03-09T06:00:00+08:00",
         "ogoh_ogoh_date": "2027-03-07",
         "ngembak_geni": "2027-03-09",
+        "confidence": "perkiraan",
+        "source_url": "https://kemenag.go.id",
     },
     2028: {
         "date": "2028-03-26",
@@ -44,6 +50,8 @@ NYEPI_CALENDAR: Dict[int, Dict[str, Any]] = {
         "end_time": "2028-03-27T06:00:00+08:00",
         "ogoh_ogoh_date": "2028-03-25",
         "ngembak_geni": "2028-03-27",
+        "confidence": "perkiraan",
+        "source_url": "https://kemenag.go.id",
     },
 }
 
@@ -176,10 +184,19 @@ def check_holiday_conflicts(start_date_str: str, end_date_str: Optional[str] = N
                 else "Rentang perjalanan bersinggungan dengan sebagian jendela Nyepi. Bandara dan layanan publik tetap tutup sampai pukul 06.00 WITA pada hari berikutnya."
             )
 
+            conf_level = info.get("confidence", "resmi")
+            source_url = info.get("source_url", "")
+            event_label = (
+                f"Hari Suci Nyepi (Tahun Baru Saka {info['saka_year']})"
+                if conf_level == "resmi"
+                else f"Hari Suci Nyepi (Tahun Baru Saka {info['saka_year']}) [Perkiraan]"
+            )
             details = {
-                "event_name": f"Hari Suci Nyepi (Tahun Baru Saka {info['saka_year']})",
+                "event_name": event_label,
                 "date": info["date"],
                 "saka_year": info["saka_year"],
+                "confidence": conf_level,
+                "source_url": source_url,
                 "severity": "CRITICAL",
                 "window_start": info["start_time"],
                 "window_end": info["end_time"],
@@ -203,8 +220,10 @@ def check_holiday_conflicts(start_date_str: str, end_date_str: Optional[str] = N
             }
 
             conflicts.append({
-                "name": f"Hari Suci Nyepi (Saka {info['saka_year']})",
+                "name": event_label,
                 "date": info["date"],
+                "confidence": conf_level,
+                "source_url": source_url,
                 "severity": "CRITICAL",
                 "details": details,
             })

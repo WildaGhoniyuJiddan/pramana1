@@ -13,7 +13,7 @@ Bali DigiFest 2026 — AI Web Innovation Challenge
 | Bagian | Status | Catatan |
 | :--- | :--- | :--- |
 | Retrieval deterministik + abstain (Layer-2) | ✅ Live | Ambang relevansi normalisasi `0.5` + pemotongan relatif `0.75` dari skor teratas |
-| Registry provenance korpus | ✅ Live | 29 dokumen registry, 40 chunk retrieval, validasi silang `document_id`, status teks, dan amendment |
+| Registry provenance korpus | ✅ Live | 29 dokumen registry, 42 chunk retrieval, validasi silang `document_id`, status teks, dan amendment |
 | PII masking (5 kategori) | ✅ Live | Email, telepon, kode booking, kartu, paspor. Bersifat best-effort, bukan DLP penuh |
 | Kalender Nyepi & Pawukon | ✅ Live | Cakupan deterministik 2025–2028, jendela Nyepi 24 jam |
 | Ekspor `.ics` (RFC 5545) | ✅ Live | Escaping teks, line folding, UID stabil, validasi tanggal |
@@ -22,12 +22,12 @@ Bali DigiFest 2026 — AI Web Innovation Challenge
 | Active Legal Triage | ✅ Live | Diagnosis unsur yang kurang, langkah konkret, kanal resmi, dan 3 query rewrite yang bisa diklik |
 | Mode 1 — Trip Brief | 🟡 Prototype | Retrieval, kalender, PII, ICS, teks WhatsApp; AI-first dengan triage bila konteks kurang |
 | Mode 2 — Context Note | 🟡 Prototype | Sitasi korpus, deteksi framing, claim verifier, triage aktif; AI-first |
-| Mode 3 — Smart Gate (NFC/QR) | 🟡 Prototype | 3 zona, kartu deterministik, AI brief grounded, TTS, QR; offline belum |
+| Mode 3 — Smart Gate (NFC/QR) | 🟡 Prototype | 3 zona, kartu deterministik, AI brief grounded, TTS, QR; konsep arsitektural tanpa instalasi fisik lapangan |
 | Corpus Explorer | 🟡 Prototype | Menampilkan registry dokumen, chunk retrieval, provenance, dan keterbatasan korpus |
 | Sintesis Gemini | 🟡 Prototype | Structured JSON + evidence span; `AI_MODE=required` di submission |
 | Verifikasi silang JDIH real-time | ⚪ Planned | Belum diimplementasikan |
-| Benchmark publik | 🟡 Internal eval | 45 kasus berlabel; baseline `--mode fast` dan live di `eval/results/`; belum benchmark publik |
-| Antarmuka bilingual ID/EN | 🟡 Prototype | Smart Gate ID/EN; ringkasan AI Mode 1/2 punya toggle ID/EN |
+| Benchmark publik | 🟡 Internal eval | 65 kasus berlabel (termasuk 25 kasus EN); baseline `--mode fast` dan live di `eval/results/`; belum benchmark publik |
+| Antarmuka bilingual ID/EN | ✅ Live | Korpus bilingual offline (42 chunk + 29 dokumen), toggle ID/EN di seluruh mode, verifier naskah asli (ID) |
 
 ---
 
@@ -149,7 +149,7 @@ Baseline internal 45 kasus: 15 in-scope, 10 triage, 10 out-of-scope, 4 adversari
 Korpus memakai dua lapis yang sengaja dipisahkan:
 
 - **`documents` — registry provenance (29 dokumen):** 21 entri manifest awal, dokumen legacy SE Gubernur Bali No. 4 Tahun 2023, dan 7 dokumen tambahan Phase 2C. Registry mencatat status teks, cakupan, sumber PDF, SHA-256, dan keputusan audit. **Registry bukan bukti kutipan dan tidak menambah hasil retrieval.**
-- **`regulations` — chunk retrieval (40 chunk):** hanya chunk yang teksnya tersimpan dan boleh diverifikasi Layer-1.
+- **`regulations` — chunk retrieval (42 chunk):** hanya chunk yang teksnya tersimpan dan boleh diverifikasi Layer-1.
 
 Cakupan chunk:
 
@@ -189,7 +189,7 @@ Catatan penting:
 - **Backend:** Python 3.11+ (diuji pada 3.12.10), FastAPI, Pydantic v2, Uvicorn, HTTPX.
 - **Penyimpanan:** JSON korpus terstruktur dan zone registry di memori; tidak ada database.
 - **AI:** Google Gemini API (`gemini-3.5-flash`, `temperature=0.1`) dengan structured JSON + evidence span verifier. `AI_MODE=required` untuk submission; `optional` untuk pengembangan.
-- **Evaluasi:** `eval/run_eval.py`, 45 kasus berlabel, baseline `--mode fast` dan live `--mode live` dengan metrik epistemic routing, guidance completeness, citation/span validity, PII recall, dan latensi.
+- **Evaluasi:** `eval/run_eval.py`, 65 kasus berlabel (termasuk 25 kasus EN), baseline `--mode fast` dan live `--mode live` dengan metrik epistemic routing, guidance completeness, citation/span validity, PII recall, dan latensi.
 - **Testing:** Pytest + FastAPI TestClient.
 
 ---
@@ -287,12 +287,12 @@ Status terakhir dijalankan (6 November 2026): **126 passed**. Build frontend den
 | `GEMINI_MODEL` | `gemini-3.5-flash` | Model generasi utama. |
 | `GEMINI_MODEL_FALLBACKS` | `gemini-3.1-flash-lite,gemini-3.5-flash-lite,gemini-3.6-flash` | Rantai fallback berurutan saat model utama 404/429/503, timeout, atau JSON invalid. |
 | `GEMINI_EMBEDDING_MODEL` | `gemini-embedding-001` | Diverifikasi ulang sebelum membangun embedding. |
-| `PRAMANA_PUBLIC_URL` | kosong | Opsional. URL publik frontend untuk tautan QR dan teks WhatsApp, misalnya `https://pramana.example.com`. Jika kosong, tautan memakai origin browser. |
+| `PRAMANA_PUBLIC_URL` | kosong | Opsional. URL publik frontend untuk tautan QR dan teks WhatsApp, misalnya `https://pramana1.vercel.app` atau `http://192.168.1.10:5173`. Jika kosong, tautan memakai origin browser. |
 | `CORS_ALLOW_ORIGINS` | `http://localhost:5173,http://127.0.0.1:5173` | Daftar origin yang diizinkan, dipisahkan koma. |
 | `RATE_LIMIT_WINDOW_SECONDS` | `60` | Jendela waktu rate limit. |
 | `RATE_LIMIT_MAX_REQUESTS` | `60` | Maksimum request POST per klien per jendela. |
 | `MAX_REQUEST_BODY_BYTES` | `65536` | Batas ukuran body berdasarkan header `Content-Length`. |
-| `TRUST_PROXY_HEADERS` | `false` | Aktifkan hanya di belakang reverse proxy tepercaya yang menimpa `X-Forwarded-For`. |
+| `TRUST_PROXY_HEADERS` | `true` | Menghormati header `X-Forwarded-For` dan `X-Session-ID` dari reverse proxy tepercaya (misal Render, Railway). Set `false` bila diekspos langsung tanpa proxy. |
 
 Jangan commit `.env` atau kunci API nyata.
 
@@ -322,7 +322,7 @@ Kode kesalahan yang relevan: `404` untuk zona tidak dikenal, `422` untuk input/l
 - CORS dibatasi lewat environment; tidak lagi wildcard.
 - Rate limit in-memory hanya berlaku per proses. Beberapa worker/Uvicorn dapat memiliki hitungan terpisah. Untuk produksi, gunakan limiter terpusat (misalnya Redis).
 - Batas ukuran body hanya memeriksa `Content-Length`; request chunked tanpa header tersebut tidak tertangkap oleh pemeriksaan ini.
-- `TRUST_PROXY_HEADERS=false` secara default agar klien tidak bisa memalsukan IP lewat `X-Forwarded-For`.
+- `TRUST_PROXY_HEADERS=true` secara default pada backend untuk menghormati `X-Forwarded-For` dan `X-Session-ID` dari reverse proxy cloud produksi (Render/Railway), sehingga rate limiter tidak menggabungkan seluruh pengunjung ke satu IP proxy. Ubah ke `false` jika server menerima koneksi langsung dari publik tanpa proxy.
 - Header keamanan dasar dikirim (`X-Content-Type-Options`, `X-Frame-Options`, `Referrer-Policy`, `Permissions-Policy`, `Cache-Control`, CSP untuk `/api/`).
 - Belum ada autentikasi. Jangan mengekspos instance ini untuk data sensitif tanpa lapisan tambahan.
 - PII masking berbasis regex dan bersifat best-effort. Pola yang tidak dikenal bisa lolos.
@@ -332,7 +332,7 @@ Kode kesalahan yang relevan: `404` untuk zona tidak dikenal, `422` untuk input/l
 
 ## Keterbatasan yang Diketahui
 
-1. **Korpus retrieval masih terkurasi manual**: 40 chunk dari 29 dokumen registry. Belum mencakup seluruh Perda, Pergub, SE, dan awig-awig desa adat.
+1. **Korpus retrieval masih terkurasi manual**: 42 chunk dari 29 dokumen registry. Belum mencakup seluruh Perda, Pergub, SE, dan awig-awig desa adat.
 2. **Retrieval berbasis kata kunci**, bukan embedding atau entailment semantik. Kueri dengan sinonim jauh dapat gagal retrieval dan memicu abstain.
 3. **Tidak ada verifikasi real-time ke JDIH.** Layer-1 hanya mencocokkan kutipan dengan teks yang tersimpan di korpus.
 4. **Ringkasan AI tidak diverifikasi Layer-1.** AI claims diverifikasi terhadap evidence span; kebenaran parafrase tetap terbatas.
@@ -346,9 +346,11 @@ Kode kesalahan yang relevan: `404` untuk zona tidak dikenal, `422` untuk input/l
 12. **Kunci Gemini di deployment harus diset agar AI aktif.** Dengan `AI_MODE=required`, kegagalan AI menghasilkan status `unavailable`, bukan template.
 13. **SE Gubernur Bali No. 7 Tahun 2025 hanya ada di registry**, bukan chunk retrieval, karena PDF resminya belum diperoleh.
 14. **Kalender hanya 2025–2028.** Di luar rentang itu, hasil tidak lengkap dan diberi peringatan.
-15. **Belum ada benchmark publik.** Eval internal 45 kasus bukan klaim akurasi universal.
-16. **Belum ada QR/NFC verifikasi dokumen fisik.** QR/NFC hanya membuka URL; tidak memverifikasi identitas atau pembayaran.
-17. **QR dari `localhost` tidak bisa dibuka di perangkat lain.** Untuk pengujian dari HP, set `PRAMANA_PUBLIC_URL` ke alamat LAN/publik frontend, misalnya `http://192.168.1.10:5173`.
+15. **Evaluasi Berkelanjutan.** Evaluasi internal mencakup 65 kasus berlabel (termasuk 25 kasus Bahasa Inggris) dengan akurasi retrieval deterministik 100% pada cakupan korpus lokal; belum merupakan benchmark publik.
+16. **Metodologi Pengujian Jarak Jauh (Remote Validation).** Tim tidak berada di Bali dan tidak memiliki akses langsung ke narasumber lokal. Seluruh pengujian dan kurasi didasarkan pada teks hukum PDF resmi pemerintah dan kasus uji sintetis.
+17. **Status Nyepi 2027 dan 2028.** Tanggal Nyepi 2027 dan 2028 berstatus perkiraan astronomis kalender Bali dan belum terbit dalam SKB 3 Menteri resmi.
+18. **Belum ada QR/NFC verifikasi dokumen fisik.** QR/NFC hanya membuka URL panduan edukasi; tidak memverifikasi identitas atau pembayaran dan bukan instalasi fisik lapangan.
+19. **QR dari `localhost` tidak bisa dibuka di perangkat lain.** Untuk pengujian dari HP, set `PRAMANA_PUBLIC_URL` ke alamat LAN/publik frontend, misalnya `http://192.168.1.10:5173` atau URL deploy `https://pramana1.vercel.app`.
 
 ---
 
@@ -392,18 +394,53 @@ Pustaka open-source: FastAPI, Pydantic, Uvicorn, HTTPX, Pytest, Svelte 5, Vite, 
 | **Framework / Frontend** | Svelte 5, Vite 5.4.x, Tailwind CSS 3 |
 | **Backend / Runtime** | Python 3.11+, FastAPI, Uvicorn |
 | **Database / Storage** | JSON korpus dan zone registry di memori (`corpus/bali_regulations.json`, `corpus/zones.json`); tidak ada database |
-| **Hosting / Deployment** | Belum ada deployment publik yang diverifikasi; jalankan secara lokal atau self-hosted |
-| **AI Model / API** | Gemini API (`gemini-3.5-flash`, dapat diganti via `GEMINI_MODEL`) dengan structured JSON + evidence span verifier + Layer-1/Layer-2 guard |
+| **Hosting / Deployment** | Frontend: https://pramana1.vercel.app (Vercel) · Backend: https://pramana1.onrender.com (Render) |
+| **AI Model / API** | Gemini API (`gemini-3.5-flash`, dengan rantai fallback otomatis ke `gemini-3.1-flash-lite`, `gemini-3.5-flash-lite`, `gemini-3.6-flash`) dengan structured JSON + evidence span verifier + Layer-1/Layer-2 guard |
 | **Peran AI** | Menyusun ringkasan eksekutif (Mode 1), catatan konteks netral (Mode 2), dan AI brief Smart Gate (Mode 3) dari sitasi terverifikasi. AI tidak membuat sitasi; setiap claim harus menunjuk evidence span. `AI_MODE=required` di submission. |
 | **Phygital Interface** | URL record NFC NTAG213 / QR, Web Speech API (TTS). Tidak memakai Web NFC API dan tidak memverifikasi identitas. |
 | **Dataset** | Korpus kurasi manual dari sumber resmi; lihat bagian Sumber Data |
 | **Open-source Libraries** | `fastapi`, `pydantic`, `uvicorn`, `httpx`, `python-dotenv`, `pytest`, `svelte`, `vite`, `tailwindcss`, `qrcode`, `lucide-svelte` |
 | **Template / Boilerplate** | Dibangun khusus, tanpa template komersial pihak ketiga |
-| **AI Coding Assistant** | Digunakan sebagai alat bantu pengembangan dan pengujian; arsitektur dan keputusan verifikasi tetap ditinjau manusia |
+| **AI Coding Assistant** | Google Antigravity & Google Gemini (penulisan kode, pengetesan, translasi korpus offline, dan dokumentasi; arsitektur, verifier, dan korpus verbatim ditinjau manusia) |
 | **Pre-existing Components** | Tidak ada komponen komersial pihak ketiga |
 
 ---
 
-## Tim
 
-Tim Pengembang Pramana — Bali DigiFest 2026 AI Web Innovation Challenge.
+---
+
+## Deployment & Panduan Operasional
+
+### 1. URL Produksi
+- **Web App (Frontend)**: [https://pramana1.vercel.app](https://pramana1.vercel.app)
+- **API Server (Backend)**: [https://pramana1.onrender.com](https://pramana1.onrender.com)
+- **API Health Check**: [https://pramana1.onrender.com/api/v1/health](https://pramana1.onrender.com/api/v1/health)
+
+### 2. Konfigurasi `AI_MODE`
+Backend mendukung variabel lingkungan `AI_MODE`:
+- `optional` (Disarankan untuk demo): Jika kuota Gemini habis atau API mengalami gangguan, sistem secara otomatis beralih ke fallback deterministik berlabel jelas tanpa merusak alur aplikasi pengguna.
+- `required`: Mode penegakan murni. Jika API Gemini gagal, sistem mengembalikan status `unavailable`.
+
+### 3. Mitigasi Cold-Start (Uptime Robot / Keep-Alive)
+Hosting gratis Render memberlakukan penonaktifan kontainer otomatis (spin-down) setelah periode tidak aktif:
+- Frontend Pramana memiliki toleransi cold-start otomatis dengan timer 5 detik, banner informasi pemanasan server ("Server sedang bangun, harap tunggu"), dan percobaan ulang otomatis (retry).
+- Untuk menjaga ketersediaan respons cepat bagi juri kompetisi, konfigurasikan monitor HTTP HEAD/GET berkala (setiap 5–10 menit) ke `https://pramana1.onrender.com/health` melalui layanan seperti UptimeRobot, Cron-Job.org, atau GitHub Actions scheduled workflow.
+
+## Tim dan Pernyataan Orisinalitas
+
+**Tim Pramana — Bali DigiFest 2026 AI Web Innovation Challenge:**
+- **Azzaky Raihan Ramdhani** — Developer (Fullstack & AI Architecture)
+- **Wilda Ghoniyu Jiddan** — Developer (Backend, RAG Engine & Evaluasi)
+- **Andhika Guntur Ramadan** — Proposal, Dokumentasi & Kurasi Regulasi
+
+> `[BUTUH-MANUSIA]`: Tambahkan nama perguruan tinggi, program studi, dan nomor kontak ketua tim sebelum pengumpulan akhir.
+
+### Pernyataan Kepatuhan dan Etika AI (Lampiran C Panduan Kompetisi)
+Kami menyatakan bahwa seluruh kode sumber, materi proposal, dan prototipe web yang diserahkan untuk Bali DigiFest 2026 merupakan karya orisinal tim pengembang. Alat bantu AI generatif (Google Antigravity dan model Google Gemini) digunakan secara transparan sebagai akselerator koding, pembuatan fixture uji, asistensi terjemahan korpus offline, dan visual art prototipe. Naskah regulasi verbatim Bahasa Indonesia dijaga tanpa modifikasi LLM, dan verifikasi hukum dilakukan secara deterministik tanpa halusinasi buatan.
+
+---
+
+## Kredit Aset Visual
+- `frontend/public/assets/opero_bali_hero.jpg` & `hero_sky_clouds.png`: Dibuat secara sintetis menggunakan asistensi Generative AI (pointillist impasto style, siluet Candi Bentar Bali) khusus sebagai backdrop visual prototipe Pramana.
+- `frontend/public/assets/pramana_logo_flower_option1.svg`: Ikon grafis brutalist cut-paper bunga Jepun (kamboja Bali) yang dirancang khusus untuk identitas visual Pramana.
+- Font: *Plus Jakarta Sans* (Gumpita Rahayu / Tokotype), *Newsreader* (Production Type), *JetBrains Mono* (JetBrains) — berlisensi SIL Open Font License 1.1.

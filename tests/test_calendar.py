@@ -140,3 +140,16 @@ def test_ics_rejects_invalid_dates(start_date, end_date):
             start_date_str=start_date,
             end_date_str=end_date,
         )
+
+
+def test_nyepi_2027_2028_perkiraan_label():
+    res27 = check_holiday_conflicts('2027-03-07', '2027-03-10')
+    assert res27['has_nyepi'] is True
+    assert res27['nyepi_summary']['confidence'] == 'perkiraan'
+    assert '[Perkiraan]' in res27['nyepi_summary']['event_name']
+    assert res27['nyepi_summary']['source_url']
+
+    res28 = check_holiday_conflicts('2028-03-25', '2028-03-28')
+    assert res28['has_nyepi'] is True
+    assert res28['nyepi_summary']['confidence'] == 'perkiraan'
+    assert '[Perkiraan]' in res28['nyepi_summary']['event_name']

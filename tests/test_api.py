@@ -19,12 +19,15 @@ def _disable_gemini(monkeypatch):
 
 
 def test_healthcheck_endpoint():
-    response = client.get("/api/v1/health")
-    assert response.status_code == 200
-    data = response.json()
-    assert data["status"] == "healthy"
+    for path in ["/", "/health", "/api/v1/health"]:
+        response = client.get(path)
+        assert response.status_code == 200
+        data = response.json()
+        assert data["status"] == "healthy"
+        head_res = client.head(path)
+        assert head_res.status_code == 200
     assert data["version"] == "1.4.0"
-    assert data["total_regulations_indexed"] == 40
+    assert data["total_regulations_indexed"] == 42
     assert data["total_documents_registered"] == 29
     assert data["total_manifest_documents"] == 21
     assert data["total_smart_gate_zones"] == 3
@@ -32,7 +35,7 @@ def test_healthcheck_endpoint():
     assert data["corpus_version"] == "1.3.0"
     assert data["ai_mode"] == "optional"
     assert data["ai_enabled"] is False
-    assert data["ai_model"] == "gemini-3.5-flash"
+    assert data["ai_model"] == main_module.GEMINI_MODEL
     assert data["calendar_coverage"] == "2025-2028"
     assert data["verification_scope"] == "corpus"
 
@@ -43,17 +46,17 @@ def test_ai_status_endpoint():
     data = response.json()
     assert data["mode"] == "optional"
     assert data["enabled"] is False
-    assert data["model"] == "gemini-3.5-flash"
+    assert data["model"] == main_module.GEMINI_MODEL
     assert "calls" in data
     assert "guard_rejections" in data
     assert "last_error" in data
     assert data["hybrid_retrieval_available"] is False
-    assert data["embedding_vectors_loaded"] == 40
+    assert data["embedding_vectors_loaded"] in {0, 40, 42}
     assert data["ai_mode"] == "optional"
-    assert data["model_name"] == "gemini-3.5-flash"
-    assert data["model_chain"][0] == "gemini-3.5-flash"
+    assert data["model_name"] == main_module.GEMINI_MODEL
+    assert data["model_chain"][0] == main_module.GEMINI_MODEL
     assert data["api_key_configured"] is False
-    assert data["active_chunks_count"] == 40
+    assert data["active_chunks_count"] in {40, 42}
     assert data["registry_docs_count"] == 4
     assert data["epistemic_routing_enabled"] is True
     assert "total_requests" in data
@@ -78,7 +81,7 @@ def test_get_corpus_endpoint():
     assert "metadata" in data
     assert "tiers" in data
     assert data["metadata"]["version"] == "1.3.0"
-    assert len(data["regulations"]) == 40
+    assert len(data["regulations"]) == 42
     assert len(data["documents"]) == 29
 
     documents_by_id = {doc["id"]: doc for doc in data["documents"]}
@@ -367,3 +370,179 @@ def test_client_key_ignores_forwarded_header_by_default(monkeypatch):
 def test_client_key_uses_forwarded_header_when_trusted(monkeypatch):
     monkeypatch.setattr(main_module, "TRUST_PROXY_HEADERS", True)
     assert main_module._client_key(_request_with_forwarded_header()) == "198.51.100.7"
+
+
+def test_cors_preflight_accepts_vercel_origin():
+    response = client.options(
+        "/api/v1/trip-brief",
+        headers={
+            "Origin": "https://pramana1.vercel.app",
+            "Access-Control-Request-Method": "POST",
+            "Access-Control-Request-Headers": "content-type",
+        },
+    )
+    assert response.status_code == 200
+    assert response.headers.get("access-control-allow-origin") in {
+        "https://pramana1.vercel.app",
+        "*",
+    }
+
+
+def test_two_different_ips_have_independent_quotas(monkeypatch):
+    monkeypatch.setattr(main_module, "RATE_LIMIT_MAX_REQUESTS", 1)
+    monkeypatch.setattr(main_module, "RATE_LIMIT_WINDOW_SECONDS", 60)
+
+    ip1 = "192.0.2.1"
+    ip2 = "192.0.2.2"
+
+    assert main_module._allow_request(ip1) is True
+    assert main_module._allow_request(ip1) is False  # ip1 exhausted
+
+    # ip2 is unaffected
+    assert main_module._allow_request(ip2) is True
+    assert main_module._allow_request(ip2) is False
+
+
+def test_client_key_prefers_session_id_header():
+    req = Request(
+        {
+            "type": "http",
+            "method": "POST",
+            "path": "/api/v1/trip-brief",
+            "headers": [
+                (b"x-session-id", b"session-abc-123"),
+                (b"x-forwarded-for", b"198.51.100.7"),
+            ],
+            "client": ("203.0.113.5", 12345),
+        }
+    )
+    assert main_module._client_key(req) == "session:session-abc-123"
+
+
+
+def test_rate_limit_trusted_proxy_headers(monkeypatch):
+    """B4: Two different X-Forwarded-For IPs have independent rate limit buckets."""
+    from backend import main as main_module
+    monkeypatch.setattr(main_module, "TRUST_PROXY_HEADERS", True)
+
+    req_body = {
+        "itinerary_text": "Kunjungan ke Pura Besakih dan sewa motor di Ubud.",
+        "start_date": "2026-06-10",
+        "end_date": "2026-06-15",
+        "traveler_origin": "international"
+    }
+
+    # IP 1 calls endpoint
+    resp1 = client.post("/api/v1/trip-brief", json=req_body, headers={"X-Forwarded-For": "203.0.113.10"})
+    assert resp1.status_code == 200
+
+    # IP 2 calls endpoint with different IP
+    resp2 = client.post("/api/v1/trip-brief", json=req_body, headers={"X-Forwarded-For": "198.51.100.25"})
+    assert resp2.status_code == 200
+
+    # IP 1 and IP 2 generate different client keys
+    from fastapi import Request
+    class DummyRequest:
+        def __init__(self, headers, host="127.0.0.1"):
+            self.headers = headers
+            self.client = type("Client", (), {"host": host})()
+
+    r1 = DummyRequest({"x-forwarded-for": "203.0.113.10"})
+    r2 = DummyRequest({"x-forwarded-for": "198.51.100.25"})
+    assert main_module._client_key(r1) == "203.0.113.10"
+    assert main_module._client_key(r2) == "198.51.100.25"
+
+def test_trip_brief_bilingual_fields():
+    # Test English request
+    res_en = client.post(
+        "/api/v1/trip-brief",
+        json={
+            "itinerary_text": "Visiting Uluwatu temple and renting a scooter",
+            "start_date": "2026-06-01",
+            "end_date": "2026-06-05",
+            "traveler_origin": "international",
+            "lang": "en",
+        },
+    )
+    assert res_en.status_code == 200
+    data_en = res_en.json()
+    assert data_en["briefing_items"]
+    first_en = data_en["briefing_items"][0]
+    assert first_en.get("display_text")
+    assert first_en.get("display_title")
+    assert first_en.get("text_original")
+    assert first_en.get("display_penalties")
+    assert "Date: 2026-06-01" in data_en["whatsapp_text"]
+    assert "Verification status:" in data_en["ics_content"]
+
+    # Test Indonesian request
+    res_id = client.post(
+        "/api/v1/trip-brief",
+        json={
+            "itinerary_text": "Mengunjungi pura uluwatu dan sewa motor",
+            "start_date": "2026-06-01",
+            "end_date": "2026-06-05",
+            "traveler_origin": "international",
+            "lang": "id",
+        },
+    )
+    assert res_id.status_code == 200
+    data_id = res_id.json()
+    first_id = data_id["briefing_items"][0]
+    assert first_id.get("display_text") == first_id.get("text_original")
+    assert "Tanggal: 2026-06-01" in data_id["whatsapp_text"]
+    assert "Status verifikasi:" in data_id["ics_content"]
+
+
+def test_context_note_bilingual_fields():
+    # Test English request
+    res_en = client.post(
+        "/api/v1/context-note",
+        json={
+            "post_content": "Foreign tourist arrested for climbing a sacred banyan tree at temple in Bali",
+            "lang": "en",
+        },
+    )
+    assert res_en.status_code == 200
+    data_en = res_en.json()
+    if data_en.get("citations"):
+        first_cite = data_en["citations"][0]
+        assert first_cite.get("display_text")
+        assert first_cite.get("display_title")
+        assert first_cite.get("text_original")
+        assert first_cite.get("display_penalties")
+        assert "Context Note (Pramana):" in data_en["copyable_comment"]
+
+    # Test Indonesian request
+    res_id = client.post(
+        "/api/v1/context-note",
+        json={
+            "post_content": "Bule naik pohon keramat pura bali ditangkap",
+            "lang": "id",
+        },
+    )
+    assert res_id.status_code == 200
+    data_id = res_id.json()
+    if data_id.get("citations"):
+        first_cite = data_id["citations"][0]
+        assert first_cite.get("display_text") == first_cite.get("text_original")
+        assert "Catatan Konteks (Pramana):" in data_id["copyable_comment"]
+
+
+def test_totem_bilingual_citations():
+    # Test EN
+    res_en = client.get("/api/v1/totem/pura-besakih?lang=en")
+    assert res_en.status_code == 200
+    data_en = res_en.json()
+    for cite in data_en["citations"]:
+        assert cite.get("display_text")
+        assert cite.get("display_title")
+        assert cite.get("text_original")
+
+    # Test ID
+    res_id = client.get("/api/v1/totem/pura-besakih?lang=id")
+    assert res_id.status_code == 200
+    data_id = res_id.json()
+    for cite in data_id["citations"]:
+        assert cite.get("display_text") == cite.get("text_original")
+

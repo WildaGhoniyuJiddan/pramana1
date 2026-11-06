@@ -330,8 +330,14 @@
       >
         ALUR KERJA 3-TAHAP
       </span>
+      <span
+        class="px-1.5 py-0.5 font-mono text-[9px] font-bold"
+        style="background-color: #dfd6c3; color: #0a0a0a; border: 1px solid #0a0a0a;"
+      >
+        Ilustrasi alur (contoh statis)
+      </span>
       <span class="text-xs font-bold tracking-tight hidden sm:inline" style="color: #0a0a0a;">
-        Pilih contoh kasus untuk melihat simulasi:
+        Pilih contoh kasus:
       </span>
     </div>
 

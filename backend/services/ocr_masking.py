@@ -1,13 +1,14 @@
 """
 PII Masking Service for Pramana Strict-RAG.
 
-Strips five categories of sensitive personal information before text is
-processed or forwarded to an LLM:
+Strips sensitive personal information before text is processed or forwarded to an LLM:
 1. Email addresses
 2. Phone numbers
 3. Booking references / PNR / e-ticket codes
 4. Payment card numbers
 5. Passport numbers
+6. Social handles (@username)
+7. Introductory name patterns (e.g. 'Nama saya Budi', 'My name is John')
 
 This is a best-effort deterministic filter, not a complete DLP system.
 """
@@ -29,6 +30,11 @@ PASSPORT_PATTERN = re.compile(
     r'[^\n]{0,25}?\b([A-Z0-9]{7,10})\b',
     re.IGNORECASE,
 )
+HANDLE_PATTERN = re.compile(r'(?<!\w)@([A-Za-z0-9_]{3,30})\b')
+NAME_PATTERN = re.compile(
+    r'\b((?:nama\s+saya|namaku|my\s+name\s+is|i\s+am)\s+)([A-Z][a-z]+(?:\s+[A-Z][a-z]+)?)',
+    re.IGNORECASE,
+)
 
 
 def mask_pii(text: str) -> Tuple[str, Dict[str, int]]:
@@ -44,7 +50,9 @@ def mask_pii(text: str) -> Tuple[str, Dict[str, int]]:
         "phone": 0,
         "booking_code": 0,
         "card": 0,
-        "passport": 0
+        "passport": 0,
+        "handle": 0,
+        "name": 0,
     }
 
     # Mask emails
@@ -76,5 +84,17 @@ def mask_pii(text: str) -> Tuple[str, Dict[str, int]]:
         counts["phone"] += 1
         return "[TELEPON_DISAMARKAN]"
     masked = PHONE_PATTERN.sub(phone_repl, masked)
+
+    # Mask social handles
+    def handle_repl(match):
+        counts["handle"] += 1
+        return "[HANDLE_DISAMARKAN]"
+    masked = HANDLE_PATTERN.sub(handle_repl, masked)
+
+    # Mask introductory names
+    def name_repl(match):
+        counts["name"] += 1
+        return f"{match.group(1)}[NAMA_DISAMARKAN]"
+    masked = NAME_PATTERN.sub(name_repl, masked)
 
     return masked, counts

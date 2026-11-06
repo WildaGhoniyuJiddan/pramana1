@@ -1,14 +1,18 @@
 <script>
   import { onMount, onDestroy } from 'svelte';
-  import { fetchZones, fetchTotem, requestTotemBrief } from '../lib/api.js';
+  import { fetchZones, fetchTotem, requestTotemBrief } from '../lib/api.svelte.js';
+  import { i18n } from '../lib/i18n.svelte.js';
   import EpistemicBadge from './EpistemicBadge.svelte';
   import QrCode from './QrCode.svelte';
+  import GateScannerModal from './GateScannerModal.svelte';
 
   let { zoneId = null, navigate = (path) => {}, onOpenDoc = () => {} } = $props();
 
+  let showScanner = $state(false);
+
   const UI_TEXT = {
     id: {
-      badge: '04 // Phygital Smart Gate',
+      badge: '03 // Phygital Smart Gate',
       title: 'Gerbang Pintar',
       titleAccent: 'Pramana',
       subtitle:
@@ -41,13 +45,13 @@
       ttsUnsupported: 'Browser ini tidak mendukung Web Speech API.',
       ttsError: 'Audio gagal diputar. Gunakan teks panduan di samping.',
       checks: 'Panduan Utama',
-      legalBasis: 'Dasar Hukum Terverifikasi',
+      legalBasis: 'Dasar Hukum Resmi',
       historicalTitle: 'Rujukan Historis',
       historicalNote:
         'Rujukan ini sudah disempurnakan dan tidak boleh diperlakukan sebagai aturan aktif. Ditampilkan untuk transparansi.',
       openSource: 'Buka teks korpus',
       localAck: 'Konfirmasi Lokal',
-      ackButton: 'Tandai Sudah Dibaca',
+      ackButton: 'Tandai Sudah Dibaca (tersimpan di perangkat ini saja)',
       ackDone: 'Sudah ditandai di perangkat ini.',
       ackClear: 'Hapus Tanda',
       ackNote:
@@ -68,7 +72,7 @@
       back: 'Kembali ke daftar gerbang'
     },
     en: {
-      badge: '04 // Phygital Smart Gate',
+      badge: '03 // Phygital Smart Gate',
       title: 'Smart Gate',
       titleAccent: 'Pramana',
       subtitle:
@@ -101,13 +105,13 @@
       ttsUnsupported: 'This browser does not support the Web Speech API.',
       ttsError: 'Audio could not be played. Use the text guidance instead.',
       checks: 'Key Guidance',
-      legalBasis: 'Verified Legal Basis',
+      legalBasis: 'Official Legal Basis',
       historicalTitle: 'Historical References',
       historicalNote:
         'These references have been superseded and must not be treated as current rules. They are shown for transparency.',
       openSource: 'Open corpus text',
       localAck: 'Local Acknowledgement',
-      ackButton: 'Mark as Read',
+      ackButton: 'Mark as Read (stored on this device only)',
       ackDone: 'Marked on this device.',
       ackClear: 'Clear Mark',
       ackNote:
@@ -135,7 +139,7 @@
     public_area: { id: 'Ruang Publik', en: 'Public Space' }
   };
 
-  let lang = $state(detectLanguage());
+  let lang = $derived(i18n.lang);
   let zones = $state([]);
   let card = $state(null);
   let loading = $state(true);
@@ -153,12 +157,6 @@
 
   let t = $derived(UI_TEXT[lang]);
 
-  function detectLanguage() {
-    if (typeof navigator === 'undefined') return 'id';
-    const code = (navigator.language || 'id').toLowerCase();
-    return code.startsWith('id') ? 'id' : 'en';
-  }
-
   function categoryLabel(category) {
     return CATEGORY_LABELS[category]?.[lang] || category;
   }
@@ -174,7 +172,13 @@
   }
 
   function statusLabel(citation) {
-    if (citation.status === 'Disempurnakan') return 'HISTORIS';
+    if (citation.status === 'Disempurnakan') return lang === 'en' ? 'HISTORICAL' : 'HISTORIS';
+    if (lang === 'en') {
+      if (citation.translation_status === 'human-reviewed') return 'HUMAN-REVIEWED (EN)';
+      if (citation.translation_status === 'ai-assisted') return 'AI-ASSISTED (EN)';
+      if (citation.text_status === 'verbatim') return 'VERBATIM (ID)';
+      return 'NON-VERBATIM';
+    }
     if (citation.text_status === 'verbatim') return 'VERBATIM';
     return (citation.text_status || 'TEKS').toUpperCase();
   }
@@ -315,13 +319,6 @@
     }
   }
 
-  function changeLanguage(next) {
-    if (next === lang) return;
-    lang = next;
-    stopSpeaking();
-    if (zoneId) loadCard();
-  }
-
   function openZone(id) {
     navigate(`/totem/${id}`);
   }
@@ -340,7 +337,10 @@
     window.speechSynthesis.cancel();
     const utterance = new SpeechSynthesisUtterance(text);
     utterance.lang = lang === 'id' ? 'id-ID' : 'en-US';
-    utterance.rate = 0.95;
+    utterance.rate =
+      typeof window !== 'undefined'
+        ? parseFloat(localStorage.getItem('pramana_tts_rate') || '0.95')
+        : 0.95;
     utterance.onend = () => {
       speaking = false;
     };
@@ -361,8 +361,10 @@
     speaking = false;
   }
 
-  onMount(() => {
-    if (zoneId) {
+  $effect(() => {
+    const _lang = i18n.lang;
+    const _zone = zoneId;
+    if (_zone) {
       loadCard();
     } else {
       loadZoneList();
@@ -392,7 +394,7 @@
             style="background-color: #dfd6c3; color: #0a0a0a;"
             class="px-2 py-0.5 font-mono text-[10px] font-bold"
           >
-            04
+            03
           </span>
           <span class="px-3 py-0.5 text-[11px] font-semibold">{t.badge}</span>
         </div>
@@ -408,23 +410,11 @@
       <div class="flex flex-wrap items-center gap-2">
         <button
           type="button"
-          onclick={() => changeLanguage('id')}
-          style={lang === 'id'
-            ? 'background-color: #0c249c; color: #ffffff; border: 1.5px solid #0a0a0a; box-shadow: 2px 2px 0px #0a0a0a;'
-            : 'background-color: #ffffff; color: #0a0a0a; border: 1.5px solid #0a0a0a;'}
-          class="brutal-press px-3 py-1.5 font-mono text-[11px] font-bold cursor-pointer"
+          onclick={() => showScanner = true}
+          style="background-color: #0c249c; color: #ffffff; border: 1.5px solid #0a0a0a; box-shadow: 2px 2px 0px #0a0a0a;"
+          class="brutal-press px-3 py-1.5 font-mono text-[11px] font-bold cursor-pointer inline-flex items-center gap-1.5"
         >
-          ID
-        </button>
-        <button
-          type="button"
-          onclick={() => changeLanguage('en')}
-          style={lang === 'en'
-            ? 'background-color: #0c249c; color: #ffffff; border: 1.5px solid #0a0a0a; box-shadow: 2px 2px 0px #0a0a0a;'
-            : 'background-color: #ffffff; color: #0a0a0a; border: 1.5px solid #0a0a0a;'}
-          class="brutal-press px-3 py-1.5 font-mono text-[11px] font-bold cursor-pointer"
-        >
-          EN
+          <span>{lang === 'id' ? 'Pindai QR / Tap NFC' : 'Scan QR / Tap NFC'}</span>
         </button>
         {#if zoneId}
           <button
@@ -610,10 +600,10 @@
                     </span>
                   </div>
                   <h3 class="text-xs sm:text-[13px] font-semibold leading-snug" style="color: #0a0a0a;">
-                    {citation.official_doc_title}
+                    {lang === 'en' ? (citation.display_title || citation.title_en || citation.official_doc_title) : citation.official_doc_title}
                   </h3>
                   <p class="text-[11px] leading-relaxed" style="color: #3a3935;">
-                    {excerpt(citation.quoted_text)}
+                    {excerpt(lang === 'en' ? (citation.display_text || citation.text_en || citation.quoted_text) : citation.quoted_text)}
                   </p>
                   <span class="font-mono text-[10px] font-bold" style="color: #0c249c;">
                     {t.openSource} ↗
@@ -657,10 +647,10 @@
                       </span>
                     </div>
                     <h3 class="text-xs font-semibold leading-snug" style="color: #0a0a0a;">
-                      {citation.official_doc_title}
+                      {lang === 'en' ? (citation.display_title || citation.title_en || citation.official_doc_title) : citation.official_doc_title}
                     </h3>
                     <p class="font-mono text-[10px]" style="color: #8a3b00;">
-                      {citation.superseded_by || citation.status}
+                      {lang === 'en' ? (citation.display_status_note || citation.status_note_en || citation.superseded_by || citation.status) : (citation.superseded_by || citation.status)}
                     </p>
                   </button>
                 {/each}
@@ -778,10 +768,25 @@
     {:else}
       <div class="space-y-5">
         <div
-          class="p-4 text-xs leading-relaxed"
-          style="background-color: #ffffff; border: 1.5px solid #0a0a0a; color: #0a0a0a;"
+          class="p-4 sm:p-5 flex flex-wrap items-center justify-between gap-4"
+          style="background-color: #ffffff; border: 1.5px solid #0a0a0a; box-shadow: 3px 3px 0px #0a0a0a;"
         >
-          <strong>{t.tapNote}</strong>
+          <div class="space-y-1 max-w-xl">
+            <span class="font-mono text-[10px] font-bold uppercase tracking-wider" style="color: #0c249c;">
+              INTEGRASI FISIK LAPANGAN (NFC &amp; QR)
+            </span>
+            <p class="text-xs leading-relaxed text-[#0a0a0a]">
+              <strong>{t.tapNote}</strong>
+            </p>
+          </div>
+          <button
+            type="button"
+            onclick={() => { showScanner = true; }}
+            class="brutal-press px-4 py-2.5 font-mono text-xs font-bold cursor-pointer inline-flex items-center gap-2"
+            style="background-color: #0c249c; color: #ffffff; border: 1.5px solid #0a0a0a; box-shadow: 2px 2px 0px #0a0a0a;"
+          >
+            <span>{lang === 'id' ? 'Buka Kamera / Simulasi Tap NFC' : 'Open Camera / Tap NFC Sim'}</span>
+          </button>
         </div>
 
         <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
@@ -831,4 +836,13 @@
       </div>
     {/if}
   </section>
+
+  <GateScannerModal
+    isOpen={showScanner}
+    onClose={() => { showScanner = false; }}
+    onScan={(scannedZoneId) => {
+      showScanner = false;
+      openZone(scannedZoneId);
+    }}
+  />
 </div>

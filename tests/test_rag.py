@@ -381,3 +381,115 @@ def test_gemini_falls_back_to_next_model_on_429(monkeypatch):
         {"model": "gemini-3.5-flash", "error": "HTTP 429"}
     ]
     assert len(calls) == 2
+
+def test_mode2_weak_match_not_positive_status_and_detects_framing(engine):
+    post = 'Turis bule telanjang di Pura Besakih, usir semua turis asing dari Bali!'
+    result = engine.analyze_viral_post(post)
+
+    assert result['status'] != 'TERVERIFIKASI'
+    assert result['status'] == 'BUKTI_TERBATAS'
+    assert result['confidence'] == 'RENDAH'
+    assert len(result['framing_markers']) >= 1
+    assert any(
+        'usir' in m['phrase'] or 'semua turis' in m['phrase']
+        for m in result['framing_markers']
+    )
+    assert result['citations']
+    assert result['citations'][0]['reg_id'] != 'PERDA_BALI_06_2023_PENJELASAN_UMUM'
+
+
+def test_mode2_english_framing_and_retrieval(engine):
+    post = 'Tourist climbed a sacred tree at a Bali temple and posted it. Deport them all!'
+    result = engine.analyze_viral_post(post)
+
+    assert any(m['phrase'] == 'deport them all' for m in result['framing_markers'])
+    assert any(c['reg_id'] == 'SE_GUB_04_2023_DONT' for c in result['citations'])
+
+
+def test_mode2_single_word_abstains(engine):
+    result = engine.analyze_viral_post('pura')
+    assert result['status'] == 'TIDAK_DITEMUKAN'
+    assert result['guard_status'] == 'KUERI_TERLALU_PENDEK'
+    assert result['citations'] == []
+
+
+def test_mode1_trip_brief_activity_personalization(engine):
+    # 1. Scooter only
+    scooter_res = engine.analyze_trip_itinerary(
+        itinerary_text='Renting a scooter to drive between Canggu and Seminyak cafes',
+        start_date='2026-04-10',
+        traveler_origin='domestic',
+    )
+    scooter_ids = [item['id'] for item in scooter_res['briefing_items']]
+    assert 'SE_GUB_04_2023_DONT' in scooter_ids
+    assert 'PERGUB_BALI_25_2020_PASAL_45_46' not in scooter_ids
+
+    # 2. Temple only
+    temple_res = engine.analyze_trip_itinerary(
+        itinerary_text='Visiting Pura Besakih sacred temple for morning prayers',
+        start_date='2026-04-10',
+        traveler_origin='domestic',
+    )
+    temple_ids = [item['id'] for item in temple_res['briefing_items']]
+    assert 'PERGUB_BALI_25_2020_PASAL_45_46' in temple_ids
+
+    # 3. Surfing / beach only
+    surf_res = engine.analyze_trip_itinerary(
+        itinerary_text='Surfing and beach sunset dining at Canggu beach',
+        start_date='2026-04-10',
+        traveler_origin='domestic',
+    )
+    surf_ids = [item['id'] for item in surf_res['briefing_items']]
+    assert any('PERDA_BALI_05_2020' in reg_id or 'UU_18_2025' in reg_id for reg_id in surf_ids)
+    assert 'PERGUB_BALI_25_2020_PASAL_45_46' not in surf_ids
+
+
+def test_english_probe_retrieval_success(engine):
+    """B2: English viral posts and tourist queries ground successfully without key."""
+
+    # Probe 1: Naked foreigner at Mount Batur
+    p1 = "A foreigner posed naked at Mount Batur sacred site, authorities must deport him"
+    res1 = engine.analyze_viral_post(p1)
+    assert res1["status"] in {"TERVERIFIKASI_KORPUS", "TERVERIFIKASI"}, f"Expected verified, got {res1['status']}"
+    assert any(c["reg_id"] in {"SE_GUB_04_2023_DONT", "SE_GUB_04_2023_DO"} for c in res1["citations"])
+
+    # Probe 2: Riding rented scooters without license in Canggu
+    p2 = "Foreigners riding rented scooters without license in Canggu are out of control"
+    res2 = engine.analyze_viral_post(p2)
+    assert res2["status"] in {"TERVERIFIKASI_KORPUS", "TERVERIFIKASI"}, f"Expected verified, got {res2['status']}"
+    assert any(c["reg_id"] == "SE_GUB_04_2023_DONT" for c in res2["citations"])
+
+
+def test_anatomy_rig_scenarios_match_engine(engine):
+    """PH8: Verify AnatomyRig static scenarios match actual engine classification."""
+
+    # Scenario 1: Sacred tree climbed
+    res1 = engine.analyze_viral_post("Wisatawan memanjat pohon keramat di kawasan pura")
+    assert res1["status"] in {"TERVERIFIKASI_KORPUS", "TERVERIFIKASI"}
+
+    # Scenario 2: Nyepi overlap
+    res2 = engine.analyze_trip_itinerary(
+        itinerary_text="Tiba di Bandara Ngurah Rai dan menginap di Ubud",
+        start_date="2026-03-18",
+        end_date="2026-03-21",
+        traveler_origin="international",
+    )
+    assert res2["calendar_conflicts"]["has_nyepi"] is True
+
+    # Scenario 3: Hoax / Abstain outside law
+    res3 = engine.analyze_viral_post("Kucing oranye tertidur di atas meja kasir restoran dan meminta ikan tongkol")
+    assert res3["status"] == "TIDAK_DITEMUKAN"
+
+
+def test_trip_brief_trigger_reasons(engine):
+    """PH10: Verify trip briefing items contain human-readable trigger reasons."""
+    res = engine.analyze_trip_itinerary(
+        itinerary_text="Sewa motor keliling pantai Canggu dan kunjungan ke Pura Besakih",
+        start_date="2026-06-10",
+        end_date="2026-06-15",
+        traveler_origin="international",
+    )
+    assert len(res["briefing_items"]) > 0
+    for item in res["briefing_items"]:
+        assert "trigger_reason" in item and item["trigger_reason"]
+        assert "trigger_reason_en" in item and item["trigger_reason_en"]

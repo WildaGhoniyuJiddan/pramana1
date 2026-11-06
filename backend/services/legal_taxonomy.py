@@ -55,7 +55,7 @@ LEGAL_DOMAIN_CLUSTERS: Dict[str, Dict[str, Any]] = {
             "foto tidak sopan", "sedang haid masuk pura", "menstruasi",
             "utama mandala", "kawasan suci", "tempat suci", "pratima",
             "pecalang", "desa adat", "catur brata", "nyepi", "busana adat",
-            "pura", "upacara adat", "kegiatan keagamaan",
+            "pura", "upacara adat", "kegiatan keagamaan", "tree", "sacred tree", "sacred", "holy", "temple", "temples", "mount batur", "posed naked", "climbed", "climb", "batur", "sacred site",
         ],
         "inject_keywords": [
             "kawasan suci", "utama mandala", "pohon keramat", "busana adat",
@@ -84,7 +84,7 @@ LEGAL_DOMAIN_CLUSTERS: Dict[str, Dict[str, Any]] = {
             "bebas pungutan", "cara bayar pungutan", "wna belum bayar",
             "pungutan wisman", "pungutan wisatawan", "pungutan asing",
             "pungutan", "retribusi", "kitas", "kitap", "golden visa",
-            "visa diplomatik",
+            "visa diplomatik", "levy", "tourist levy", "150k", "love bali online", "pay levy", "pay the bali tourist levy", "deport", "deported",
         ],
         "inject_keywords": [
             "pungutan wisatawan asing", "Rp150.000", "pembayaran elektronik",
@@ -163,7 +163,7 @@ LEGAL_DOMAIN_CLUSTERS: Dict[str, Dict[str, Any]] = {
             "daya tarik wisata", "standar usaha", "ketertiban umum",
             "pengelola wisata", "kepariwisataan", "pariwisata",
             "akomodasi", "pemandu wisata", "izin usaha pariwisata",
-            "tata tertib wisatawan",
+            "tata tertib wisatawan", "scooter", "scooters", "without license", "rented scooters", "riding", "rented", "deport", "deported", "illegal business",
         ],
         "inject_keywords": [
             "daya tarik wisata", "standar usaha pariwisata", "ketertiban umum",
@@ -214,7 +214,7 @@ LOCATION_TERMS = (
     "bangli", "bandara", "pelabuhan", "pantai", "beach club", "restoran",
     "hotel", "villa", "kafe", "pasar", "jalan raya", "terminal", "desa adat",
     "medsos", "tiktok", "instagram", "whatsapp", "facebook", "twitter",
-    "pohon suci", "kawasan suci", "area pura",
+    "pohon suci", "kawasan suci", "area pura", "temple", "temples", "shrine", "mount", "batur", "site", "sacred site", "beach", "airport", "cafe", "restaurant",
 )
 
 ACTION_TERMS = (
@@ -226,7 +226,7 @@ ACTION_TERMS = (
     "menyalakan", "berisik", "memakai", "mengenakan", "merusak", "mencuri",
     "menodai", "menolak", "mengejek", "mengucapkan", "berteriak", "memukul",
     "menganiaya", "overstay", "bikin ulah", "mengganggu", "berbuat",
-    "melakukan", "mengemudi", "membawa", "dipukul", "dihina",
+    "melakukan", "mengemudi", "membawa", "dipukul", "dihina", "climb", "climbed", "climbing", "posed", "naked", "nude", "nudity", "riding", "ride", "rented", "rent", "deport", "deported", "deportation", "expel", "throw", "trash", "illegal", "without license", "damage", "damaging",
 )
 
 LEGAL_QUERY_TERMS = (
@@ -327,7 +327,7 @@ def assess_factual_completeness(text: str) -> Dict[str, Any]:
         for term in (
             "wisatawan", "wna", "wni", "bule", "warga", "pengunjung",
             "turis", "pelaku usaha", "staf", "petugas", "pemandu", "pedagang",
-            "akun", "hotel", "restoran", "beach club",
+            "akun", "hotel", "restoran", "beach club", "tourist", "tourists", "foreigner", "foreigners", "authorities", "driver",
         )
     )
 
@@ -373,11 +373,18 @@ def assess_factual_completeness(text: str) -> Dict[str, Any]:
         matched_clusters[0] if matched_clusters else None
     )
     cluster = LEGAL_DOMAIN_CLUSTERS.get(primary_cluster, {})
-    query_expansion = " ".join(
-        keyword
-        for cluster_id in matched_clusters[:2]
-        for keyword in LEGAL_DOMAIN_CLUSTERS[cluster_id]["inject_keywords"]
+    has_nyepi_term = any(
+        "nyepi" in term.lower() or "catur brata" in term.lower()
+        for term in matched_terms
     )
+    query_expansion_keywords = []
+    for cluster_id in matched_clusters[:2]:
+        for keyword in LEGAL_DOMAIN_CLUSTERS[cluster_id]["inject_keywords"]:
+            if "nyepi" in keyword.lower() or "catur brata" in keyword.lower():
+                if not has_nyepi_term:
+                    continue
+            query_expansion_keywords.append(keyword)
+    query_expansion = " ".join(query_expansion_keywords)
 
     if registry_only:
         tone = "Instrumen Registry-Only / Perlu Verifikasi Lokal"

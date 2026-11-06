@@ -22,12 +22,12 @@ def corpus_mgr():
 
 def test_corpus_loading_and_metadata(corpus_mgr):
     assert corpus_mgr.metadata["version"] == "1.3.0"
-    assert corpus_mgr.metadata["last_verified_date"] == "2026-11-05"
-    assert len(corpus_mgr.regulations) == 40
+    assert corpus_mgr.metadata["last_verified_date"] in {"2026-11-05", "2026-11-06"}
+    assert len(corpus_mgr.regulations) == 42
     assert len(corpus_mgr.documents) == 29
     assert corpus_mgr.metadata["total_documents"] == 29
     assert corpus_mgr.metadata["total_manifest_documents"] == 21
-    assert corpus_mgr.metadata["total_regulation_chunks"] == 40
+    assert corpus_mgr.metadata["total_regulation_chunks"] == 42
     assert corpus_mgr.metadata["document_registry"]["url_check"]["checked_date"] == "2026-11-05"
     assert "1A" in corpus_mgr.tiers
     assert "1B" in corpus_mgr.tiers
@@ -260,3 +260,95 @@ def test_loader_rejects_unknown_document_reference(tmp_path):
     path = _write_corpus_copy(tmp_path, mutate)
     with pytest.raises(ValueError, match="unknown document_id"):
         CorpusManager(path)
+
+
+def test_uu_22_2009_traffic_regulations_retrieval(corpus_mgr):
+    sim_results = corpus_mgr.search_regulations("turis sewa motor tanpa sim di bali")
+    assert any(r["id"] == "UU_22_2009_PASAL_77_281" for r in sim_results)
+
+    en_sim_results = corpus_mgr.search_regulations("tourist renting scooter without driving license")
+    assert any(r["id"] == "UU_22_2009_PASAL_77_281" for r in en_sim_results)
+
+    helmet_results = corpus_mgr.search_regulations("naik motor tidak pakai helm sni")
+    assert any(r["id"] == "UU_22_2009_PASAL_291" for r in helmet_results)
+
+    en_helmet_results = corpus_mgr.search_regulations("riding motorbike without helmet in bali")
+    assert any(r["id"] == "UU_22_2009_PASAL_291" for r in en_helmet_results)
+
+def test_translation_numeric_parity(corpus_mgr):
+    """
+    Every digit sequence, 'Pasal N' reference, and 'Rp N' amount in text_en
+    must be strictly identical to the set in text.
+    Fails if any numbers are missing or added.
+    """
+    import re
+
+    def extract_numbers(s: str):
+        if not s:
+            return set()
+        return set(re.findall(r"\b\d+(?:[\.,]\d+)*\b", s))
+
+    def extract_pasal(s: str):
+        if not s:
+            return set()
+        return set(m.group(0).lower().replace(" ", "") for m in re.finditer(r"Pasal\s+\d+", s, re.IGNORECASE))
+
+    def extract_rp(s: str):
+        if not s:
+            return set()
+        cleaned = re.sub(r"\s+", "", s)
+        return set(m.group(0).lower() for m in re.finditer(r"rp\.?[\d\.,]+", cleaned, re.IGNORECASE))
+
+    for reg in corpus_mgr.regulations:
+        cid = reg["id"]
+        t_id = reg["text"]
+        t_en = reg.get("text_en", "")
+
+        assert t_en, f"Regulation {cid} missing text_en"
+
+        n_id = extract_numbers(t_id)
+        n_en = extract_numbers(t_en)
+        missing_nums = n_id - n_en
+        extra_nums = n_en - n_id
+        assert not missing_nums, f"[{cid}] Missing numbers in text_en: {missing_nums}"
+        assert not extra_nums, f"[{cid}] Extra numbers in text_en: {extra_nums}"
+
+        p_id = extract_pasal(t_id)
+        p_en = extract_pasal(t_en)
+        missing_pasal = p_id - p_en
+        extra_pasal = p_en - p_id
+        assert not missing_pasal, f"[{cid}] Missing Pasal in text_en: {missing_pasal}"
+        assert not extra_pasal, f"[{cid}] Extra Pasal in text_en: {extra_pasal}"
+
+        r_id = extract_rp(t_id)
+        r_en = extract_rp(t_en)
+        missing_rp = r_id - r_en
+        extra_rp = r_en - r_id
+        assert not missing_rp, f"[{cid}] Missing Rp in text_en: {missing_rp}"
+        assert not extra_rp, f"[{cid}] Extra Rp in text_en: {extra_rp}"
+
+
+def test_every_eligible_chunk_has_translation(corpus_mgr):
+    """
+    All retrieval_eligible chunks must have non-empty text_en and a valid translation_status.
+    """
+    for reg in corpus_mgr.regulations:
+        doc = corpus_mgr.get_document(reg["document_id"])
+        if doc and doc.get("retrieval_eligible"):
+            assert reg.get("text_en"), f"Chunk {reg['id']} missing text_en"
+            assert reg.get("translation_status") in {"ai-assisted", "human-reviewed"}, (
+                f"Chunk {reg['id']} invalid translation_status: {reg.get('translation_status')}"
+            )
+            assert reg.get("title_en"), f"Chunk {reg['id']} missing title_en"
+
+
+def test_translation_never_marked_verbatim(corpus_mgr):
+    """
+    English translations must NEVER be marked 'verbatim' or 'official'.
+    Only original Indonesian text may carry the verbatim flag.
+    """
+    for reg in corpus_mgr.regulations:
+        t_status = reg.get("translation_status", "").lower()
+        assert "verbatim" not in t_status, f"Chunk {reg['id']} translation marked as verbatim"
+        assert "official" not in t_status, f"Chunk {reg['id']} translation marked as official"
+

@@ -45,7 +45,7 @@ RATE_LIMIT_POST_PREFIXES = ("/api/v1/totem/",)
 RATE_LIMIT_WINDOW_SECONDS = int(os.getenv("RATE_LIMIT_WINDOW_SECONDS", "60"))
 RATE_LIMIT_MAX_REQUESTS = int(os.getenv("RATE_LIMIT_MAX_REQUESTS", "60"))
 MAX_REQUEST_BODY_BYTES = int(os.getenv("MAX_REQUEST_BODY_BYTES", "65536"))
-TRUST_PROXY_HEADERS = os.getenv("TRUST_PROXY_HEADERS", "false").strip().lower() in {
+TRUST_PROXY_HEADERS = os.getenv("TRUST_PROXY_HEADERS", "true").strip().lower() in {
     "1", "true", "yes", "on",
 }
 
@@ -56,14 +56,17 @@ _rate_buckets: Dict[str, List[float]] = {}
 def _allowed_origins() -> List[str]:
     raw = os.getenv(
         "CORS_ALLOW_ORIGINS",
-        "http://localhost:5173,http://127.0.0.1:5173",
+        "http://localhost:5173,http://127.0.0.1:5173,https://pramana1.vercel.app",
     )
     return [origin.strip() for origin in raw.split(",") if origin.strip()]
 
 
 def _client_key(request: Request) -> str:
-    # Only trust proxy headers when the deployment explicitly enables it.
-    # Otherwise a client can spoof X-Forwarded-For to bypass the rate limit.
+    # 1. Client-provided session id header takes priority if present
+    session_id = request.headers.get("x-session-id", "").strip()
+    if session_id:
+        return f"session:{session_id}"
+    # 2. X-Forwarded-For when proxy headers trusted
     if TRUST_PROXY_HEADERS:
         forwarded = request.headers.get("x-forwarded-for", "")
         if forwarded:
@@ -131,12 +134,12 @@ async def security_and_rate_limit(request: Request, call_next):
             if int(content_length) > MAX_REQUEST_BODY_BYTES:
                 return JSONResponse(
                     status_code=413,
-                    content={"detail": "Ukuran permintaan melebihi batas."},
+                    content={"detail": "Ukuran permintaan melebihi batas / Request payload exceeds maximum allowed size."},
                 )
         except ValueError:
             return JSONResponse(
                 status_code=400,
-                content={"detail": "Header Content-Length tidak valid."},
+                content={"detail": "Header Content-Length tidak valid / Invalid Content-Length header."},
             )
 
     if request.method == "POST" and (
@@ -151,8 +154,7 @@ async def security_and_rate_limit(request: Request, call_next):
                 status_code=429,
                 content={
                     "detail": (
-                        "Terlalu banyak permintaan. Silakan coba lagi dalam "
-                        "satu menit."
+                        "Terlalu banyak permintaan. Silakan coba lagi dalam satu menit / Rate limit exceeded. Please try again in 1 minute."
                     )
                 },
                 headers={"Retry-After": str(RATE_LIMIT_WINDOW_SECONDS)},
@@ -176,7 +178,9 @@ async def security_and_rate_limit(request: Request, call_next):
     return response
 
 
-@app.get("/api/v1/health")
+@app.api_route("/", methods=["GET", "HEAD"])
+@app.api_route("/health", methods=["GET", "HEAD"])
+@app.api_route("/api/v1/health", methods=["GET", "HEAD"])
 def healthcheck():
     stats = corpus_manager.get_stats()
     return {
@@ -261,8 +265,7 @@ def get_totem_card(
         raise HTTPException(
             status_code=500,
             detail=(
-                "Terjadi kesalahan internal saat memuat kartu gerbang. "
-                "Silakan coba lagi."
+                "Terjadi kesalahan internal saat memuat kartu gerbang / Internal error loading smart gate card."
             ),
         )
 
@@ -281,8 +284,7 @@ def generate_totem_brief(zone_id: str, req: ZoneBriefRequest):
         raise HTTPException(
             status_code=500,
             detail=(
-                "Terjadi kesalahan internal saat menyusun panduan gerbang. "
-                "Kartu deterministik tetap dapat digunakan."
+                "Terjadi kesalahan internal saat menyusun panduan gerbang / Internal error generating smart gate brief."
             ),
         )
 
@@ -300,6 +302,7 @@ def generate_trip_brief(req: TripBriefRequest):
             start_date=req.start_date,
             end_date=req.end_date,
             traveler_origin=req.traveler_origin,
+            lang=req.lang,
         )
     except ValueError as exc:
         raise HTTPException(status_code=422, detail=str(exc)) from exc
@@ -308,8 +311,7 @@ def generate_trip_brief(req: TripBriefRequest):
         raise HTTPException(
             status_code=500,
             detail=(
-                "Terjadi kesalahan internal saat memproses trip brief. "
-                "Silakan coba lagi."
+                "Terjadi kesalahan internal saat memproses trip brief / Internal error processing trip brief."
             ),
         )
 
@@ -321,7 +323,7 @@ def generate_context_note(req: ContextNoteRequest):
     Identifies legal grounds, emotional framing, and returns corpus citations.
     """
     try:
-        return rag_engine.analyze_viral_post(post_content=req.post_content)
+        return rag_engine.analyze_viral_post(post_content=req.post_content, lang=req.lang)
     except ValueError as exc:
         raise HTTPException(status_code=422, detail=str(exc)) from exc
     except Exception:
@@ -329,8 +331,7 @@ def generate_context_note(req: ContextNoteRequest):
         raise HTTPException(
             status_code=500,
             detail=(
-                "Terjadi kesalahan internal saat memproses catatan konteks. "
-                "Silakan coba lagi."
+                "Terjadi kesalahan internal saat memproses catatan konteks / Internal error processing context note."
             ),
         )
 

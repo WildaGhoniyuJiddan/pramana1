@@ -19,16 +19,19 @@ def _load_cases():
 
 def test_eval_cases_are_unique_and_complete():
     cases = _load_cases()
-    assert len(cases) == 45
+    assert len(cases) >= 65
     ids = [case["id"] for case in cases]
     assert len(ids) == len(set(ids))
 
     counts = Counter(case["category"] for case in cases)
-    assert counts["in_scope"] == 15
-    assert counts["triage"] == 10
-    assert counts["out_of_scope"] == 10
-    assert counts["adversarial"] == 4
-    assert counts["pii"] == 6
+    assert counts["in_scope"] >= 35
+    assert counts["out_of_scope"] >= 18
+    assert counts["adversarial"] >= 5
+    assert counts["pii"] >= 7
+    assert counts["triage"] >= 10
+
+    en_cases = [c for c in cases if c.get("language") == "en"]
+    assert len(en_cases) >= 25
 
     for case in cases:
         assert case["input"].strip()

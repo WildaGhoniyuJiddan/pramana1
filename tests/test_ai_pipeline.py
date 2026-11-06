@@ -273,3 +273,135 @@ def test_pipeline_tier1_downgrades_when_all_claims_fail(citations, monkeypatch):
     assert result["resolution_mode"] == "NEEDS_CLARIFICATION"
     assert result["claims"] == []
     assert result["guard_status"] in {"AI_OUTPUT_DITOLAK", "FALLBACK_GUARD"}
+
+def test_pipeline_rejects_fake_rupiah_substring_match(citations, monkeypatch):
+    monkeypatch.setenv("AI_MODE", "optional")
+    span_index = build_span_index(citations)
+    span_id = next(iter(span_index))
+
+    # Rp500.000 is fake, should NOT match Rp150.000,00 substring
+    parsed = {
+        "abstain": False,
+        "summary_id": "Wisatawan asing wajib membayar denda Rp500.000 di Bali.",
+        "summary_en": "Foreign tourists must pay a 500,000 fine in Bali.",
+        "claims": [{
+            "claim_text_id": "Wisatawan asing wajib membayar denda Rp500.000 di Bali.",
+            "claim_text_en": "Foreign tourists must pay a 500,000 fine in Bali.",
+            "citation_id": "PERDA_BALI_06_2023_LEVY",
+            "span_ids": [span_id],
+        }],
+    }
+
+    result = _pipeline(parsed).answer(
+        citations=citations,
+        system_prompt="test",
+        user_prompt="test",
+        fallback_summary="fallback",
+    )
+
+    assert result["ai_synthesis_status"] == "deterministic"
+    assert result["guard_status"] == "FALLBACK_GUARD"
+
+
+def test_pipeline_rejects_external_url(citations, monkeypatch):
+    monkeypatch.setenv("AI_MODE", "optional")
+    span_index = build_span_index(citations)
+    span_id = next(iter(span_index))
+
+    parsed = {
+        "abstain": False,
+        "summary_id": "Bayar retribusi via http://evil.example/pay resmi.",
+        "summary_en": "Pay levy via http://evil.example/pay official.",
+        "claims": [{
+            "claim_text_id": "Wisatawan asing wajib membayar pungutan Rp150.000.",
+            "claim_text_en": "Foreign tourists must pay the IDR 150,000 levy.",
+            "citation_id": "PERDA_BALI_06_2023_LEVY",
+            "span_ids": [span_id],
+        }],
+    }
+
+    result = _pipeline(parsed).answer(
+        citations=citations,
+        system_prompt="test",
+        user_prompt="test",
+        fallback_summary="fallback",
+    )
+
+    assert result["ai_synthesis_status"] == "deterministic"
+    assert result["guard_status"] == "FALLBACK_GUARD"
+
+
+def test_pipeline_rejects_invented_number(citations, monkeypatch):
+    monkeypatch.setenv("AI_MODE", "optional")
+    span_index = build_span_index(citations)
+    span_id = next(iter(span_index))
+
+    parsed = {
+        "abstain": False,
+        "summary_id": "Pembayaran pungutan berlaku selama 30 hari di Bali.",
+        "summary_en": "Levy payment is valid for 30 days in Bali.",
+        "claims": [{
+            "claim_text_id": "Wisatawan asing wajib membayar pungutan Rp150.000.",
+            "claim_text_en": "Foreign tourists must pay the IDR 150,000 levy.",
+            "citation_id": "PERDA_BALI_06_2023_LEVY",
+            "span_ids": [span_id],
+        }],
+    }
+
+    result = _pipeline(parsed).answer(
+        citations=citations,
+        system_prompt="test",
+        user_prompt="test",
+        fallback_summary="fallback",
+    )
+
+    assert result["ai_synthesis_status"] == "deterministic"
+    assert result["guard_status"] == "FALLBACK_GUARD"
+
+
+def test_pipeline_rejects_contradiction_phrase(citations, monkeypatch):
+    monkeypatch.setenv("AI_MODE", "optional")
+    span_index = build_span_index(citations)
+    span_id = next(iter(span_index))
+
+    parsed = {
+        "abstain": False,
+        "summary_id": "Semua wisatawan dibebaskan dari semua kewajiban pungutan.",
+        "summary_en": "All tourists are exempt from all levy payments.",
+        "claims": [{
+            "claim_text_id": "Wisatawan asing wajib membayar pungutan Rp150.000.",
+            "claim_text_en": "Foreign tourists must pay the IDR 150,000 levy.",
+            "citation_id": "PERDA_BALI_06_2023_LEVY",
+            "span_ids": [span_id],
+        }],
+    }
+
+    result = _pipeline(parsed).answer(
+        citations=citations,
+        system_prompt="test",
+        user_prompt="test",
+        fallback_summary="fallback",
+    )
+
+    assert result["ai_synthesis_status"] == "deterministic"
+    assert result["guard_status"] == "FALLBACK_GUARD"
+
+
+def test_pipeline_rejects_fabricated_duration_unit():
+    """B1: Numbers with units must match exact values in citations, not stray digits."""
+    sample_citations = [{
+        "reg_id": "TEST_REG",
+        "official_doc_title": "Test Law",
+        "tier": "1A",
+        "tier_label": "UU",
+        "pasal": "Pasal 10 ayat (3)",
+        "quoted_text": "Sesuai Pasal 10 ayat (3), wisatawan wajib melapor dalam waktu 24 jam.",
+        "penalties": "Denda",
+        "source_url": "https://example.com/law",
+    }]
+
+    valid_text = "Wisatawan wajib melapor dalam waktu 24 jam sesuai ketentuan Pasal 10."
+    assert GroundedAIPipeline._guard_text(valid_text, sample_citations) is True
+
+    fabricated_text = "Wisatawan diberikan batas waktu 3 hari untuk melapor sesuai Pasal 10."
+    assert GroundedAIPipeline._guard_text(fabricated_text, sample_citations) is False

@@ -1,18 +1,21 @@
 <script>
   import AnatomyRig from './AnatomyRig.svelte';
+  import { i18n, DICT } from '../lib/i18n.svelte.js';
 
   let { navigate = (path) => {}, onOpenDoc = (doc) => {} } = $props();
 
+  let landing = $derived(DICT[i18n.lang].landing);
+
   // Distinct institutional & statutory wordmarks for the single-row Hero Ribbon
-  const HERO_INSTITUTIONS = [
-    { id: 'jdih', name: 'JDIH BPK & Sumber Resmi', icon: 'gate' },
-    { id: 'imigrasi', name: 'UU Imigrasi Pasal 75', icon: 'compass' },
-    { id: 'perda5', name: 'Perda Bali No. 5/2020', icon: 'dharma' },
-    { id: 'segub4', name: 'SE Gubernur 4/2023 & 7/2025', icon: 'scroll' },
-    { id: 'phdi', name: 'PHDI & Majelis Desa Adat', icon: 'lotus' },
-    { id: 'lovebali', name: 'Perda Pungutan 6/2023 jo. 2/2025', icon: 'diamond' },
-    { id: 'uu28', name: 'Domain Publik UU 28/2014', icon: 'book' }
-  ];
+  let heroInstitutions = $derived([
+    { id: 'jdih', name: i18n.lang === 'en' ? 'BPK JDIH & Official Sources' : 'JDIH BPK & Sumber Resmi', icon: 'gate' },
+    { id: 'imigrasi', name: i18n.lang === 'en' ? 'Immigration Law Art. 75' : 'UU Imigrasi Pasal 75', icon: 'compass' },
+    { id: 'perda5', name: i18n.lang === 'en' ? 'Bali Regional Reg 5/2020' : 'Perda Bali No. 5/2020', icon: 'dharma' },
+    { id: 'segub4', name: i18n.lang === 'en' ? 'Governor Circular 4/2023 & 7/2025' : 'SE Gubernur 4/2023 & 7/2025', icon: 'scroll' },
+    { id: 'phdi', name: i18n.lang === 'en' ? 'PHDI & Customary Village Council' : 'PHDI & Majelis Desa Adat', icon: 'lotus' },
+    { id: 'lovebali', name: i18n.lang === 'en' ? 'Levy Bylaw 6/2023 jo. 2/2025' : 'Perda Pungutan 6/2023 jo. 2/2025', icon: 'diamond' },
+    { id: 'uu28', name: i18n.lang === 'en' ? 'Public Domain Law 28/2014' : 'Domain Publik UU 28/2014', icon: 'book' }
+  ]);
 </script>
 
 <div class="w-full" style="background-color: #e6e4de; color: #0a0a0a; width: 100%; max-width: 100vw; overflow-x: hidden;">
@@ -23,7 +26,7 @@
     <!-- 1. HERO ARTWORK SECTION -->
     <section class="p-3 sm:p-4">
       <div
-        class="relative w-full h-[540px] sm:h-[640px] lg:h-[700px] overflow-hidden"
+        class="relative w-full h-[420px] sm:h-[640px] lg:h-[700px] overflow-hidden"
         style="border-radius: 8px; background-color: #091e8a; border: 1px solid #b8b3a6;"
       >
         <img
@@ -43,7 +46,7 @@
           style="width: 100%; max-width: 100%; overflow: hidden;"
         >
           <div class="opero-marquee-track gap-3.5">
-            {#each [...HERO_INSTITUTIONS, ...HERO_INSTITUTIONS] as item}
+            {#each [...heroInstitutions, ...heroInstitutions] as item}
               <button
                 type="button"
                 onclick={() => navigate('/corpus')}
@@ -98,7 +101,7 @@
       class="px-5 sm:px-10 pt-8 sm:pt-11 pb-12 sm:pb-16"
       style="border-bottom: 1px solid #cdc9be;"
     >
-      <h1 class="opero-h1 text-[38px] sm:text-[56px] lg:text-[66px] max-w-4xl">
+      <h1 class="opero-h1 text-[32px] sm:text-[56px] lg:text-[66px] max-w-4xl">
         The AI <span class="opero-serif">legal context</span> layer<br />
         for Bali tourism &amp; governance.
       </h1>
@@ -110,7 +113,7 @@
           style="background-color: #0c249c; color: #ffffff; padding: 3px; border: 1.5px solid #0a0a0a; box-shadow: 3px 3px 0px #0a0a0a;"
           class="opero-split-btn brutal-press inline-flex items-center text-xs font-medium cursor-pointer"
         >
-          <span class="px-5 py-2.5">Susun Trip Brief</span>
+          <span class="px-5 py-2.5">{landing.tripBtn}</span>
           <span
             style="background-color: #dfd8c8; color: #0a0a0a;"
             class="opero-arrow-box w-8 h-8 flex items-center justify-center font-mono text-xs font-bold"
@@ -125,7 +128,7 @@
           style="background-color: #ffffff; color: #0a0a0a; padding: 3px; border: 1.5px solid #0a0a0a; box-shadow: 3px 3px 0px #0a0a0a;"
           class="opero-split-btn brutal-press inline-flex items-center text-xs font-medium cursor-pointer"
         >
-          <span class="px-5 py-2.5">Uji Klaim Viral</span>
+          <span class="px-5 py-2.5">{landing.contextBtn}</span>
           <span
             style="background-color: #0c249c; color: #ffffff;"
             class="opero-arrow-box w-8 h-8 flex items-center justify-center font-mono text-xs font-bold"
@@ -183,14 +186,14 @@
               class="text-2xl sm:text-3xl font-normal tracking-tight leading-tight break-words"
               style="color: #ffffff; letter-spacing: -0.03em;"
             >
-              Three-Layer Legal Architecture
+              {landing.archTitle}
             </h2>
 
             <p
               class="text-xs sm:text-[13.5px] leading-relaxed break-words"
               style="color: rgba(255, 255, 255, 0.88);"
             >
-              Setiap permohonan melewati tiga tahap deterministik: penyaringan data pribadi otomatis (Tahap 01), filter spasio-temporal Gerbang Candi Bentar &amp; Kalender Saka (Tahap 02), serta pencocokan kutipan terhadap 40 chunk terverifikasi dari 29 dokumen registry Pramana (Tahap 03). Registry bukan bukti kutipan, dan korpus tidak diverifikasi ulang secara real-time ke JDIH.
+              {landing.archDesc}
             </p>
 
             <div class="pt-1 flex flex-wrap gap-3">
@@ -200,7 +203,7 @@
                 style="background-color: #dfd6c3; color: #0a0a0a; border: 1.5px solid #0a0a0a; box-shadow: 3px 3px 0px #0a0a0a;"
                 class="brutal-press px-4 py-2.5 text-xs font-semibold hover:bg-white transition-colors cursor-pointer"
               >
-                Inspeksi Korpus Pramana
+                {landing.openCorpusBtn}
               </button>
               <button
                 type="button"
@@ -208,7 +211,7 @@
                 style="background-color: #ffffff; color: #0a0a0a; border: 1.5px solid #0a0a0a; box-shadow: 3px 3px 0px #0a0a0a;"
                 class="brutal-press px-4 py-2.5 text-xs font-semibold hover:bg-stone transition-colors cursor-pointer"
               >
-                Buka Simulasi →
+                {i18n.lang === 'en' ? 'Try Trip Brief →' : 'Coba Trip Brief →'}
               </button>
             </div>
           </div>
@@ -249,14 +252,11 @@
               </span>
               <span class="font-mono text-xs font-bold" style="color: #0c249c;">/trip-brief</span>
             </div>
-            <span class="inline-block font-mono text-[9.5px] font-bold px-1.5 py-0.5" style="background-color: #fff3cd; color: #8a3b00; border: 1px solid #8a3b00;">
-              🟡 Prototype
-            </span>
             <h3 class="text-lg font-medium tracking-tight pt-1" style="color: #0a0a0a;">
-              Rencana Perjalanan &amp; Kalender .ICS
+              {landing.card1Title}
             </h3>
             <p class="text-xs leading-relaxed" style="color: #3a3935;">
-              Ubah draf itinerary menjadi daftar periksa kepatuhan berpasal, samarkan data reservasi tamu (PII), dan unduh pengingat Hari Suci Nyepi (`.ics` RFC 5545).
+              {landing.card1Desc}
             </p>
           </div>
 
@@ -266,7 +266,7 @@
             style="background-color: #0c249c; color: #ffffff; padding: 2px; border: 1.5px solid #0a0a0a; box-shadow: 3px 3px 0px #0a0a0a;"
             class="opero-split-btn brutal-press w-full inline-flex items-center justify-between text-xs font-medium cursor-pointer"
           >
-            <span class="px-3.5 py-2">Buka Studio Trip Brief</span>
+            <span class="px-3.5 py-2">{landing.card1Btn}</span>
             <span
               style="background-color: #dfd8c8; color: #0a0a0a;"
               class="opero-arrow-box w-7 h-7 flex items-center justify-center font-mono text-xs font-bold"
@@ -288,14 +288,11 @@
               </span>
               <span class="font-mono text-xs font-bold" style="color: #0c249c;">/context-note</span>
             </div>
-            <span class="inline-block font-mono text-[9.5px] font-bold px-1.5 py-0.5" style="background-color: #fff3cd; color: #8a3b00; border: 1px solid #8a3b00;">
-              🟡 Prototype
-            </span>
             <h3 class="text-lg font-medium tracking-tight pt-1" style="color: #0a0a0a;">
-              Verifikasi Klaim Insiden Viral
+              {landing.card2Title}
             </h3>
             <p class="text-xs leading-relaxed" style="color: #3a3935;">
-              Luruskan misinformasi wisata dengan kutipan dari korpus regulasi Pramana yang dicocokkan Layer-1, atau penolakan spekulasi (Layer-2 Abstain). Bukan verifikasi real-time ke JDIH.
+              {landing.card2Desc}
             </p>
           </div>
 
@@ -305,7 +302,7 @@
             style="background-color: #ffffff; color: #0a0a0a; padding: 2px; border: 1.5px solid #0a0a0a; box-shadow: 3px 3px 0px #0a0a0a;"
             class="opero-split-btn brutal-press w-full inline-flex items-center justify-between text-xs font-medium cursor-pointer"
           >
-            <span class="px-3.5 py-2">Uji Klaim Viral</span>
+            <span class="px-3.5 py-2">{landing.card2Btn}</span>
             <span
               style="background-color: #0c249c; color: #ffffff;"
               class="opero-arrow-box w-7 h-7 flex items-center justify-center font-mono text-xs font-bold"
@@ -327,28 +324,25 @@
               </span>
               <span class="font-mono text-xs font-bold" style="color: #0a0a0a;">2026</span>
             </div>
-            <span class="inline-block font-mono text-[9.5px] font-bold px-1.5 py-0.5" style="background-color: #fff3cd; color: #8a3b00; border: 1px solid #8a3b00;">
-              🟡 Prototype
-            </span>
             <h3 class="text-lg font-medium tracking-tight pt-1" style="color: #0a0a0a;">
-              Jadwal Deterministik Bali 2026
+              {landing.card3Title}
             </h3>
             <div class="space-y-1.5 pt-1 text-xs" style="color: #0a0a0a;">
               <div class="flex justify-between py-1 px-2.5 bg-white" style="border: 1px solid #0a0a0a;">
                 <span class="font-mono font-bold">18 Mar</span>
-                <span>Pengerupukan (Ogoh-ogoh)</span>
+                <span>{landing.ogoh}</span>
               </div>
               <div class="flex justify-between py-1 px-2.5 font-semibold" style="background-color: #0c249c; color: #ffffff; border: 1px solid #0a0a0a;">
                 <span class="font-mono">19 Mar</span>
-                <span>Hari Suci Nyepi (Tutup 24J)</span>
+                <span>{landing.nyepi}</span>
               </div>
               <div class="flex justify-between py-1 px-2.5 bg-white" style="border: 1px solid #0a0a0a;">
                 <span class="font-mono font-bold">17 Jun</span>
-                <span>Hari Raya Galungan</span>
+                <span>{landing.galungan}</span>
               </div>
               <div class="flex justify-between py-1 px-2.5 bg-white" style="border: 1px solid #0a0a0a;">
                 <span class="font-mono font-bold">27 Jun</span>
-                <span>Hari Raya Kuningan</span>
+                <span>{landing.kuningan}</span>
               </div>
             </div>
           </div>
@@ -359,7 +353,7 @@
             style="background-color: #0a0a0a; color: #ffffff; padding: 2px; border: 1.5px solid #0a0a0a; box-shadow: 3px 3px 0px #0c249c;"
             class="opero-split-btn brutal-press w-full inline-flex items-center justify-between text-xs font-medium cursor-pointer"
           >
-            <span class="px-3.5 py-2">Buka Korpus Pramana</span>
+            <span class="px-3.5 py-2">{landing.card3Btn}</span>
             <span
               style="background-color: #dfd8c8; color: #0a0a0a;"
               class="opero-arrow-box w-7 h-7 flex items-center justify-center font-mono text-xs font-bold"

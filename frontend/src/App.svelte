@@ -1,5 +1,6 @@
 <script>
   import { onMount } from 'svelte';
+  import { i18n } from './lib/i18n.svelte.js';
   import Header from './components/Header.svelte';
   import LandingView from './components/LandingView.svelte';
   import ModeTripBrief from './components/ModeTripBrief.svelte';
@@ -7,8 +8,9 @@
   import CorpusExplorer from './components/CorpusExplorer.svelte';
   import CorpusDrawer from './components/CorpusDrawer.svelte';
   import SmartGateView from './components/SmartGateView.svelte';
+  import SettingsView from './components/SettingsView.svelte';
 
-  const STATIC_ROUTES = ['/', '/trip-brief', '/context-note', '/corpus', '/totem'];
+  const STATIC_ROUTES = ['/', '/trip-brief', '/context-note', '/corpus', '/totem', '/settings'];
   const TOTEM_ROUTE = /^\/totem\/[a-z0-9]+(?:-[a-z0-9]+)*$/;
 
   function normalizePath(p) {
@@ -93,6 +95,8 @@
           />
         {:else if currentPath === '/corpus'}
           <CorpusExplorer />
+        {:else if currentPath === '/settings'}
+          <SettingsView />
         {/if}
       </div>
     {/key}
@@ -110,25 +114,28 @@
       <div class="flex items-center gap-3">
         <!-- Clean Sketchy Scissor-Cut Swirl Logo -->
         <img
-          src="/assets/pramana_logo.svg?v=5"
+          src="/assets/pramana_logo.svg?v=8"
           alt="Pramana Logo"
-          class="w-4 h-4 object-contain shrink-0"
+          class="w-5 h-5 object-contain shrink-0"
         />
         <span class="font-semibold text-xs" style="color: #0a0a0a;">Pramana</span>
       </div>
-      <div class="flex items-center gap-5 font-mono text-[11px]" style="color: #5c5b57;">
+      <div class="flex flex-wrap items-center justify-center sm:justify-start gap-x-4 gap-y-2 font-mono text-[11px]" style="color: #5c5b57;">
         <a href="/" onclick={(e) => { e.preventDefault(); navigate('/'); }} class="hover:underline">/</a>
         <a href="/trip-brief" onclick={(e) => { e.preventDefault(); navigate('/trip-brief'); }} class="hover:underline">/trip-brief</a>
         <a href="/context-note" onclick={(e) => { e.preventDefault(); navigate('/context-note'); }} class="hover:underline">/context-note</a>
         <a href="/totem" onclick={(e) => { e.preventDefault(); navigate('/totem'); }} class="hover:underline">/totem</a>
         <a href="/corpus" onclick={(e) => { e.preventDefault(); navigate('/corpus'); }} class="hover:underline">/corpus</a>
+        <a href="/settings" onclick={(e) => { e.preventDefault(); navigate('/settings'); }} class="hover:underline">/settings</a>
       </div>
     </div>
     <div
       class="px-6 sm:px-10 pb-6 text-[11px] leading-relaxed"
       style="background-color: #e6e4de; color: #5c5b57;"
     >
-      <strong>🟡 Prototype.</strong> Pramana adalah alat edukasi konteks aturan pariwisata berbasis korpus lokal. Keluaran sistem bukan nasihat hukum resmi dan tidak menggantikan teks peraturan pada JDIH atau instansi berwenang. Kutipan diverifikasi terhadap korpus Pramana, bukan diverifikasi ulang secara real-time ke JDIH.
+      <strong>{i18n.lang === 'en' ? 'Note:' : 'Catatan:'}</strong> {i18n.lang === 'en'
+        ? 'Pramana is an AI legal context assistance system based on a verified local corpus. System outputs do not constitute official legal advice and do not supersede statutory texts published on JDIH or official authorities. Citations are verified against the Pramana corpus, not re-verified real-time against JDIH servers.'
+        : 'Pramana adalah sistem asistensi konteks aturan pariwisata berbasis korpus lokal. Keluaran sistem bukan nasihat hukum resmi dan tidak menggantikan teks peraturan pada JDIH atau instansi berwenang. Kutipan diverifikasi terhadap korpus Pramana, bukan verifikasi langsung real-time ke server JDIH.'}
     </div>
   </footer>
 

@@ -121,10 +121,20 @@ class DualLayerVerifier:
         citation["related_document_ids"] = reg.get("related_document_ids", [])
         citation["superseded_by"] = reg.get("superseded_by")
         citation["superseded_by_url"] = reg.get("superseded_by_url")
+        citation["title_en"] = reg.get("title_en")
+        citation["text_en"] = reg.get("text_en")
+        citation["status_note_en"] = reg.get("status_note_en")
+        citation["source_note_en"] = reg.get("source_note_en")
+        citation["penalties_en"] = reg.get("penalties_en")
+        citation["category_en"] = reg.get("category_en")
+        citation["tier_label_en"] = reg.get("tier_label_en")
+        citation["translation_status"] = reg.get("translation_status")
+        citation["text_original"] = reg.get("text", quote)
 
     def verify_and_filter_citations(
         self,
         citations: List[Dict[str, Any]],
+        lang: str = "id",
     ) -> List[Dict[str, Any]]:
         """
         Filter out citations that fail Layer 1 or reference unknown regulations,
@@ -151,6 +161,15 @@ class DualLayerVerifier:
                 continue
 
             self._apply_provenance(cite, reg, quote)
+
+            # Apply display fields according to lang
+            is_en = (lang == "en")
+            cite["display_text"] = (cite.get("text_en") if is_en and cite.get("text_en") else cite.get("text_original"))
+            cite["display_title"] = (cite.get("title_en") if is_en and cite.get("title_en") else cite.get("official_doc_title"))
+            cite["display_status_note"] = (cite.get("status_note_en") if is_en and cite.get("status_note_en") else cite.get("status_note"))
+            cite["display_source_note"] = (cite.get("source_note_en") if is_en and cite.get("source_note_en") else cite.get("source_note"))
+            cite["display_penalties"] = (cite.get("penalties_en") if is_en and cite.get("penalties_en") else cite.get("penalties"))
+
             verified.append(cite)
 
         return verified

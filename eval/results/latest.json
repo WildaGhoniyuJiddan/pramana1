@@ -1,42 +1,28 @@
 {
-  "generated_at": "2026-11-06T12:57:12.232213+00:00",
+  "generated_at": "2026-11-06T08:24:59.071278+00:00",
   "metrics": {
-    "total_cases": 45,
-    "passed": 45,
+    "total_cases": 65,
+    "passed": 65,
     "overall_accuracy": 1.0,
-    "in_scope_cases": 15,
-    "in_scope_pass": 15,
+    "in_scope_cases": 35,
+    "in_scope_pass": 35,
     "retrieval_recall_at_3": 1.0,
-    "triage_cases": 10,
-    "triage_pass": 10,
-    "out_of_scope_cases": 10,
-    "out_of_scope_pass": 10,
-    "adversarial_cases": 4,
-    "adversarial_pass": 4,
-    "pii_cases": 6,
+    "out_of_scope_cases": 18,
+    "abstain_accuracy": 1.0,
+    "adversarial_cases": 5,
+    "adversarial_pass": 5,
+    "pii_cases": 7,
     "pii_leak_rate": 0.0,
-    "pii_masking_recall": 1.0,
-    "epistemic_routing_accuracy": 1.0,
-    "actionable_guidance_completeness_rate": 1.0,
-    "rewrite_recovery_rate": 1.0,
-    "citations_emitted": 75,
-    "citations_verified": 75,
+    "citations_emitted": 95,
+    "citations_verified": 95,
     "citation_validity": 1.0,
-    "claims_emitted": 47,
-    "claims_verified": 47,
-    "claim_span_validity": 1.0,
-    "latency_p50_ms": 5218,
-    "latency_p95_ms": 20711,
-    "resolution_mode_counts": {
-      "VERIFIED_GROUNDED": 15,
-      "NEEDS_CLARIFICATION": 14,
-      "OUT_OF_SCOPE_GUIDANCE": 16
-    },
+    "latency_p50_ms": 0,
+    "latency_p95_ms": 1,
     "ai_status_counts": {
-      "llm": 29,
-      "abstain": 16
+      "deterministic": 39,
+      "abstain": 26
     },
-    "ai_mode": "required",
+    "ai_mode": "disabled",
     "ai_key_present": true
   },
   "results": [
@@ -45,47 +31,29 @@
       "category": "in_scope",
       "passed": true,
       "status": "TERVERIFIKASI",
-      "resolution_mode": "VERIFIED_GROUNDED",
-      "expected_mode": "VERIFIED_GROUNDED",
-      "epistemic_tier": 1,
-      "guidance_complete": true,
-      "ai_synthesis_status": "llm",
+      "ai_synthesis_status": "deterministic",
       "citation_ids": [
         "PERDA_BALI_06_2023_LEVY",
-        "PERGUB_BALI_25_2025_PASAL_9_12",
-        "PERGUB_BALI_02_2024_PASAL_11",
-        "PERGUB_BALI_02_2024_PASAL_7",
-        "PERGUB_BALI_02_2024_PASAL_6"
+        "PERGUB_BALI_02_2024_PASAL_6",
+        "PERGUB_BALI_02_2024_PASAL_7"
       ],
       "expected_citation_ids": [
         "PERDA_BALI_06_2023_LEVY"
       ],
       "forbidden_hits": [],
       "leaked_pii": [],
-      "latency_ms": 6785,
-      "citations_emitted": 5,
-      "citations_valid": 5,
-      "claims_emitted": 3,
-      "claims_valid": 3,
-      "rewrite_probe": null
+      "latency_ms": 1
     },
     {
       "id": "tourism-02",
       "category": "in_scope",
       "passed": true,
       "status": "TERVERIFIKASI",
-      "resolution_mode": "VERIFIED_GROUNDED",
-      "expected_mode": "VERIFIED_GROUNDED",
-      "epistemic_tier": 1,
-      "guidance_complete": false,
-      "ai_synthesis_status": "llm",
+      "ai_synthesis_status": "deterministic",
       "citation_ids": [
         "PERDA_BALI_06_2023_LEVY",
         "PERGUB_BALI_02_2024_PASAL_6",
-        "PERGUB_BALI_25_2025_PASAL_9_12",
-        "PERGUB_BALI_02_2024_PASAL_11",
-        "PERGUB_BALI_02_2024_PASAL_7",
-        "PERDA_BALI_06_2023_PENJELASAN_UMUM"
+        "PERGUB_BALI_02_2024_PASAL_7"
       ],
       "expected_citation_ids": [
         "PERDA_BALI_06_2023_LEVY",
@@ -93,27 +61,17 @@
       ],
       "forbidden_hits": [],
       "leaked_pii": [],
-      "latency_ms": 5781,
-      "citations_emitted": 6,
-      "citations_valid": 6,
-      "claims_emitted": 2,
-      "claims_valid": 2,
-      "rewrite_probe": null
+      "latency_ms": 1
     },
     {
       "id": "tourism-03",
       "category": "in_scope",
       "passed": true,
       "status": "TERVERIFIKASI",
-      "resolution_mode": "VERIFIED_GROUNDED",
-      "expected_mode": "VERIFIED_GROUNDED",
-      "epistemic_tier": 1,
-      "guidance_complete": false,
-      "ai_synthesis_status": "llm",
+      "ai_synthesis_status": "deterministic",
       "citation_ids": [
         "PERDA_BALI_06_2023_LEVY",
         "PERGUB_BALI_02_2024_PASAL_7",
-        "PERGUB_BALI_25_2025_PASAL_9_12",
         "PERGUB_BALI_02_2024_PASAL_11"
       ],
       "expected_citation_ids": [
@@ -121,28 +79,17 @@
       ],
       "forbidden_hits": [],
       "leaked_pii": [],
-      "latency_ms": 5389,
-      "citations_emitted": 4,
-      "citations_valid": 4,
-      "claims_emitted": 2,
-      "claims_valid": 2,
-      "rewrite_probe": null
+      "latency_ms": 0
     },
     {
       "id": "tourism-04",
       "category": "in_scope",
       "passed": true,
       "status": "TERVERIFIKASI",
-      "resolution_mode": "VERIFIED_GROUNDED",
-      "expected_mode": "VERIFIED_GROUNDED",
-      "epistemic_tier": 1,
-      "guidance_complete": false,
-      "ai_synthesis_status": "llm",
+      "ai_synthesis_status": "deterministic",
       "citation_ids": [
-        "SE_GUB_04_2023_DONT",
         "PERGUB_BALI_25_2020_PASAL_45_46",
-        "KETENTUAN_HARI_RAYA_NYEPI",
-        "SE_GUB_04_2023_DO"
+        "SE_GUB_04_2023_DONT"
       ],
       "expected_citation_ids": [
         "PERGUB_BALI_25_2020_PASAL_45_46",
@@ -150,142 +97,87 @@
       ],
       "forbidden_hits": [],
       "leaked_pii": [],
-      "latency_ms": 6687,
-      "citations_emitted": 4,
-      "citations_valid": 4,
-      "claims_emitted": 3,
-      "claims_valid": 3,
-      "rewrite_probe": null
+      "latency_ms": 0
     },
     {
       "id": "tourism-05",
       "category": "in_scope",
       "passed": true,
       "status": "TERVERIFIKASI",
-      "resolution_mode": "VERIFIED_GROUNDED",
-      "expected_mode": "VERIFIED_GROUNDED",
-      "epistemic_tier": 1,
-      "guidance_complete": false,
-      "ai_synthesis_status": "llm",
+      "ai_synthesis_status": "deterministic",
       "citation_ids": [
         "PERGUB_BALI_25_2020_PASAL_45_46",
-        "SE_GUB_04_2023_DONT",
-        "KETENTUAN_HARI_RAYA_NYEPI",
-        "SE_GUB_04_2023_DO",
-        "PERGUB_BALI_25_2020_PASAL_10"
+        "PERGUB_BALI_25_2020_PASAL_10",
+        "PERGUB_BALI_25_2020_PASAL_3_4"
       ],
       "expected_citation_ids": [
         "PERGUB_BALI_25_2020_PASAL_45_46"
       ],
       "forbidden_hits": [],
       "leaked_pii": [],
-      "latency_ms": 38397,
-      "citations_emitted": 5,
-      "citations_valid": 5,
-      "claims_emitted": 3,
-      "claims_valid": 3,
-      "rewrite_probe": null
+      "latency_ms": 0
     },
     {
       "id": "tourism-06",
       "category": "in_scope",
       "passed": true,
       "status": "TERVERIFIKASI",
-      "resolution_mode": "VERIFIED_GROUNDED",
-      "expected_mode": "VERIFIED_GROUNDED",
-      "epistemic_tier": 1,
-      "guidance_complete": false,
-      "ai_synthesis_status": "llm",
+      "ai_synthesis_status": "deterministic",
       "citation_ids": [
-        "KETENTUAN_HARI_RAYA_NYEPI",
-        "SE_GUB_04_2023_DONT",
-        "PERGUB_BALI_25_2020_PASAL_45_46",
-        "SE_GUB_04_2023_DO"
+        "KETENTUAN_HARI_RAYA_NYEPI"
       ],
       "expected_citation_ids": [
         "KETENTUAN_HARI_RAYA_NYEPI"
       ],
       "forbidden_hits": [],
       "leaked_pii": [],
-      "latency_ms": 7225,
-      "citations_emitted": 4,
-      "citations_valid": 4,
-      "claims_emitted": 5,
-      "claims_valid": 5,
-      "rewrite_probe": null
+      "latency_ms": 0
     },
     {
       "id": "tourism-07",
       "category": "in_scope",
       "passed": true,
       "status": "TERVERIFIKASI",
-      "resolution_mode": "VERIFIED_GROUNDED",
-      "expected_mode": "VERIFIED_GROUNDED",
-      "epistemic_tier": 1,
-      "guidance_complete": false,
-      "ai_synthesis_status": "llm",
+      "ai_synthesis_status": "deterministic",
       "citation_ids": [
-        "UU_06_2011_PASAL_75",
         "PERDA_BALI_05_2020_PASAL_15",
         "PERDA_BALI_06_2023_PASAL_12",
-        "PERDA_BALI_05_2020_PASAL_6",
-        "PERDA_BALI_06_2023_LEVY",
-        "UU_18_2025_PASAL_1"
+        "UU_06_2011_PASAL_75"
       ],
       "expected_citation_ids": [
         "UU_06_2011_PASAL_75"
       ],
       "forbidden_hits": [],
       "leaked_pii": [],
-      "latency_ms": 5953,
-      "citations_emitted": 6,
-      "citations_valid": 6,
-      "claims_emitted": 2,
-      "claims_valid": 2,
-      "rewrite_probe": null
+      "latency_ms": 0
     },
     {
       "id": "tourism-08",
       "category": "in_scope",
       "passed": true,
       "status": "TERVERIFIKASI",
-      "resolution_mode": "VERIFIED_GROUNDED",
-      "expected_mode": "VERIFIED_GROUNDED",
-      "epistemic_tier": 1,
-      "guidance_complete": true,
-      "ai_synthesis_status": "llm",
+      "ai_synthesis_status": "deterministic",
       "citation_ids": [
         "PERDA_BALI_05_2020_PASAL_15",
         "SE_GUB_04_2023_DO",
-        "PERGUB_BALI_02_2024_PASAL_7",
-        "PERDA_BALI_06_2023_LEVY"
+        "PERGUB_BALI_02_2024_PASAL_7"
       ],
       "expected_citation_ids": [
         "PERDA_BALI_05_2020_PASAL_15"
       ],
       "forbidden_hits": [],
       "leaked_pii": [],
-      "latency_ms": 6704,
-      "citations_emitted": 4,
-      "citations_valid": 4,
-      "claims_emitted": 5,
-      "claims_valid": 5,
-      "rewrite_probe": null
+      "latency_ms": 0
     },
     {
       "id": "tourism-09",
       "category": "in_scope",
       "passed": true,
       "status": "TERVERIFIKASI",
-      "resolution_mode": "VERIFIED_GROUNDED",
-      "expected_mode": "VERIFIED_GROUNDED",
-      "epistemic_tier": 1,
-      "guidance_complete": false,
-      "ai_synthesis_status": "llm",
+      "ai_synthesis_status": "deterministic",
       "citation_ids": [
         "SE_GUB_04_2023_DO",
         "PERDA_BALI_06_2023_LEVY",
-        "PERGUB_BALI_02_2024_PASAL_7",
         "PERDA_BALI_06_2023_PASAL_14"
       ],
       "expected_citation_ids": [
@@ -293,30 +185,17 @@
       ],
       "forbidden_hits": [],
       "leaked_pii": [],
-      "latency_ms": 8739,
-      "citations_emitted": 4,
-      "citations_valid": 4,
-      "claims_emitted": 5,
-      "claims_valid": 5,
-      "rewrite_probe": null
+      "latency_ms": 0
     },
     {
       "id": "tourism-10",
       "category": "in_scope",
       "passed": true,
       "status": "TERVERIFIKASI",
-      "resolution_mode": "VERIFIED_GROUNDED",
-      "expected_mode": "VERIFIED_GROUNDED",
-      "epistemic_tier": 1,
-      "guidance_complete": false,
-      "ai_synthesis_status": "llm",
+      "ai_synthesis_status": "deterministic",
       "citation_ids": [
         "PERDA_BALI_05_2020_PASAL_6",
-        "UU_18_2025_PASAL_1",
-        "PERDA_BALI_05_2020_PASAL_15",
-        "UU_18_2025_PASAL_25",
         "PERDA_BALI_06_2023_PASAL_12",
-        "PERDA_BALI_06_2023_PENJELASAN_UMUM",
         "UU_18_2025_PASAL_8"
       ],
       "expected_citation_ids": [
@@ -324,58 +203,54 @@
       ],
       "forbidden_hits": [],
       "leaked_pii": [],
-      "latency_ms": 5218,
-      "citations_emitted": 7,
-      "citations_valid": 7,
-      "claims_emitted": 1,
-      "claims_valid": 1,
-      "rewrite_probe": null
+      "latency_ms": 1
     },
     {
       "id": "tourism-11",
       "category": "in_scope",
       "passed": true,
       "status": "TERVERIFIKASI",
-      "resolution_mode": "VERIFIED_GROUNDED",
-      "expected_mode": "VERIFIED_GROUNDED",
-      "epistemic_tier": 1,
-      "guidance_complete": false,
-      "ai_synthesis_status": "llm",
+      "ai_synthesis_status": "deterministic",
+      "citation_ids": [
+        "PERGUB_BALI_25_2020_PASAL_10",
+        "PERGUB_BALI_25_2020_PASAL_45_46",
+        "PERGUB_BALI_25_2020_PASAL_3_4"
+      ],
+      "expected_citation_ids": [
+        "PERGUB_BALI_25_2020_PASAL_10"
+      ],
+      "forbidden_hits": [],
+      "leaked_pii": [],
+      "latency_ms": 0
+    },
+    {
+      "id": "tourism-12",
+      "category": "in_scope",
+      "passed": true,
+      "status": "TERVERIFIKASI",
+      "ai_synthesis_status": "deterministic",
       "citation_ids": [
         "UU_18_2025_PASAL_25",
         "PERDA_BALI_05_2020_PASAL_15",
-        "SE_GUB_04_2023_DO",
-        "UU_18_2025_PASAL_57A"
+        "SE_GUB_04_2023_DO"
       ],
       "expected_citation_ids": [
         "UU_18_2025_PASAL_25"
       ],
       "forbidden_hits": [],
       "leaked_pii": [],
-      "latency_ms": 8559,
-      "citations_emitted": 4,
-      "citations_valid": 4,
-      "claims_emitted": 5,
-      "claims_valid": 5,
-      "rewrite_probe": null
+      "latency_ms": 0
     },
     {
       "id": "discourse-01",
       "category": "in_scope",
       "passed": true,
       "status": "TERVERIFIKASI",
-      "resolution_mode": "VERIFIED_GROUNDED",
-      "expected_mode": "VERIFIED_GROUNDED",
-      "epistemic_tier": 1,
-      "guidance_complete": false,
-      "ai_synthesis_status": "llm",
+      "ai_synthesis_status": "deterministic",
       "citation_ids": [
-        "UU_01_2024_PASAL_28_2",
-        "UU_01_2024_PASAL_45A_2",
         "UU_01_2023_PASAL_243",
         "UU_01_2023_PASAL_244_245",
-        "UU_40_2008_PASAL_15",
-        "UU_40_2008_PASAL_4"
+        "UU_01_2024_PASAL_28_2"
       ],
       "expected_citation_ids": [
         "UU_01_2024_PASAL_28_2",
@@ -383,30 +258,36 @@
       ],
       "forbidden_hits": [],
       "leaked_pii": [],
-      "latency_ms": 24228,
-      "citations_emitted": 6,
-      "citations_valid": 6,
-      "claims_emitted": 2,
-      "claims_valid": 2,
-      "rewrite_probe": null
+      "latency_ms": 1
     },
     {
       "id": "discourse-02",
       "category": "in_scope",
       "passed": true,
       "status": "TERVERIFIKASI",
-      "resolution_mode": "VERIFIED_GROUNDED",
-      "expected_mode": "VERIFIED_GROUNDED",
-      "epistemic_tier": 1,
-      "guidance_complete": true,
-      "ai_synthesis_status": "llm",
+      "ai_synthesis_status": "deterministic",
+      "citation_ids": [
+        "UU_01_2023_PASAL_243",
+        "UU_01_2023_PASAL_242",
+        "UU_01_2024_PASAL_45A_2"
+      ],
+      "expected_citation_ids": [
+        "UU_01_2023_PASAL_243"
+      ],
+      "forbidden_hits": [],
+      "leaked_pii": [],
+      "latency_ms": 1
+    },
+    {
+      "id": "discourse-03",
+      "category": "in_scope",
+      "passed": true,
+      "status": "TERVERIFIKASI",
+      "ai_synthesis_status": "deterministic",
       "citation_ids": [
         "UU_01_2023_PASAL_242",
-        "UU_08_1999_PASAL_4G",
         "UU_01_2023_PASAL_243",
-        "UU_40_2008_PASAL_15",
-        "UU_40_2008_PASAL_16_17",
-        "UU_40_2008_PASAL_4"
+        "UU_01_2023_PASAL_244_245"
       ],
       "expected_citation_ids": [
         "UU_40_2008_PASAL_4",
@@ -415,714 +296,735 @@
       ],
       "forbidden_hits": [],
       "leaked_pii": [],
-      "latency_ms": 7342,
-      "citations_emitted": 6,
-      "citations_valid": 6,
-      "claims_emitted": 4,
-      "claims_valid": 4,
-      "rewrite_probe": null
+      "latency_ms": 0
     },
     {
-      "id": "colloquial-01",
+      "id": "discourse-04",
       "category": "in_scope",
       "passed": true,
       "status": "TERVERIFIKASI",
-      "resolution_mode": "VERIFIED_GROUNDED",
-      "expected_mode": "VERIFIED_GROUNDED",
-      "epistemic_tier": 1,
-      "guidance_complete": false,
-      "ai_synthesis_status": "llm",
+      "ai_synthesis_status": "deterministic",
       "citation_ids": [
-        "SE_GUB_04_2023_DONT",
-        "KETENTUAN_HARI_RAYA_NYEPI",
-        "PERGUB_BALI_25_2020_PASAL_45_46",
-        "SE_GUB_04_2023_DO"
+        "UU_08_1999_PASAL_4G"
       ],
       "expected_citation_ids": [
-        "SE_GUB_04_2023_DONT"
+        "UU_08_1999_PASAL_4G",
+        "UU_39_1999_PASAL_1_3"
       ],
       "forbidden_hits": [],
       "leaked_pii": [],
-      "latency_ms": 20711,
-      "citations_emitted": 4,
-      "citations_valid": 4,
-      "claims_emitted": 3,
-      "claims_valid": 3,
-      "rewrite_probe": null
+      "latency_ms": 0
     },
     {
-      "id": "colloquial-02",
+      "id": "discourse-05",
       "category": "in_scope",
       "passed": true,
       "status": "TERVERIFIKASI",
-      "resolution_mode": "VERIFIED_GROUNDED",
-      "expected_mode": "VERIFIED_GROUNDED",
-      "epistemic_tier": 1,
-      "guidance_complete": true,
-      "ai_synthesis_status": "llm",
+      "ai_synthesis_status": "deterministic",
       "citation_ids": [
-        "UU_08_1999_PASAL_4G",
-        "UU_40_2008_PASAL_4",
-        "PERDA_BALI_06_2023_LEVY",
-        "PERGUB_BALI_02_2024_PASAL_7",
-        "SE_GUB_04_2023_DONT",
-        "PERDA_BALI_05_2020_PASAL_15"
+        "UU_39_1999_PASAL_1_3",
+        "UU_40_2008_PASAL_1"
       ],
       "expected_citation_ids": [
-        "UU_08_1999_PASAL_4G",
+        "UU_39_1999_PASAL_1_3"
+      ],
+      "forbidden_hits": [],
+      "leaked_pii": [],
+      "latency_ms": 0
+    },
+    {
+      "id": "discourse-06",
+      "category": "in_scope",
+      "passed": true,
+      "status": "TERVERIFIKASI",
+      "ai_synthesis_status": "deterministic",
+      "citation_ids": [
+        "UU_01_2023_PASAL_242",
+        "UU_01_2023_PASAL_243",
+        "UU_01_2024_PASAL_28_2"
+      ],
+      "expected_citation_ids": [
+        "UU_01_2023_PASAL_242"
+      ],
+      "forbidden_hits": [],
+      "leaked_pii": [],
+      "latency_ms": 0
+    },
+    {
+      "id": "discourse-07",
+      "category": "in_scope",
+      "passed": true,
+      "status": "TERVERIFIKASI",
+      "ai_synthesis_status": "deterministic",
+      "citation_ids": [
+        "UU_01_2023_PASAL_243",
+        "UU_01_2023_PASAL_242",
+        "UU_01_2024_PASAL_45A_2"
+      ],
+      "expected_citation_ids": [
+        "UU_01_2023_PASAL_243"
+      ],
+      "forbidden_hits": [],
+      "leaked_pii": [],
+      "latency_ms": 0
+    },
+    {
+      "id": "discourse-08",
+      "category": "in_scope",
+      "passed": true,
+      "status": "TERVERIFIKASI",
+      "ai_synthesis_status": "deterministic",
+      "citation_ids": [
+        "UU_01_2023_PASAL_244_245",
+        "UU_40_2008_PASAL_16_17",
         "UU_40_2008_PASAL_4"
       ],
+      "expected_citation_ids": [
+        "UU_40_2008_PASAL_16_17",
+        "UU_01_2023_PASAL_244_245"
+      ],
       "forbidden_hits": [],
       "leaked_pii": [],
-      "latency_ms": 6713,
-      "citations_emitted": 6,
-      "citations_valid": 6,
-      "claims_emitted": 2,
-      "claims_valid": 2,
-      "rewrite_probe": null
-    },
-    {
-      "id": "triage-01",
-      "category": "triage",
-      "passed": true,
-      "status": "PERLU_KLARIFIKASI",
-      "resolution_mode": "NEEDS_CLARIFICATION",
-      "expected_mode": "NEEDS_CLARIFICATION",
-      "epistemic_tier": 2,
-      "guidance_complete": true,
-      "ai_synthesis_status": "llm",
-      "citation_ids": [],
-      "expected_citation_ids": [],
-      "forbidden_hits": [],
-      "leaked_pii": [],
-      "latency_ms": 4872,
-      "citations_emitted": 0,
-      "citations_valid": 0,
-      "claims_emitted": 0,
-      "claims_valid": 0,
-      "rewrite_probe": {
-        "input": "Wisatawan lokal ditolak masuk dan dibedakan syarat minimum spend dengan WNA di beach club Bali",
-        "resolution_mode": "VERIFIED_GROUNDED",
-        "citation_ids": [
-          "UU_08_1999_PASAL_4G",
-          "UU_40_2008_PASAL_4",
-          "PERDA_BALI_06_2023_LEVY",
-          "PERGUB_BALI_02_2024_PASAL_7",
-          "SE_GUB_04_2023_DONT",
-          "PERDA_BALI_05_2020_PASAL_15"
-        ],
-        "passed": true,
-        "latency_ms": 5819
-      }
-    },
-    {
-      "id": "triage-02",
-      "category": "triage",
-      "passed": true,
-      "status": "PERLU_KLARIFIKASI",
-      "resolution_mode": "NEEDS_CLARIFICATION",
-      "expected_mode": "NEEDS_CLARIFICATION",
-      "epistemic_tier": 2,
-      "guidance_complete": true,
-      "ai_synthesis_status": "llm",
-      "citation_ids": [],
-      "expected_citation_ids": [],
-      "forbidden_hits": [],
-      "leaked_pii": [],
-      "latency_ms": 5189,
-      "citations_emitted": 0,
-      "citations_valid": 0,
-      "claims_emitted": 0,
-      "claims_valid": 0,
-      "rewrite_probe": null
-    },
-    {
-      "id": "triage-03",
-      "category": "triage",
-      "passed": true,
-      "status": "PERLU_KLARIFIKASI",
-      "resolution_mode": "NEEDS_CLARIFICATION",
-      "expected_mode": "NEEDS_CLARIFICATION",
-      "epistemic_tier": 2,
-      "guidance_complete": true,
-      "ai_synthesis_status": "llm",
-      "citation_ids": [],
-      "expected_citation_ids": [],
-      "forbidden_hits": [],
-      "leaked_pii": [],
-      "latency_ms": 4493,
-      "citations_emitted": 0,
-      "citations_valid": 0,
-      "claims_emitted": 0,
-      "claims_valid": 0,
-      "rewrite_probe": null
-    },
-    {
-      "id": "triage-04",
-      "category": "triage",
-      "passed": true,
-      "status": "PERLU_KLARIFIKASI",
-      "resolution_mode": "NEEDS_CLARIFICATION",
-      "expected_mode": "NEEDS_CLARIFICATION",
-      "epistemic_tier": 2,
-      "guidance_complete": true,
-      "ai_synthesis_status": "llm",
-      "citation_ids": [],
-      "expected_citation_ids": [],
-      "forbidden_hits": [],
-      "leaked_pii": [],
-      "latency_ms": 5112,
-      "citations_emitted": 0,
-      "citations_valid": 0,
-      "claims_emitted": 0,
-      "claims_valid": 0,
-      "rewrite_probe": null
-    },
-    {
-      "id": "triage-05",
-      "category": "triage",
-      "passed": true,
-      "status": "PERLU_KLARIFIKASI",
-      "resolution_mode": "NEEDS_CLARIFICATION",
-      "expected_mode": "NEEDS_CLARIFICATION",
-      "epistemic_tier": 2,
-      "guidance_complete": true,
-      "ai_synthesis_status": "llm",
-      "citation_ids": [],
-      "expected_citation_ids": [],
-      "forbidden_hits": [],
-      "leaked_pii": [],
-      "latency_ms": 5017,
-      "citations_emitted": 0,
-      "citations_valid": 0,
-      "claims_emitted": 0,
-      "claims_valid": 0,
-      "rewrite_probe": null
-    },
-    {
-      "id": "triage-06",
-      "category": "triage",
-      "passed": true,
-      "status": "PERLU_KLARIFIKASI",
-      "resolution_mode": "NEEDS_CLARIFICATION",
-      "expected_mode": "NEEDS_CLARIFICATION",
-      "epistemic_tier": 2,
-      "guidance_complete": true,
-      "ai_synthesis_status": "llm",
-      "citation_ids": [],
-      "expected_citation_ids": [],
-      "forbidden_hits": [],
-      "leaked_pii": [],
-      "latency_ms": 5521,
-      "citations_emitted": 0,
-      "citations_valid": 0,
-      "claims_emitted": 0,
-      "claims_valid": 0,
-      "rewrite_probe": null
-    },
-    {
-      "id": "triage-07",
-      "category": "triage",
-      "passed": true,
-      "status": "PERLU_KLARIFIKASI",
-      "resolution_mode": "NEEDS_CLARIFICATION",
-      "expected_mode": "NEEDS_CLARIFICATION",
-      "epistemic_tier": 2,
-      "guidance_complete": true,
-      "ai_synthesis_status": "llm",
-      "citation_ids": [],
-      "expected_citation_ids": [],
-      "forbidden_hits": [],
-      "leaked_pii": [],
-      "latency_ms": 4235,
-      "citations_emitted": 0,
-      "citations_valid": 0,
-      "claims_emitted": 0,
-      "claims_valid": 0,
-      "rewrite_probe": null
-    },
-    {
-      "id": "triage-08",
-      "category": "triage",
-      "passed": true,
-      "status": "PERLU_KLARIFIKASI",
-      "resolution_mode": "NEEDS_CLARIFICATION",
-      "expected_mode": "NEEDS_CLARIFICATION",
-      "epistemic_tier": 2,
-      "guidance_complete": true,
-      "ai_synthesis_status": "llm",
-      "citation_ids": [],
-      "expected_citation_ids": [],
-      "forbidden_hits": [],
-      "leaked_pii": [],
-      "latency_ms": 10091,
-      "citations_emitted": 0,
-      "citations_valid": 0,
-      "claims_emitted": 0,
-      "claims_valid": 0,
-      "rewrite_probe": null
-    },
-    {
-      "id": "triage-09",
-      "category": "triage",
-      "passed": true,
-      "status": "PERLU_KLARIFIKASI",
-      "resolution_mode": "NEEDS_CLARIFICATION",
-      "expected_mode": "NEEDS_CLARIFICATION",
-      "epistemic_tier": 2,
-      "guidance_complete": true,
-      "ai_synthesis_status": "llm",
-      "citation_ids": [],
-      "expected_citation_ids": [],
-      "forbidden_hits": [],
-      "leaked_pii": [],
-      "latency_ms": 7649,
-      "citations_emitted": 0,
-      "citations_valid": 0,
-      "claims_emitted": 0,
-      "claims_valid": 0,
-      "rewrite_probe": null
-    },
-    {
-      "id": "triage-10",
-      "category": "triage",
-      "passed": true,
-      "status": "PERLU_KLARIFIKASI",
-      "resolution_mode": "NEEDS_CLARIFICATION",
-      "expected_mode": "NEEDS_CLARIFICATION",
-      "epistemic_tier": 2,
-      "guidance_complete": true,
-      "ai_synthesis_status": "llm",
-      "citation_ids": [],
-      "expected_citation_ids": [],
-      "forbidden_hits": [],
-      "leaked_pii": [],
-      "latency_ms": 4538,
-      "citations_emitted": 0,
-      "citations_valid": 0,
-      "claims_emitted": 0,
-      "claims_valid": 0,
-      "rewrite_probe": null
+      "latency_ms": 0
     },
     {
       "id": "out-01",
       "category": "out_of_scope",
       "passed": true,
       "status": "TIDAK_DITEMUKAN",
-      "resolution_mode": "OUT_OF_SCOPE_GUIDANCE",
-      "expected_mode": "OUT_OF_SCOPE_GUIDANCE",
-      "epistemic_tier": 3,
-      "guidance_complete": true,
       "ai_synthesis_status": "abstain",
       "citation_ids": [],
       "expected_citation_ids": [],
       "forbidden_hits": [],
       "leaked_pii": [],
-      "latency_ms": 5902,
-      "citations_emitted": 0,
-      "citations_valid": 0,
-      "claims_emitted": 0,
-      "claims_valid": 0,
-      "rewrite_probe": null
+      "latency_ms": 0
     },
     {
       "id": "out-02",
       "category": "out_of_scope",
       "passed": true,
       "status": "TIDAK_DITEMUKAN",
-      "resolution_mode": "OUT_OF_SCOPE_GUIDANCE",
-      "expected_mode": "OUT_OF_SCOPE_GUIDANCE",
-      "epistemic_tier": 3,
-      "guidance_complete": true,
       "ai_synthesis_status": "abstain",
       "citation_ids": [],
       "expected_citation_ids": [],
       "forbidden_hits": [],
       "leaked_pii": [],
-      "latency_ms": 5053,
-      "citations_emitted": 0,
-      "citations_valid": 0,
-      "claims_emitted": 0,
-      "claims_valid": 0,
-      "rewrite_probe": null
+      "latency_ms": 0
     },
     {
       "id": "out-03",
       "category": "out_of_scope",
       "passed": true,
       "status": "TIDAK_DITEMUKAN",
-      "resolution_mode": "OUT_OF_SCOPE_GUIDANCE",
-      "expected_mode": "OUT_OF_SCOPE_GUIDANCE",
-      "epistemic_tier": 3,
-      "guidance_complete": true,
       "ai_synthesis_status": "abstain",
       "citation_ids": [],
       "expected_citation_ids": [],
       "forbidden_hits": [],
       "leaked_pii": [],
-      "latency_ms": 3928,
-      "citations_emitted": 0,
-      "citations_valid": 0,
-      "claims_emitted": 0,
-      "claims_valid": 0,
-      "rewrite_probe": null
+      "latency_ms": 0
     },
     {
       "id": "out-04",
       "category": "out_of_scope",
       "passed": true,
       "status": "TIDAK_DITEMUKAN",
-      "resolution_mode": "OUT_OF_SCOPE_GUIDANCE",
-      "expected_mode": "OUT_OF_SCOPE_GUIDANCE",
-      "epistemic_tier": 3,
-      "guidance_complete": true,
       "ai_synthesis_status": "abstain",
       "citation_ids": [],
       "expected_citation_ids": [],
       "forbidden_hits": [],
       "leaked_pii": [],
-      "latency_ms": 10337,
-      "citations_emitted": 0,
-      "citations_valid": 0,
-      "claims_emitted": 0,
-      "claims_valid": 0,
-      "rewrite_probe": null
+      "latency_ms": 0
     },
     {
       "id": "out-05",
       "category": "out_of_scope",
       "passed": true,
       "status": "TIDAK_DITEMUKAN",
-      "resolution_mode": "OUT_OF_SCOPE_GUIDANCE",
-      "expected_mode": "OUT_OF_SCOPE_GUIDANCE",
-      "epistemic_tier": 3,
-      "guidance_complete": true,
       "ai_synthesis_status": "abstain",
       "citation_ids": [],
       "expected_citation_ids": [],
       "forbidden_hits": [],
       "leaked_pii": [],
-      "latency_ms": 3758,
-      "citations_emitted": 0,
-      "citations_valid": 0,
-      "claims_emitted": 0,
-      "claims_valid": 0,
-      "rewrite_probe": null
+      "latency_ms": 0
     },
     {
       "id": "out-06",
       "category": "out_of_scope",
       "passed": true,
       "status": "TIDAK_DITEMUKAN",
-      "resolution_mode": "OUT_OF_SCOPE_GUIDANCE",
-      "expected_mode": "OUT_OF_SCOPE_GUIDANCE",
-      "epistemic_tier": 3,
-      "guidance_complete": true,
       "ai_synthesis_status": "abstain",
       "citation_ids": [],
       "expected_citation_ids": [],
       "forbidden_hits": [],
       "leaked_pii": [],
-      "latency_ms": 3601,
-      "citations_emitted": 0,
-      "citations_valid": 0,
-      "claims_emitted": 0,
-      "claims_valid": 0,
-      "rewrite_probe": null
+      "latency_ms": 0
     },
     {
       "id": "out-07",
       "category": "out_of_scope",
       "passed": true,
       "status": "TIDAK_DITEMUKAN",
-      "resolution_mode": "OUT_OF_SCOPE_GUIDANCE",
-      "expected_mode": "OUT_OF_SCOPE_GUIDANCE",
-      "epistemic_tier": 3,
-      "guidance_complete": true,
       "ai_synthesis_status": "abstain",
       "citation_ids": [],
       "expected_citation_ids": [],
       "forbidden_hits": [],
       "leaked_pii": [],
-      "latency_ms": 3552,
-      "citations_emitted": 0,
-      "citations_valid": 0,
-      "claims_emitted": 0,
-      "claims_valid": 0,
-      "rewrite_probe": null
+      "latency_ms": 0
     },
     {
       "id": "out-08",
       "category": "out_of_scope",
       "passed": true,
       "status": "TIDAK_DITEMUKAN",
-      "resolution_mode": "OUT_OF_SCOPE_GUIDANCE",
-      "expected_mode": "OUT_OF_SCOPE_GUIDANCE",
-      "epistemic_tier": 3,
-      "guidance_complete": true,
       "ai_synthesis_status": "abstain",
       "citation_ids": [],
       "expected_citation_ids": [],
       "forbidden_hits": [],
       "leaked_pii": [],
-      "latency_ms": 4433,
-      "citations_emitted": 0,
-      "citations_valid": 0,
-      "claims_emitted": 0,
-      "claims_valid": 0,
-      "rewrite_probe": null
+      "latency_ms": 0
     },
     {
       "id": "out-09",
       "category": "out_of_scope",
       "passed": true,
       "status": "TIDAK_DITEMUKAN",
-      "resolution_mode": "OUT_OF_SCOPE_GUIDANCE",
-      "expected_mode": "OUT_OF_SCOPE_GUIDANCE",
-      "epistemic_tier": 3,
-      "guidance_complete": true,
       "ai_synthesis_status": "abstain",
       "citation_ids": [],
       "expected_citation_ids": [],
       "forbidden_hits": [],
       "leaked_pii": [],
-      "latency_ms": 3703,
-      "citations_emitted": 0,
-      "citations_valid": 0,
-      "claims_emitted": 0,
-      "claims_valid": 0,
-      "rewrite_probe": null
+      "latency_ms": 0
     },
     {
       "id": "out-10",
       "category": "out_of_scope",
       "passed": true,
       "status": "TIDAK_DITEMUKAN",
-      "resolution_mode": "OUT_OF_SCOPE_GUIDANCE",
-      "expected_mode": "OUT_OF_SCOPE_GUIDANCE",
-      "epistemic_tier": 3,
-      "guidance_complete": true,
       "ai_synthesis_status": "abstain",
       "citation_ids": [],
       "expected_citation_ids": [],
       "forbidden_hits": [],
       "leaked_pii": [],
-      "latency_ms": 5175,
-      "citations_emitted": 0,
-      "citations_valid": 0,
-      "claims_emitted": 0,
-      "claims_valid": 0,
-      "rewrite_probe": null
+      "latency_ms": 0
+    },
+    {
+      "id": "out-11",
+      "category": "out_of_scope",
+      "passed": true,
+      "status": "TIDAK_DITEMUKAN",
+      "ai_synthesis_status": "abstain",
+      "citation_ids": [],
+      "expected_citation_ids": [],
+      "forbidden_hits": [],
+      "leaked_pii": [],
+      "latency_ms": 0
+    },
+    {
+      "id": "out-12",
+      "category": "out_of_scope",
+      "passed": true,
+      "status": "TIDAK_DITEMUKAN",
+      "ai_synthesis_status": "abstain",
+      "citation_ids": [],
+      "expected_citation_ids": [],
+      "forbidden_hits": [],
+      "leaked_pii": [],
+      "latency_ms": 0
     },
     {
       "id": "adv-01",
       "category": "adversarial",
       "passed": true,
       "status": "TIDAK_DITEMUKAN",
-      "resolution_mode": "OUT_OF_SCOPE_GUIDANCE",
-      "expected_mode": null,
-      "epistemic_tier": 3,
-      "guidance_complete": true,
       "ai_synthesis_status": "abstain",
       "citation_ids": [],
       "expected_citation_ids": [],
       "forbidden_hits": [],
       "leaked_pii": [],
-      "latency_ms": 750,
-      "citations_emitted": 0,
-      "citations_valid": 0,
-      "claims_emitted": 0,
-      "claims_valid": 0,
-      "rewrite_probe": null
+      "latency_ms": 0
     },
     {
       "id": "adv-02",
       "category": "adversarial",
       "passed": true,
       "status": "TIDAK_DITEMUKAN",
-      "resolution_mode": "OUT_OF_SCOPE_GUIDANCE",
-      "expected_mode": null,
-      "epistemic_tier": 3,
-      "guidance_complete": true,
       "ai_synthesis_status": "abstain",
       "citation_ids": [],
       "expected_citation_ids": [],
       "forbidden_hits": [],
       "leaked_pii": [],
-      "latency_ms": 1452,
-      "citations_emitted": 0,
-      "citations_valid": 0,
-      "claims_emitted": 0,
-      "claims_valid": 0,
-      "rewrite_probe": null
+      "latency_ms": 0
     },
     {
       "id": "adv-03",
       "category": "adversarial",
       "passed": true,
-      "status": "PERLU_KLARIFIKASI",
-      "resolution_mode": "NEEDS_CLARIFICATION",
-      "expected_mode": null,
-      "epistemic_tier": 2,
-      "guidance_complete": true,
-      "ai_synthesis_status": "llm",
-      "citation_ids": [],
+      "status": "BUKTI_TERBATAS",
+      "ai_synthesis_status": "deterministic",
+      "citation_ids": [
+        "PERDA_BALI_06_2023_LEVY",
+        "PERGUB_BALI_02_2024_PASAL_7",
+        "PERGUB_BALI_02_2024_PASAL_6"
+      ],
       "expected_citation_ids": [],
       "forbidden_hits": [],
       "leaked_pii": [],
-      "latency_ms": 3653,
-      "citations_emitted": 0,
-      "citations_valid": 0,
-      "claims_emitted": 0,
-      "claims_valid": 0,
-      "rewrite_probe": null
-    },
-    {
-      "id": "adv-04",
-      "category": "adversarial",
-      "passed": true,
-      "status": "TIDAK_DITEMUKAN",
-      "resolution_mode": "OUT_OF_SCOPE_GUIDANCE",
-      "expected_mode": null,
-      "epistemic_tier": 3,
-      "guidance_complete": true,
-      "ai_synthesis_status": "abstain",
-      "citation_ids": [],
-      "expected_citation_ids": [],
-      "forbidden_hits": [],
-      "leaked_pii": [],
-      "latency_ms": 762,
-      "citations_emitted": 0,
-      "citations_valid": 0,
-      "claims_emitted": 0,
-      "claims_valid": 0,
-      "rewrite_probe": null
+      "latency_ms": 0
     },
     {
       "id": "pii-01",
       "category": "pii",
       "passed": true,
       "status": "TIDAK_DITEMUKAN",
-      "resolution_mode": "OUT_OF_SCOPE_GUIDANCE",
-      "expected_mode": null,
-      "epistemic_tier": 3,
-      "guidance_complete": true,
       "ai_synthesis_status": "abstain",
       "citation_ids": [],
       "expected_citation_ids": [],
       "forbidden_hits": [],
       "leaked_pii": [],
-      "latency_ms": 4868,
-      "citations_emitted": 0,
-      "citations_valid": 0,
-      "claims_emitted": 0,
-      "claims_valid": 0,
-      "rewrite_probe": null
+      "latency_ms": 0
     },
     {
       "id": "pii-02",
       "category": "pii",
       "passed": true,
-      "status": "PERLU_KLARIFIKASI",
-      "resolution_mode": "NEEDS_CLARIFICATION",
-      "expected_mode": null,
-      "epistemic_tier": 2,
-      "guidance_complete": true,
-      "ai_synthesis_status": "llm",
-      "citation_ids": [],
+      "status": "TERVERIFIKASI",
+      "ai_synthesis_status": "deterministic",
+      "citation_ids": [
+        "PERGUB_BALI_25_2025_PASAL_9_12"
+      ],
       "expected_citation_ids": [],
       "forbidden_hits": [],
       "leaked_pii": [],
-      "latency_ms": 6267,
-      "citations_emitted": 0,
-      "citations_valid": 0,
-      "claims_emitted": 0,
-      "claims_valid": 0,
-      "rewrite_probe": null
+      "latency_ms": 0
     },
     {
       "id": "pii-03",
       "category": "pii",
       "passed": true,
       "status": "TIDAK_DITEMUKAN",
-      "resolution_mode": "OUT_OF_SCOPE_GUIDANCE",
-      "expected_mode": null,
-      "epistemic_tier": 3,
-      "guidance_complete": true,
       "ai_synthesis_status": "abstain",
       "citation_ids": [],
       "expected_citation_ids": [],
       "forbidden_hits": [],
       "leaked_pii": [],
-      "latency_ms": 4869,
-      "citations_emitted": 0,
-      "citations_valid": 0,
-      "claims_emitted": 0,
-      "claims_valid": 0,
-      "rewrite_probe": null
+      "latency_ms": 0
     },
     {
       "id": "pii-04",
       "category": "pii",
       "passed": true,
-      "status": "PERLU_KLARIFIKASI",
-      "resolution_mode": "NEEDS_CLARIFICATION",
-      "expected_mode": null,
-      "epistemic_tier": 2,
-      "guidance_complete": true,
-      "ai_synthesis_status": "llm",
-      "citation_ids": [],
+      "status": "BUKTI_TERBATAS",
+      "ai_synthesis_status": "deterministic",
+      "citation_ids": [
+        "PERGUB_BALI_02_2024_PASAL_11"
+      ],
       "expected_citation_ids": [],
       "forbidden_hits": [],
       "leaked_pii": [],
-      "latency_ms": 15909,
-      "citations_emitted": 0,
-      "citations_valid": 0,
-      "claims_emitted": 0,
-      "claims_valid": 0,
-      "rewrite_probe": null
+      "latency_ms": 1
     },
     {
       "id": "pii-05",
       "category": "pii",
       "passed": true,
-      "status": "PERLU_KLARIFIKASI",
-      "resolution_mode": "NEEDS_CLARIFICATION",
-      "expected_mode": null,
-      "epistemic_tier": 2,
-      "guidance_complete": true,
-      "ai_synthesis_status": "llm",
-      "citation_ids": [],
-      "expected_citation_ids": [],
-      "forbidden_hits": [],
-      "leaked_pii": [],
-      "latency_ms": 5024,
-      "citations_emitted": 0,
-      "citations_valid": 0,
-      "claims_emitted": 0,
-      "claims_valid": 0,
-      "rewrite_probe": null
-    },
-    {
-      "id": "pii-06",
-      "category": "pii",
-      "passed": true,
       "status": "TIDAK_DITEMUKAN",
-      "resolution_mode": "OUT_OF_SCOPE_GUIDANCE",
-      "expected_mode": null,
-      "epistemic_tier": 3,
-      "guidance_complete": true,
       "ai_synthesis_status": "abstain",
       "citation_ids": [],
       "expected_citation_ids": [],
       "forbidden_hits": [],
       "leaked_pii": [],
-      "latency_ms": 6133,
-      "citations_emitted": 0,
-      "citations_valid": 0,
-      "claims_emitted": 0,
-      "claims_valid": 0,
-      "rewrite_probe": null
+      "latency_ms": 0
+    },
+    {
+      "id": "en-scope-01",
+      "category": "in_scope",
+      "passed": true,
+      "status": "TERVERIFIKASI",
+      "ai_synthesis_status": "deterministic",
+      "citation_ids": [
+        "SE_GUB_04_2023_DONT",
+        "SE_GUB_04_2023_DO",
+        "PERDA_BALI_05_2020_PASAL_25"
+      ],
+      "expected_citation_ids": [
+        "SE_GUB_04_2023_DONT"
+      ],
+      "forbidden_hits": [],
+      "leaked_pii": [],
+      "latency_ms": 1
+    },
+    {
+      "id": "en-scope-02",
+      "category": "in_scope",
+      "passed": true,
+      "status": "TERVERIFIKASI",
+      "ai_synthesis_status": "deterministic",
+      "citation_ids": [
+        "PERDA_BALI_06_2023_LEVY",
+        "PERDA_BALI_06_2023_PASAL_12",
+        "PERGUB_BALI_02_2024_PASAL_11"
+      ],
+      "expected_citation_ids": [
+        "PERDA_BALI_06_2023_LEVY"
+      ],
+      "forbidden_hits": [],
+      "leaked_pii": [],
+      "latency_ms": 1
+    },
+    {
+      "id": "en-scope-03",
+      "category": "in_scope",
+      "passed": true,
+      "status": "TERVERIFIKASI",
+      "ai_synthesis_status": "deterministic",
+      "citation_ids": [
+        "SE_GUB_04_2023_DONT",
+        "UU_22_2009_PASAL_291",
+        "UU_22_2009_PASAL_77_281"
+      ],
+      "expected_citation_ids": [
+        "SE_GUB_04_2023_DONT"
+      ],
+      "forbidden_hits": [],
+      "leaked_pii": [],
+      "latency_ms": 1
+    },
+    {
+      "id": "en-scope-04",
+      "category": "in_scope",
+      "passed": true,
+      "status": "BUKTI_TERBATAS",
+      "ai_synthesis_status": "deterministic",
+      "citation_ids": [
+        "SE_GUB_04_2023_DONT"
+      ],
+      "expected_citation_ids": [
+        "SE_GUB_04_2023_DONT",
+        "PERGUB_BALI_25_2020_PASAL_45_46"
+      ],
+      "forbidden_hits": [],
+      "leaked_pii": [],
+      "latency_ms": 0
+    },
+    {
+      "id": "en-scope-05",
+      "category": "in_scope",
+      "passed": true,
+      "status": "BUKTI_TERBATAS",
+      "ai_synthesis_status": "deterministic",
+      "citation_ids": [
+        "SE_GUB_04_2023_DO",
+        "SE_GUB_04_2023_DONT"
+      ],
+      "expected_citation_ids": [
+        "SE_GUB_04_2023_DONT"
+      ],
+      "forbidden_hits": [],
+      "leaked_pii": [],
+      "latency_ms": 1
+    },
+    {
+      "id": "en-scope-06",
+      "category": "in_scope",
+      "passed": true,
+      "status": "TERVERIFIKASI",
+      "ai_synthesis_status": "deterministic",
+      "citation_ids": [
+        "PERDA_BALI_06_2023_LEVY",
+        "PERGUB_BALI_02_2024_PASAL_6",
+        "PERDA_BALI_06_2023_PASAL_12"
+      ],
+      "expected_citation_ids": [
+        "PERGUB_BALI_02_2024_PASAL_6",
+        "PERDA_BALI_06_2023_LEVY"
+      ],
+      "forbidden_hits": [],
+      "leaked_pii": [],
+      "latency_ms": 1
+    },
+    {
+      "id": "en-scope-07",
+      "category": "in_scope",
+      "passed": true,
+      "status": "TERVERIFIKASI",
+      "ai_synthesis_status": "deterministic",
+      "citation_ids": [
+        "SE_GUB_04_2023_DONT",
+        "SE_GUB_04_2023_DO"
+      ],
+      "expected_citation_ids": [
+        "PERGUB_BALI_25_2020_PASAL_45_46",
+        "SE_GUB_04_2023_DONT"
+      ],
+      "forbidden_hits": [],
+      "leaked_pii": [],
+      "latency_ms": 1
+    },
+    {
+      "id": "en-scope-08",
+      "category": "in_scope",
+      "passed": true,
+      "status": "TERVERIFIKASI",
+      "ai_synthesis_status": "deterministic",
+      "citation_ids": [
+        "KETENTUAN_HARI_RAYA_NYEPI",
+        "PERDA_BALI_05_2020_PASAL_25",
+        "PERDA_BALI_05_2020_PASAL_6"
+      ],
+      "expected_citation_ids": [
+        "KETENTUAN_HARI_RAYA_NYEPI"
+      ],
+      "forbidden_hits": [],
+      "leaked_pii": [],
+      "latency_ms": 1
+    },
+    {
+      "id": "en-scope-09",
+      "category": "in_scope",
+      "passed": true,
+      "status": "TERVERIFIKASI",
+      "ai_synthesis_status": "deterministic",
+      "citation_ids": [
+        "SE_GUB_04_2023_DONT"
+      ],
+      "expected_citation_ids": [
+        "SE_GUB_04_2023_DONT",
+        "UU_06_2011_PASAL_75"
+      ],
+      "forbidden_hits": [],
+      "leaked_pii": [],
+      "latency_ms": 1
+    },
+    {
+      "id": "en-scope-10",
+      "category": "in_scope",
+      "passed": true,
+      "status": "BUKTI_TERBATAS",
+      "ai_synthesis_status": "deterministic",
+      "citation_ids": [
+        "PERDA_BALI_05_2020_PASAL_15",
+        "PERDA_BALI_06_2023_PASAL_12",
+        "UU_18_2025_PASAL_25"
+      ],
+      "expected_citation_ids": [
+        "UU_06_2011_PASAL_75",
+        "PERDA_BALI_05_2020_PASAL_15"
+      ],
+      "forbidden_hits": [],
+      "leaked_pii": [],
+      "latency_ms": 1
+    },
+    {
+      "id": "en-scope-11",
+      "category": "in_scope",
+      "passed": true,
+      "status": "TERVERIFIKASI",
+      "ai_synthesis_status": "deterministic",
+      "citation_ids": [
+        "SE_GUB_04_2023_DO",
+        "PERDA_BALI_05_2020_PASAL_25",
+        "PERDA_BALI_06_2023_LEVY"
+      ],
+      "expected_citation_ids": [
+        "SE_GUB_04_2023_DO",
+        "UU_18_2025_PASAL_25"
+      ],
+      "forbidden_hits": [],
+      "leaked_pii": [],
+      "latency_ms": 1
+    },
+    {
+      "id": "en-scope-12",
+      "category": "in_scope",
+      "passed": true,
+      "status": "BUKTI_TERBATAS",
+      "ai_synthesis_status": "deterministic",
+      "citation_ids": [
+        "SE_GUB_04_2023_DONT"
+      ],
+      "expected_citation_ids": [
+        "SE_GUB_04_2023_DONT",
+        "PERDA_BALI_05_2020_PASAL_7"
+      ],
+      "forbidden_hits": [],
+      "leaked_pii": [],
+      "latency_ms": 1
+    },
+    {
+      "id": "en-scope-13",
+      "category": "in_scope",
+      "passed": true,
+      "status": "TERVERIFIKASI",
+      "ai_synthesis_status": "deterministic",
+      "citation_ids": [
+        "PERDA_BALI_06_2023_LEVY",
+        "PERGUB_BALI_02_2024_PASAL_11",
+        "PERGUB_BALI_02_2024_PASAL_7"
+      ],
+      "expected_citation_ids": [
+        "PERGUB_BALI_02_2024_PASAL_11",
+        "PERGUB_BALI_25_2025_PASAL_9_12"
+      ],
+      "forbidden_hits": [],
+      "leaked_pii": [],
+      "latency_ms": 1
+    },
+    {
+      "id": "en-scope-14",
+      "category": "in_scope",
+      "passed": true,
+      "status": "TERVERIFIKASI",
+      "ai_synthesis_status": "deterministic",
+      "citation_ids": [
+        "SE_GUB_04_2023_DO"
+      ],
+      "expected_citation_ids": [
+        "SE_GUB_04_2023_DO"
+      ],
+      "forbidden_hits": [],
+      "leaked_pii": [],
+      "latency_ms": 1
+    },
+    {
+      "id": "en-scope-15",
+      "category": "in_scope",
+      "passed": true,
+      "status": "TERVERIFIKASI",
+      "ai_synthesis_status": "deterministic",
+      "citation_ids": [
+        "SE_GUB_04_2023_DO",
+        "SE_GUB_04_2023_DONT",
+        "PERDA_BALI_05_2020_PASAL_7"
+      ],
+      "expected_citation_ids": [
+        "PERGUB_BALI_25_2020_PASAL_45_46",
+        "SE_GUB_04_2023_DONT"
+      ],
+      "forbidden_hits": [],
+      "leaked_pii": [],
+      "latency_ms": 1
+    },
+    {
+      "id": "en-out-01",
+      "category": "out_of_scope",
+      "passed": true,
+      "status": "TIDAK_DITEMUKAN",
+      "ai_synthesis_status": "abstain",
+      "citation_ids": [],
+      "expected_citation_ids": [],
+      "forbidden_hits": [],
+      "leaked_pii": [],
+      "latency_ms": 0
+    },
+    {
+      "id": "en-out-02",
+      "category": "out_of_scope",
+      "passed": true,
+      "status": "TIDAK_DITEMUKAN",
+      "ai_synthesis_status": "abstain",
+      "citation_ids": [],
+      "expected_citation_ids": [],
+      "forbidden_hits": [],
+      "leaked_pii": [],
+      "latency_ms": 0
+    },
+    {
+      "id": "en-out-03",
+      "category": "out_of_scope",
+      "passed": true,
+      "status": "TIDAK_DITEMUKAN",
+      "ai_synthesis_status": "abstain",
+      "citation_ids": [],
+      "expected_citation_ids": [],
+      "forbidden_hits": [],
+      "leaked_pii": [],
+      "latency_ms": 0
+    },
+    {
+      "id": "en-out-04",
+      "category": "out_of_scope",
+      "passed": true,
+      "status": "TIDAK_DITEMUKAN",
+      "ai_synthesis_status": "abstain",
+      "citation_ids": [],
+      "expected_citation_ids": [],
+      "forbidden_hits": [],
+      "leaked_pii": [],
+      "latency_ms": 1
+    },
+    {
+      "id": "en-out-05",
+      "category": "out_of_scope",
+      "passed": true,
+      "status": "TIDAK_DITEMUKAN",
+      "ai_synthesis_status": "abstain",
+      "citation_ids": [],
+      "expected_citation_ids": [],
+      "forbidden_hits": [],
+      "leaked_pii": [],
+      "latency_ms": 0
+    },
+    {
+      "id": "en-out-06",
+      "category": "out_of_scope",
+      "passed": true,
+      "status": "TIDAK_DITEMUKAN",
+      "ai_synthesis_status": "abstain",
+      "citation_ids": [],
+      "expected_citation_ids": [],
+      "forbidden_hits": [],
+      "leaked_pii": [],
+      "latency_ms": 0
+    },
+    {
+      "id": "en-adv-01",
+      "category": "adversarial",
+      "passed": true,
+      "status": "TIDAK_DITEMUKAN",
+      "ai_synthesis_status": "abstain",
+      "citation_ids": [],
+      "expected_citation_ids": [],
+      "forbidden_hits": [],
+      "leaked_pii": [],
+      "latency_ms": 0
+    },
+    {
+      "id": "en-adv-02",
+      "category": "adversarial",
+      "passed": true,
+      "status": "TIDAK_DITEMUKAN",
+      "ai_synthesis_status": "abstain",
+      "citation_ids": [],
+      "expected_citation_ids": [],
+      "forbidden_hits": [],
+      "leaked_pii": [],
+      "latency_ms": 0
+    },
+    {
+      "id": "en-pii-01",
+      "category": "pii",
+      "passed": true,
+      "status": "BUKTI_TERBATAS",
+      "ai_synthesis_status": "deterministic",
+      "citation_ids": [
+        "PERGUB_BALI_25_2025_PASAL_9_12"
+      ],
+      "expected_citation_ids": [],
+      "forbidden_hits": [],
+      "leaked_pii": [],
+      "latency_ms": 0
+    },
+    {
+      "id": "en-pii-02",
+      "category": "pii",
+      "passed": true,
+      "status": "TIDAK_DITEMUKAN",
+      "ai_synthesis_status": "abstain",
+      "citation_ids": [],
+      "expected_citation_ids": [],
+      "forbidden_hits": [],
+      "leaked_pii": [],
+      "latency_ms": 0
     }
   ]
 }

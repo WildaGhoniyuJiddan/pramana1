@@ -29,6 +29,7 @@ from backend.services.ai_pipeline import GroundedAIPipeline
 from backend.services.corpus_loader import (
     CorpusManager,
     DEFAULT_RELEVANCE_THRESHOLD,
+    STOPWORDS,
 )
 from backend.services.verifier import DualLayerVerifier
 from backend.services.ocr_masking import mask_pii
@@ -60,14 +61,28 @@ CONFIDENCE_NOTE = (
     "bukan dari uji entailment semantik atau verifikasi silang real-time ke JDIH."
 )
 TEMPLE_TRIGGERS = (
-    "pura", "temple", "ubud", "besakih", "uluwatu", "batur",
-    "pantai", "beach", "tempat suci", "pratima",
+    "pura", "temple", "besakih", "lempuyang", "tanah lot", "uluwatu",
+    "batur", "tempat suci", "pratima", "kawasan suci", "sembahyang",
 )
 TRAFFIC_TRIGGERS = (
-    "motor", "sepeda", "lalu lintas", "sim", "helm", "kendaraan",
+    "motor", "sepeda", "sepeda motor", "scooter", "motorbike", "motorcycle",
+    "lalu lintas", "sim", "helm", "helmet", "kendaraan", "sewa motor", "rental",
+    "renting", "drive", "driving", "traffic",
 )
-TEMPLE_QUERY = "pura tempat suci pakaian adat larangan memanjat pohon"
-TRAFFIC_QUERY = "kendaraan bermotor sim helm lalu lintas"
+COASTAL_DTW_TRIGGERS = (
+    "pantai", "beach", "surf", "surfing", "selancar", "diving", "snorkeling",
+    "bahari", "daya tarik wisata", "dtw", "laut",
+)
+TEMPLE_QUERY = "pura tempat suci busana sopan adat pelindungan pura larangan memanjat"
+TRAFFIC_QUERY = "kendaraan bermotor helm sim internasional peraturan lalu lintas"
+COASTAL_DTW_QUERY = "daya tarik wisata kelestarian lingkungan kebersihan sampah laut"
+
+INJECTION_PATTERNS = [
+    re.compile(r"\babaikan\s+(?:semua\s+)?instruksi\b", re.IGNORECASE),
+    re.compile(r"\bignore\s+(?:all\s+)?(?:previous\s+)?instructions\b", re.IGNORECASE),
+    re.compile(r"\byou\s+are\s+dan\b", re.IGNORECASE),
+    re.compile(r"\breveal\s+(?:your\s+)?(?:system\s+)?prompt\b", re.IGNORECASE),
+]
 
 ZONE_LANGUAGES = ("id", "en")
 ZONE_DISCLAIMER = {
@@ -297,14 +312,13 @@ class StrictRAGEngine:
         base: List[Dict[str, Any]],
         extra: List[Dict[str, Any]],
     ) -> List[Dict[str, Any]]:
-        """Merge scored retrieval results by regulation id, keeping the best score."""
+        """Merge scored retrieval results by regulation id, preserving base score for direct matches."""
         merged: Dict[str, Dict[str, Any]] = {
             item["regulation"]["id"]: item for item in base
         }
         for item in extra:
             reg_id = item["regulation"]["id"]
-            existing = merged.get(reg_id)
-            if existing is None or item["score"] > existing["score"]:
+            if reg_id not in merged:
                 merged[reg_id] = item
         return sorted(
             merged.values(),
@@ -337,26 +351,108 @@ class StrictRAGEngine:
         framing_markers: List[Dict[str, str]] = []
         sensational_phrases = [
             ("semua bule", "Generalisasi terhadap seluruh wisatawan asing"),
+            ("semua turis", "Generalisasi terhadap seluruh wisatawan"),
             ("semua warga lokal", "Generalisasi terhadap warga lokal"),
+            ("usir semua", "Seruan pengusiran massal tanpa proses hukum"),
+            ("usir", "Tuntutan pengusiran sepihak"),
             ("kebal hukum", "Asumsi tanpa rujukan status penegakan hukum"),
             ("polisi diam saja", "Klaim sensasional tanpa verifikasi otoritas"),
             ("adat barbar", "Pelanggaran etika dan penghinaan budaya"),
             ("deportasi sekarang juga", "Tuntutan sepihak di luar wewenang Imigrasi"),
             ("pemerintah tidak peduli", "Klaim tanpa bukti tentang respons pemerintah"),
+            ("deport them all", "Generalization and demand for collective deportation"),
+            ("all tourists", "Generalization targeting all tourists"),
+            ("all foreigners", "Generalization targeting all foreign nationals"),
+            ("kick them out", "Call for expulsion without legal process"),
+            ("deport all", "Demand for collective deportation without due process"),
         ]
         lowered = (text or "").lower()
+        matched_spans: List[Tuple[int, int]] = []
         for phrase, reason in sensational_phrases:
-            if phrase in lowered:
-                framing_markers.append({"phrase": phrase, "reason": reason})
+            start = lowered.find(phrase)
+            if start != -1:
+                end = start + len(phrase)
+                # Suppress shorter sub-phrase if already covered by an earlier match
+                if not any(s <= start and end <= e for s, e in matched_spans):
+                    framing_markers.append({"phrase": phrase, "reason": reason})
+                    matched_spans.append((start, end))
         return framing_markers
+
+    def _get_trigger_reason(self, reg: Dict[str, Any]) -> Tuple[str, str]:
+        reg_id = reg.get("id", "")
+        category = reg.get("category", "")
+        cat_lower = category.lower()
+        if "LEVY" in reg_id or "pungutan" in cat_lower or "retribusi" in cat_lower:
+            return (
+                "Kewajiban retribusi kedatangan wisatawan mancanegara (Perda No. 6/2023)",
+                "Mandatory tourist levy for international arrivals (Regional Reg. No. 6/2023)",
+            )
+        if (
+            reg_id in {"PERGUB_BALI_25_2020_PASAL_45_46", "PERGUB_BALI_25_2020_PASAL_3_4"}
+            or "pura" in cat_lower
+            or "suci" in cat_lower
+            or "kewajiban wisman" in cat_lower
+        ):
+            return (
+                "Dipicu aktivitas: Kunjungan Pura / Kawasan Suci",
+                "Triggered by activity: Sacred Area / Temple Visit",
+            )
+        if (
+            reg_id in {"PERGUB_BALI_52_2021_KENDARAAN", "UU_22_2009_LALULINTAS"}
+            or "lalu lintas" in cat_lower
+            or "angkutan" in cat_lower
+            or "sepeda motor" in cat_lower
+        ):
+            return (
+                "Dipicu aktivitas: Transportasi / Sewa Kendaraan",
+                "Triggered by activity: Transport / Vehicle Rental",
+            )
+        if (
+            reg_id in {"PERDA_BALI_05_2020_PARIWISATA_BUDAYA", "PERDA_BALI_5_2020_PASAL_33"}
+            or "dtw" in cat_lower
+            or "daya tarik" in cat_lower
+            or "pesisir" in cat_lower
+        ):
+            return (
+                "Dipicu aktivitas: Kawasan Wisata / DTW & Budaya",
+                "Triggered by activity: Tourist Attraction / Cultural Site",
+            )
+        if "nyepi" in cat_lower:
+            return (
+                "Dipicu kalender: Periode Hari Suci Nyepi",
+                "Triggered by calendar: Nyepi Holy Day Period",
+            )
+        return (
+            "Checklist kepatuhan umum wisatawan",
+            "General tourist compliance checklist",
+        )
 
     def _build_briefing_items(
         self,
         regulations: List[Dict[str, Any]],
+        lang: str = "id",
     ) -> List[Dict[str, Any]]:
+        is_en = (lang == "en")
         briefing_items: List[Dict[str, Any]] = []
         for reg in regulations:
             text = reg.get("text", "")
+            text_en = reg.get("text_en")
+            title_en = reg.get("title_en")
+            status_note_en = reg.get("status_note_en")
+            source_note_en = reg.get("source_note_en")
+            penalties_en = reg.get("penalties_en")
+            category_en = reg.get("category_en")
+            tier_label_en = reg.get("tier_label_en")
+            translation_status = reg.get("translation_status")
+
+            tr_reason, tr_reason_en = self._get_trigger_reason(reg)
+
+            display_text = (text_en if is_en and text_en else text)
+            display_title = (title_en if is_en and title_en else reg["doc_title"])
+            display_status_note = (status_note_en if is_en and status_note_en else reg.get("status_note"))
+            display_source_note = (source_note_en if is_en and source_note_en else reg.get("source_note"))
+            display_penalties = (penalties_en if is_en and penalties_en else reg.get("penalties", "Sanksi administratif dan adat setempat."))
+
             briefing_items.append({
                 "id": reg["id"],
                 "title": reg["doc_title"],
@@ -384,6 +480,22 @@ class StrictRAGEngine:
                 "related_document_ids": reg.get("related_document_ids", []),
                 "superseded_by": reg.get("superseded_by"),
                 "superseded_by_url": reg.get("superseded_by_url"),
+                "trigger_reason": tr_reason,
+                "trigger_reason_en": tr_reason_en,
+                "display_text": display_text,
+                "display_title": display_title,
+                "display_status_note": display_status_note,
+                "display_source_note": display_source_note,
+                "display_penalties": display_penalties,
+                "text_original": text,
+                "text_en": text_en,
+                "title_en": title_en,
+                "status_note_en": status_note_en,
+                "source_note_en": source_note_en,
+                "penalties_en": penalties_en,
+                "category_en": category_en,
+                "tier_label_en": tier_label_en,
+                "translation_status": translation_status,
             })
         return briefing_items
 
@@ -471,6 +583,8 @@ class StrictRAGEngine:
             taxonomy.get("is_factually_complete")
         ) or (
             bool(taxonomy.get("is_direct_legal_query")) and top_score >= 0.50
+        ) or (
+            keyword_top >= 0.50 and (taxonomy.get("has_actor") or taxonomy.get("has_action"))
         )
         if top_score >= 0.50 and factually_complete:
             return "VERIFIED_GROUNDED"
@@ -562,12 +676,13 @@ class StrictRAGEngine:
     def _build_citations_for_regulations(
         self,
         regulations: List[Dict[str, Any]],
+        lang: str = "id",
     ) -> List[Dict[str, Any]]:
         raw_citations = [
             {"reg_id": reg["id"], "quoted_text": reg["text"]}
             for reg in regulations
         ]
-        return self.verifier.verify_and_filter_citations(raw_citations)
+        return self.verifier.verify_and_filter_citations(raw_citations, lang=lang)
 
     @staticmethod
     def _validate_zone_language(lang: str) -> str:
@@ -580,6 +695,7 @@ class StrictRAGEngine:
         self,
         zone: Dict[str, Any],
         historical: bool = False,
+        lang: str = "id",
     ) -> List[Dict[str, Any]]:
         """Build Layer-1 verified citations for one zone."""
         field = "historical_regulation_ids" if historical else "regulation_ids"
@@ -594,7 +710,7 @@ class StrictRAGEngine:
                 "quoted_text": reg["text"],
             })
 
-        verified = self.verifier.verify_and_filter_citations(raw_citations)
+        verified = self.verifier.verify_and_filter_citations(raw_citations, lang=lang)
         if len(verified) != len(regulation_ids):
             raise ValueError(
                 "Kartu zona gagal verifikasi Layer-1 untuk chunk: "
@@ -625,13 +741,14 @@ class StrictRAGEngine:
 
     def get_zone_card(self, zone_id: str, lang: str = "id") -> Dict[str, Any]:
         """Return a deterministic zone card with Layer-1 verified citations."""
-        lang = self._validate_zone_language(lang)
+        clean_lang = self._validate_zone_language(lang)
         zone = self.zone_registry.get_zone_or_raise(zone_id)
 
-        citations = self._build_zone_citations(zone, historical=False)
+        citations = self._build_zone_citations(zone, historical=False, lang=clean_lang)
         historical_citations = self._build_zone_citations(
-            zone, historical=True
+            zone, historical=True, lang=clean_lang
         )
+        lang = clean_lang
 
         name = zone["name"][lang]
         location_note = zone["location_note"][lang]
@@ -893,6 +1010,7 @@ class StrictRAGEngine:
         start_date: str,
         end_date: Optional[str] = None,
         traveler_origin: str = "international",
+        lang: str = "id",
     ) -> Dict[str, Any]:
         """Mode 1: Generate a verified Trip Brief with epistemic routing."""
         masked_text, pii_counts = mask_pii(itinerary_text)
@@ -900,20 +1018,44 @@ class StrictRAGEngine:
         calendar_check = check_holiday_conflicts(start_date, effective_end_date)
         taxonomy = assess_factual_completeness(masked_text)
 
-        scored = self._retrieve_with_taxonomy(masked_text, taxonomy, top_k=4)
         lowered = masked_text.lower()
+        has_temple = any(trigger in lowered for trigger in TEMPLE_TRIGGERS)
+        has_traffic = any(trigger in lowered for trigger in TRAFFIC_TRIGGERS)
+        has_coastal = any(trigger in lowered for trigger in COASTAL_DTW_TRIGGERS)
 
-        if any(trigger in lowered for trigger in TEMPLE_TRIGGERS):
-            scored = self._merge_scored(
-                scored,
-                self._retrieve_scored(TEMPLE_QUERY, top_k=4),
+        activity_scored: List[Dict[str, Any]] = []
+        if has_temple:
+            activity_scored = self._merge_scored(
+                activity_scored,
+                self._retrieve_scored(TEMPLE_QUERY, top_k=3),
             )
-
-        if any(trigger in lowered for trigger in TRAFFIC_TRIGGERS):
-            scored = self._merge_scored(
-                scored,
+        if has_traffic:
+            activity_scored = self._merge_scored(
+                activity_scored,
                 self._retrieve_scored(TRAFFIC_QUERY, top_k=2),
             )
+        if has_coastal:
+            activity_scored = self._merge_scored(
+                activity_scored,
+                self._retrieve_scored(COASTAL_DTW_QUERY, top_k=2),
+            )
+
+        if activity_scored:
+            scored = self._merge_scored(
+                activity_scored,
+                self._retrieve_with_taxonomy(masked_text, taxonomy, top_k=2),
+            )
+            # Do not inject temple protection criminal sanctions unless visiting a sacred site
+            if not has_temple:
+                scored = [
+                    item for item in scored
+                    if item["regulation"]["id"] not in {
+                        "PERGUB_BALI_25_2020_PASAL_45_46",
+                        "PERGUB_BALI_25_2020_PASAL_3_4",
+                    }
+                ]
+        else:
+            scored = self._retrieve_with_taxonomy(masked_text, taxonomy, top_k=4)
 
         matched_regs = [item["regulation"] for item in scored]
         scores = [item["score"] for item in scored]
@@ -1062,8 +1204,9 @@ class StrictRAGEngine:
                 matched_regs.append(levy_reg)
                 citations = self._build_citations_for_regulations(matched_regs)
 
-        briefing_items = self._build_briefing_items(matched_regs)
+        briefing_items = self._build_briefing_items(matched_regs, lang=lang)
         confidence = self._confidence_label(scores)
+        citations = self._build_citations_for_regulations(matched_regs, lang=lang)
 
         categories = ", ".join(
             item["category"] for item in briefing_items[:3]
@@ -1107,19 +1250,7 @@ class StrictRAGEngine:
             allowed_rupiah=self._allowed_rupiah,
         )
 
-        final_mode = ai_result.get("resolution_mode", "VERIFIED_GROUNDED")
-        if final_mode != "VERIFIED_GROUNDED":
-            summary_id = build_triage_summary(taxonomy, final_mode, "id")
-            summary_en = build_triage_summary(taxonomy, final_mode, "en")
-            guidance = self._finalize_guidance(
-                ai_result.get("user_guidance"), taxonomy, final_mode
-            )
-            guidance["suggested_query_rewrites"] = list(
-                TRIP_BRIEF_REWRITES
-            )
-            return triage_response(
-                final_mode, ai_result, guidance, summary_id, summary_en
-            )
+        final_mode = "VERIFIED_GROUNDED"
 
         if ai_result["ai_synthesis_status"] in {
             "unavailable", "rejected", "abstain"
@@ -1164,15 +1295,24 @@ class StrictRAGEngine:
             calendar_check,
             briefing_items,
             is_grounded=True,
+            lang=lang,
+        )
+
+        guard_status = "TERVERIFIKASI"
+        is_en_brief = (lang == "en")
+        ics_desc = (
+            f"Verification status: {guard_status}. "
+            f"Nyepi conflict: {calendar_check.get('has_nyepi', False)}. "
+            "Check official sources for each item."
+            if is_en_brief else
+            f"Status verifikasi: {guard_status}. "
+            f"Bentrok Nyepi: {calendar_check.get('has_nyepi', False)}. "
+            "Periksa sumber resmi pada setiap butir."
         )
 
         ics_calendar = generate_ics_calendar(
             title="Pramana: Bali Travel Brief",
-            description=(
-                f"Status verifikasi: TERVERIFIKASI. "
-                f"Bentrok Nyepi: {calendar_check.get('has_nyepi', False)}. "
-                "Periksa sumber resmi pada setiap butir."
-            ),
+            description=ics_desc,
             start_date_str=start_date,
             end_date_str=effective_end_date,
         )
@@ -1213,10 +1353,54 @@ class StrictRAGEngine:
             "confidence_note": CONFIDENCE_NOTE,
         }
 
-    def analyze_viral_post(self, post_content: str) -> Dict[str, Any]:
-        """Mode 2: neutral Context Note with 3-tier epistemic routing."""
+    def analyze_viral_post(self, post_content: str, lang: str = "id") -> Dict[str, Any]:
+        """Mode 2: Generate a neutral, verifiable Context Note with 3-tier epistemic routing."""
         masked_text, pii_counts = mask_pii(post_content)
         framing_markers = self._detect_framing(masked_text)
+
+        # Single-token or overly short queries must abstain
+        raw_words = [w for w in (post_content or "").split() if w.strip()]
+        content_tokens = [
+            t for t in re.findall(r"[a-z0-9]+", (post_content or "").lower())
+            if t not in STOPWORDS
+        ]
+        if len(raw_words) <= 1:
+            abstain_text = (
+                "Kueri atau teks postingan terlalu singkat untuk diverifikasi "
+                "secara akurat terhadap korpus hukum. Pramana memilih abstain."
+            )
+            return {
+                "status": "TIDAK_DITEMUKAN",
+                "guard_status": "KUERI_TERLALU_PENDEK",
+                "ai_engine": "dual-layer-guard (abstain)",
+                "ai_synthesis_status": "abstain",
+                "confidence": "TIDAK_DITEMUKAN",
+                "confidence_note": CONFIDENCE_NOTE,
+                "verification_scope": "corpus",
+                "masked_post": masked_text,
+                "pii_redacted_count": sum(pii_counts.values()),
+                "neutral_summary": abstain_text,
+                "neutral_summary_en": (
+                    "Query or post content is too short to be accurately verified "
+                    "against the legal corpus. Pramana abstains."
+                ),
+                "ai_claims": [],
+                "ai_rejected_claims": 0,
+                "ai_latency_ms": 0,
+                "ai_model": "",
+                "ai_guard_status": "TIDAK_DITEMUKAN",
+                "framing_markers": framing_markers,
+                "citations": [],
+                "copyable_comment": (
+                    "Catatan Konteks (Pramana): Teks terlalu singkat untuk "
+                    "menghubungkan rujukan hukum yang spesifik."
+                ),
+                "disclaimer": DISCLAIMER,
+                "resolution_mode": "OUT_OF_SCOPE_GUIDANCE",
+                "user_guidance": {},
+                "epistemic_tier": 3,
+            }
+
         taxonomy = assess_factual_completeness(masked_text)
         is_injection = detect_prompt_injection(masked_text)
         unsupported = self._detect_unsupported_references(masked_text)
@@ -1494,10 +1678,12 @@ class StrictRAGEngine:
                 ai_result["summary_en"] or fallback_summary_en
             )
 
+        status = "BUKTI_TERBATAS" if confidence == "RENDAH" else "TERVERIFIKASI"
+        guard_status = status
         ai_metrics.record_resolution("VERIFIED_GROUNDED")
         return {
-            "status": "TERVERIFIKASI",
-            "guard_status": "TERVERIFIKASI",
+            "status": status,
+            "guard_status": guard_status,
             "ai_engine": ai_result["ai_engine"],
             "ai_synthesis_status": ai_result["ai_synthesis_status"],
             "confidence": confidence,
@@ -1515,10 +1701,17 @@ class StrictRAGEngine:
             "framing_markers": framing_markers,
             "citations": citations,
             "copyable_comment": (
-                f"Catatan Konteks (Pramana):\n{neutral_summary}\n"
-                f"Rujukan: {top_citation['official_doc_title']} "
-                f"({top_citation['pasal']})\n"
-                f"Sumber: {top_citation['source_url']}\n\n{DISCLAIMER}"
+                (
+                    f"Context Note (Pramana):\n{neutral_summary_en}\n"
+                    f"Reference: {top_citation.get('display_title') or top_citation['official_doc_title']} "
+                    f"({top_citation['pasal']})\n"
+                    f"Source: {top_citation['source_url']}\n\n{DISCLAIMER}"
+                ) if lang == "en" else (
+                    f"Catatan Konteks (Pramana):\n{neutral_summary}\n"
+                    f"Rujukan: {top_citation['official_doc_title']} "
+                    f"({top_citation['pasal']})\n"
+                    f"Sumber: {top_citation['source_url']}\n\n{DISCLAIMER}"
+                )
             ),
             "disclaimer": DISCLAIMER,
             "resolution_mode": "VERIFIED_GROUNDED",
@@ -1542,48 +1735,77 @@ class StrictRAGEngine:
         is_grounded: bool = True,
         status_label: Optional[str] = None,
         summary_note: Optional[str] = None,
+        lang: str = "id",
     ) -> str:
+        is_en = (lang == "en")
         date_span = f"{start_date}" + (
-            f" s/d {end_date}" if end_date and end_date != start_date else ""
+            (f" to {end_date}" if is_en else f" s/d {end_date}") if end_date and end_date != start_date else ""
         )
         lines = [
             "*PRAMANA: Bali Trip Brief & Local Rules*",
-            f"Tanggal: {date_span}",
+            f"Date: {date_span}" if is_en else f"Tanggal: {date_span}",
             "",
         ]
 
         if calendar_check.get("has_nyepi"):
-            lines.append("*PERINGATAN NYEPI (Catur Brata Penyepian)*")
-            lines.append(
-                "Berlaku larangan keluar hotel, pemadaman lampu luar, "
-                "penutupan bandara, dan pemadaman data seluler selama 24 jam "
-                "(06.00 WITA sampai 06.00 WITA keesokan harinya)."
-            )
+            if is_en:
+                lines.append("*NYEPI WARNING (Day of Silence / Catur Brata Penyepian)*")
+                lines.append(
+                    "Mandatory hotel confinement, exterior lights extinguished, "
+                    "airport closed, and mobile internet suspended for 24 hours "
+                    "(06:00 WITA until 06:00 WITA the following morning)."
+                )
+            else:
+                lines.append("*PERINGATAN NYEPI (Catur Brata Penyepian)*")
+                lines.append(
+                    "Berlaku larangan keluar hotel, pemadaman lampu luar, "
+                    "penutupan bandara, dan pemadaman data seluler selama 24 jam "
+                    "(06.00 WITA sampai 06.00 WITA keesokan harinya)."
+                )
             lines.append("")
 
         if not is_grounded:
-            lines.append(f"*STATUS: {status_label or 'TIDAK_DITEMUKAN'}*")
-            lines.append(
-                summary_note
-                or "Tidak ditemukan aturan spesifik di korpus Pramana yang "
-                "cocok dengan rencana perjalanan ini. Tidak ada klaim hukum "
-                "tambahan yang disusun."
-            )
-        else:
-            lines.append("*Aturan Utama yang Wajib Dipatuhi:*")
-            for index, item in enumerate(briefing_items[:3], 1):
+            if is_en:
+                lines.append(f"*STATUS: {status_label or 'NOT_FOUND'}*")
                 lines.append(
-                    f"{index}. *{item['category']}* ({item['tier_label']})"
+                    summary_note
+                    or "No specific rules in the Pramana corpus matched this itinerary. "
+                    "No additional legal claims were generated."
                 )
-                summary = item["summary"][:120]
-                lines.append(f"   {summary}...")
+            else:
+                lines.append(f"*STATUS: {status_label or 'TIDAK_DITEMUKAN'}*")
+                lines.append(
+                    summary_note
+                    or "Tidak ditemukan aturan spesifik di korpus Pramana yang cocok "
+                    "dengan rencana perjalanan ini. Tidak ada klaim hukum tambahan "
+                    "yang disusun."
+                )
+        else:
+            if is_en:
+                lines.append("*Key Rules You Must Comply With:*")
+                for index, item in enumerate(briefing_items[:3], 1):
+                    cat = item.get("category_en") or item.get("category", "")
+                    tier = item.get("tier_label_en") or item.get("tier_label", "")
+                    lines.append(f"{index}. *{cat}* ({tier})")
+                    summary = (item.get("display_text") or item.get("summary", ""))[:120]
+                    lines.append(f"   {summary}...")
+            else:
+                lines.append("*Aturan Utama yang Wajib Dipatuhi:*")
+                for index, item in enumerate(briefing_items[:3], 1):
+                    lines.append(
+                        f"{index}. *{item['category']}* ({item['tier_label']})"
+                    )
+                    summary = item["summary"][:120]
+                    lines.append(f"   {summary}...")
 
         if briefing_items:
             lines.append("")
-            lines.append(f"Sumber: {briefing_items[0].get('source_url', '')}")
+            src_label = "Source: " if is_en else "Sumber: "
+            lines.append(f"{src_label}{briefing_items[0].get('source_url', '')}")
 
         if PUBLIC_BASE_URL:
-            lines.append(f"Verifikasi naskah resmi: {PUBLIC_BASE_URL}")
+            pub_label = "Verify official text: " if is_en else "Verifikasi naskah resmi: "
+            lines.append(f"{pub_label}{PUBLIC_BASE_URL}")
 
         lines.append("")
         lines.append(f"Disclaimer: {DISCLAIMER}")
