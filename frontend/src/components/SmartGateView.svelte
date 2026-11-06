@@ -1,6 +1,6 @@
 <script>
   import { onMount, onDestroy } from 'svelte';
-  import { fetchZones, fetchTotem, requestTotemBrief } from '../lib/api.js';
+  import { fetchZones, fetchTotem, requestTotemBrief } from '../lib/api.svelte.js';
   import { i18n } from '../lib/i18n.svelte.js';
   import QrCode from './QrCode.svelte';
   import GateScannerModal from './GateScannerModal.svelte';

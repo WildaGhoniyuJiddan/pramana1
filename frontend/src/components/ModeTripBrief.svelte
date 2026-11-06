@@ -1,5 +1,5 @@
 <script>
-  import { requestTripBrief, apiState } from '../lib/api.js';
+  import { requestTripBrief, apiState } from '../lib/api.svelte.js';
   import { i18n, DICT } from '../lib/i18n.svelte.js';
 
   let { onOpenDoc = () => {} } = $props();

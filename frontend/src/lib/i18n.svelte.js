@@ -6,7 +6,19 @@ const initialLang =
     : 'id';
 
 export const i18n = $state({
-  lang: initialLang
+  lang: initialLang,
+  t(key, section = 'common') {
+    const dict = DICT[i18n.lang] || DICT.id;
+    if (section && dict[section] && dict[section][key]) {
+      return dict[section][key];
+    }
+    for (const sec of Object.values(dict)) {
+      if (typeof sec === 'object' && sec && key in sec) {
+        return sec[key];
+      }
+    }
+    return key;
+  }
 });
 
 export function setLanguage(newLang) {

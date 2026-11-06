@@ -1,6 +1,6 @@
 <script>
   import { onMount } from 'svelte';
-  import { fetchCorpus } from '../lib/api.js';
+  import { fetchCorpus } from '../lib/api.svelte.js';
   import { i18n, DICT } from '../lib/i18n.svelte.js';
 
   let t = $derived(DICT[i18n.lang].corpus);
